@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 18px; font-size: 13px; }
+  h1 { font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 3px; }
+  .subtitle { font-size: 11px; color: #94a3b8; margin-bottom: 12px; }
+
+  .key-summary { background: #1a1f2e; border: 1px solid #2d3348; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .ks-item { display: flex; align-items: flex-start; gap: 8px; }
+  .ks-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .ks-label { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .ks-desc { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+
+  .top-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card { background: #1e2230; border-radius: 8px; padding: 10px 12px; border: 1px solid #2d3348; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-bottom: 3px; }
+  .stat-value { font-size: 22px; font-weight: 700; }
+  .stat-sub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+  .stat-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+  .stat-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #2d3348; color: #94a3b8; }
+  .red { color: #f87171; } .orange { color: #fb923c; } .blue { color: #60a5fa; } .green { color: #4ade80; } .purple { color: #c084fc; }
+
+  .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+
+  .routes-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .route-card { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; }
+  .route-name { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; border-bottom: 1px solid #2d3348; padding-bottom: 6px; }
+  .route-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+  .rk { font-size: 11px; color: #94a3b8; }
+  .rv { font-size: 11px; font-weight: 700; }
+  .severity-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; margin-top: 8px; gap: 1px; }
+  .bar-xl { background: #ef4444; } .bar-l { background: #fb923c; } .bar-m { background: #3b82f6; } .bar-s { background: #22c55e; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .panel { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; }
+
+  .trend-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid #1a1f2e; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-label { font-size: 11px; color: #94a3b8; flex: 1; }
+  .trend-bar-wrap { width: 80px; height: 5px; background: #2d3348; border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; }
+  .trend-count { font-size: 11px; font-weight: 700; min-width: 20px; text-align: right; }
+
+  .tab-buttons { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+  .tab-btn { padding: 4px 12px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #2d3348; background: #1a1f2e; color: #94a3b8; }
+  .tab-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #3b82f6; }
+
+  .log-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .log-table th { text-align: left; padding: 5px 8px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; }
+  .log-table td { padding: 4px 8px; border-bottom: 1px solid #1a1f2e; vertical-align: top; line-height: 1.4; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: #1a1f2e; }
+
+  .sev-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .sev-xl { background: #431407; color: #fdba74; }
+  .sev-l  { background: #422006; color: #fb923c; }
+  .sev-m  { background: #1e3a5f; color: #93c5fd; }
+  .sev-s  { background: #14532d; color: #86efac; }
+
+  .res-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .res-pass { background: #14532d; color: #86efac; }
+  .res-fail { background: #431407; color: #fca5a5; }
+  .res-warn { background: #2d2000; color: #fde68a; }
+
+  .id-col { font-weight: 700; color: #64748b; white-space: nowrap; font-size: 11px; }
+  .loc-col { font-size: 10px; color: #475569; font-style: italic; }
+  .hidden { display: none; }
+  .alert-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #f97316; background: #2d1800; margin-top: 8px; font-size: 11px; color: #fdba74; line-height: 1.5; }
+  .info-box  { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; background: #0f2040; margin-top: 6px; font-size: 11px; color: #93c5fd; line-height: 1.5; }
+
+  .pass-bar-wrap { height: 8px; background: #2d3348; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+  .pass-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #22c55e, #3b82f6); }
+</style>
+</head>
+<body>
+
+<h1>PMB U-Turn Focused Drive Summary</h1>
+<div class="subtitle">3 Structured Routes + Freestyle &nbsp;&middot;&nbsp; No HD Map &nbsp;&middot;&nbsp; Tester: W</div>
+
+<div class="key-summary">
+  <div class="ks-item">
+    <div class="ks-icon">&#x2705;</div>
+    <div><div class="ks-label">No FP U-turns</div><div class="ks-desc">No false positives observed across all routes</div></div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">&#x26A0;&#xFE0F;</div>
+    <div><div class="ks-label">Hesitant &amp; Inconsistent</div><div class="ks-desc">Wobbles, slow starts, fishhooks, oversteer across lane counts; worst on 2-lane</div></div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">&#x1F6A8;</div>
+    <div><div class="ks-label">Platform Concerns</div><div class="ks-desc">ROV failures in NDAS panel, lane keep inoperative, mid-U-turn disengagements (W27, W51)</div></div>
+  </div>
+</div>
+
+<!-- Severity cards with behavior tags and pass rate -->
+<div class="top-grid">
+  <div class="stat-card">
+    <div class="stat-label">XL</div>
+    <div class="stat-value red">22</div>
+    <div class="stat-tags">
+      <span class="stat-tag">missed</span>
+      <span class="stat-tag">no attempt</span>
+      <span class="stat-tag">oversteer</span>
+      <span class="stat-tag">disengage</span>
+      <span class="stat-tag">drive-off red</span>
+      <span class="stat-tag">into oncoming</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">L</div>
+    <div class="stat-value orange">12</div>
+    <div class="stat-tags">
+      <span class="stat-tag">wobble</span>
+      <span class="stat-tag">fishhook</span>
+      <span class="stat-tag">wide turn</span>
+      <span class="stat-tag">harsh brake</span>
+      <span class="stat-tag">over double yellow</span>
+      <span class="stat-tag">understeer</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">M</div>
+    <div class="stat-value blue">18</div>
+    <div class="stat-tags">
+      <span class="stat-tag">slight wobble</span>
+      <span class="stat-tag">jerky</span>
+      <span class="stat-tag">slow</span>
+      <span class="stat-tag">hesitant</span>
+      <span class="stat-tag">braking at end</span>
+      <span class="stat-tag">wide turn</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">S</div>
+    <div class="stat-value green">12</div>
+    <div class="stat-tags">
+      <span class="stat-tag">good turn</span>
+      <span class="stat-tag">correct lane</span>
+      <span class="stat-tag">clean</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Pass Rate (M+S)</div>
+    <div class="stat-value purple">52%</div>
+    <div class="stat-sub">30 of 58 events</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:52%"></div></div>
+  </div>
+</div>
+
+<div class="section-title">Segment Breakdown</div>
+<div class="routes-grid">
+  <div class="route-card">
+    <div class="route-name">&#x1F501; Route 1 (W1&ndash;W6)</div>
+    <div class="route-row"><span class="rk">XL</span><span class="rv red">2</span></div>
+    <div class="route-row"><span class="rk">L</span><span class="rv orange">1</span></div>
+    <div class="route-row"><span class="rk">S</span><span class="rv green">2</span></div>
+    <div class="route-row"><span class="rk">Pass (M+S)</span><span class="rv green">40%</span></div>
+    <div class="severity-bar">
+      <div class="bar-xl" style="width:40%"></div>
+      <div class="bar-l" style="width:20%"></div>
+      <div class="bar-s" style="width:40%"></div>
+    </div>
+  </div>
+  <div class="route-card">
+    <div class="route-name">&#x1F501; Route 2 (W8&ndash;W14)</div>
+    <div class="route-row"><span class="rk">XL</span><span class="rv red">3</span></div>
+    <div class="route-row"><span class="rk">L</span><span class="rv orange">1</span></div>
+    <div class="route-row"><span class="rk">M</span><span class="rv blue">1</span></div>
+    <div class="route-row"><span class="rk">S</span><span class="rv green">2</span></div>
+    <div class="route-row"><span class="rk">Pass (M+S)</span><span class="rv green">43%</span></div>
+    <div class="severity-bar">
+      <div class="bar-xl" style="width:43%"></div>
+      <div class="bar-l" style="width:14%"></div>
+      <div class="bar-m" style="width:14%"></div>
+      <div class="bar-s" style="width:29%"></div>
+    </div>
+  </div>
+  <div class="route-card">
+    <div class="route-name">&#x1F501; Route 3 (W16&ndash;W20)</div>
+    <div class="route-row"><span class="rk">XL</span><span class="rv red">2</span></div>
+    <div class="route-row"><span class="rk">M</span><span class="rv blue">3</span></div>
+    <div class="route-row"><span class="rk">Pass (M+S)</span><span class="rv green">60%</span></div>
+    <div class="severity-bar">
+      <div class="bar-xl" style="width:40%"></div>
+      <div class="bar-m" style="width:60%"></div>
+    </div>
+  </div>
+  <div class="route-card">
+    <div class="route-name">&#x1F193; Freestyle (W22&ndash;W70)</div>
+    <div class="route-row"><span class="rk">XL</span><span class="rv red">15</span></div>
+    <div class="route-row"><span class="rk">L</span><span class="rv orange">10</span></div>
+    <div class="route-row"><span class="rk">M</span><span class="rv blue">14</span></div>
+    <div class="route-row"><span class="rk">S</span><span class="rv green">8</span></div>
+    <div class="route-row"><span class="rk">Pass (M+S)</span><span class="rv green">47%</span></div>
+    <div class="severity-bar">
+      <div class="bar-xl" style="width:32%"></div>
+      <div class="bar-l" style="width:21%"></div>
+      <div class="bar-m" style="width:30%"></div>
+      <div class="bar-s" style="width:17%"></div>
+    </div>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="panel">
+    <div class="section-title">Issue Frequency</div>
+    <div class="trend-row"><span class="trend-label">Missed / no attempt (incl. rail present)</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#ef4444;"></div></div><span class="trend-count red">17</span></div>
+    <div class="trend-row"><span class="trend-label">Wobble (start / end / mid-turn)</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:65%;background:#fb923c;"></div></div><span class="trend-count orange">11</span></div>
+    <div class="trend-row"><span class="trend-label">Fishhook maneuver</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:41%;background:#fb923c;"></div></div><span class="trend-count orange">7</span></div>
+    <div class="trend-row"><span class="trend-label">Jerky execution</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:35%;background:#3b82f6;"></div></div><span class="trend-count blue">6</span></div>
+    <div class="trend-row"><span class="trend-label">Under/oversteer (wrong lane / curb)</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:29%;background:#fb923c;"></div></div><span class="trend-count orange">5</span></div>
+    <div class="trend-row"><span class="trend-label">Hesitant start / slow approach</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:29%;background:#3b82f6;"></div></div><span class="trend-count blue">5</span></div>
+    <div class="trend-row"><span class="trend-label">Mid-turn disengage / stop</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:18%;background:#ef4444;"></div></div><span class="trend-count red">3</span></div>
+    <div class="alert-box">&#x26A0;&#xFE0F; W58: Drive-off on red during U-turn<br>&#x26A0;&#xFE0F; W57: Deep oversteer into oncoming at unprotected U-turn<br>&#x26A0;&#xFE0F; W59+: Lane keep inoperative; multiple ROV failures in NDAS</div>
+  </div>
+  <div class="panel">
+    <div class="section-title">Performance by Lane Count</div>
+    <div class="trend-row"><span class="trend-label">2-lane &mdash; missed / bad</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#f87171;"></div></div><span class="trend-count red">9/10</span></div>
+    <div class="trend-row"><span class="trend-label">3-lane &mdash; missed / bad</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:55%;background:#fb923c;"></div></div><span class="trend-count orange">~55%</span></div>
+    <div class="trend-row"><span class="trend-label">4-lane &mdash; missed / bad</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:40%;background:#3b82f6;"></div></div><span class="trend-count blue">~40%</span></div>
+    <div style="margin-top:10px;" class="section-title">Recurring Failure Locations</div>
+    <div class="trend-row"><span class="trend-label">Bowers &amp; Mead</span><span class="trend-count red">Missed ×2 (W12, W19)</span></div>
+    <div class="trend-row"><span class="trend-label">Bowers &amp; Chromite</span><span class="trend-count red">Missed ×2 (W8, W22)</span></div>
+    <div class="trend-row"><span class="trend-label">Scott &amp; Coronado</span><span class="trend-count red">Missed ×2 (W66, W67)</span></div>
+    <div class="trend-row"><span class="trend-label">San Tomas &amp; El Camino</span><span class="trend-count orange">Fishhook ×2 (W45, W48)</span></div>
+    <div class="info-box">&#x2139;&#xFE0F; 4-lane intersections on San Tomas show better attempt rate but inconsistent execution</div>
+  </div>
+</div>
+
+<div class="section-title">Detailed Log</div>
+<div class="tab-buttons">
+  <button class="tab-btn active" onclick="showTab('r1')">Route 1</button>
+  <button class="tab-btn" onclick="showTab('r2')">Route 2</button>
+  <button class="tab-btn" onclick="showTab('r3')">Route 3</button>
+  <button class="tab-btn" onclick="showTab('fs')">Freestyle</button>
+</div>
+
+<div class="panel" style="padding:0;overflow:hidden;">
+
+<div id="tab-r1">
+<table class="log-table">
+<thead><tr><th>#</th><th>Sev</th><th>Result</th><th>Description</th><th>Location</th></tr></thead>
+<tbody>
+<tr><td class="id-col">W1</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Bad</span></td><td>5-lane; did not turn enough</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W2</td><td><span class="sev-pill sev-l">L</span></td><td><span class="res-pill res-fail">Bad</span></td><td>HD map no; double-lane wide turn</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W4</td><td><span class="sev-pill sev-s">S</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; slight understeer merge into sublane</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W5</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; no attempt with rail present &mdash; turned left into parking lot</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W6</td><td><span class="sev-pill sev-s">S</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; good turn</td><td class="loc-col">&mdash;</td></tr>
+</tbody>
+</table>
+</div>
+
+<div id="tab-r2" class="hidden">
+<table class="log-table">
+<thead><tr><th>#</th><th>Sev</th><th>Result</th><th>Description</th><th>Location</th></tr></thead>
+<tbody>
+<tr><td class="id-col">W8</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; not attempted</td><td class="loc-col">Chromite &amp; Bowers</td></tr>
+<tr><td class="id-col">W9</td><td><span class="sev-pill sev-s">S</span></td><td><span class="res-pill res-pass">Good</span></td><td>4-lane; wobble at end</td><td class="loc-col">San Tomas &amp; Walsh</td></tr>
+<tr><td class="id-col">W10</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; slightly jerky but good</td><td class="loc-col">Central &amp; Scott</td></tr>
+<tr><td class="id-col">W11</td><td><span class="sev-pill sev-s">S</span></td><td><span class="res-pill res-warn">Near</span></td><td>3-lane; turned into merging sublane</td><td class="loc-col">Scott &amp; Oakmead</td></tr>
+<tr><td class="id-col">W12</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; attempted left turn instead</td><td class="loc-col">Bowers &amp; Mead</td></tr>
+<tr><td class="id-col">W13</td><td><span class="sev-pill sev-l">L</span></td><td><span class="res-pill res-warn">Near</span></td><td>3-lane; jerky start, understeer right</td><td class="loc-col">Bowers &amp; Central</td></tr>
+<tr><td class="id-col">W14</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; missed with U-turn rail present</td><td class="loc-col">Bowers &amp; Chromite</td></tr>
+</tbody>
+</table>
+</div>
+
+<div id="tab-r3" class="hidden">
+<table class="log-table">
+<thead><tr><th>#</th><th>Sev</th><th>Result</th><th>Description</th><th>Location</th></tr></thead>
+<tbody>
+<tr><td class="id-col">W16</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-warn">Near</span></td><td>3-lane; wobble at end, turned into far right lane</td><td class="loc-col">San Tomas &amp; Walsh</td></tr>
+<tr><td class="id-col">W17</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; braking at end of turn</td><td class="loc-col">Scott &amp; Central</td></tr>
+<tr><td class="id-col">W18</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; slightly slow on approach</td><td class="loc-col">Oakmead &amp; Scott</td></tr>
+<tr><td class="id-col">W19</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; missed with U-turn rail present</td><td class="loc-col">Bowers &amp; Mead</td></tr>
+<tr><td class="id-col">W20</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Bad</span></td><td>3-lane; came to stop mid-turn at odd angle</td><td class="loc-col">Bowers &amp; Central</td></tr>
+</tbody>
+</table>
+</div>
+
+<div id="tab-fs" class="hidden">
+<table class="log-table">
+<thead><tr><th>#</th><th>Sev</th><th>Result</th><th>Description</th><th>Location</th></tr></thead>
+<tbody>
+<tr><td class="id-col">W22</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; no attempt with rail present</td><td class="loc-col">Bowers &amp; Chromite</td></tr>
+<tr><td class="id-col">W23</td><td><span class="sev-pill sev-s">S</span></td><td><span class="res-pill res-pass">Good</span></td><td>4-lane; good turn</td><td class="loc-col">San Tomas &amp; Walsh</td></tr>
+<tr><td class="id-col">W24</td><td><span class="sev-pill sev-l">L</span></td><td><span class="res-pill res-fail">Bad</span></td><td>4-lane; harsh brake and wobble</td><td class="loc-col">San Tomas &amp; Monroe</td></tr>
+<tr><td class="id-col">W25</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>4-lane; wobble at end</td><td class="loc-col">San Tomas &amp; Scott</td></tr>
+<tr><td class="id-col">W26</td><td><span class="sev-pill sev-l">L</span></td><td><span class="res-pill res-fail">Bad</span></td><td>4-lane; wobble at end of turn</td><td class="loc-col">San Tomas &amp; Cabrillo</td></tr>
+<tr><td class="id-col">W27</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>4-lane; disengaged mid U-turn</td><td class="loc-col">San Tomas &amp; Mission College</td></tr>
+<tr><td class="id-col">W28</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>4-lane; wobble at end</td><td class="loc-col">San Tomas &amp; Homestead</td></tr>
+<tr><td class="id-col">W29</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Bad</span></td><td>4-lane; hesitant at start, assist required</td><td class="loc-col">San Tomas &amp; Benton</td></tr>
+<tr><td class="id-col">W30</td><td><span class="sev-pill sev-l">L</span></td><td><span class="res-pill res-fail">Bad</span></td><td>4-lane; very hesitant start, jerky</td><td class="loc-col">San Tomas &amp; Forbes</td></tr>
+<tr><td class="id-col">W31</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-warn">Near</span></td><td>4-lane; slightly jerky end, wide turn</td><td class="loc-col">San Tomas &amp; Benton</td></tr>
+<tr><td class="id-col">W32</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; wobble at end</td><td class="loc-col">San Tomas &amp; Pruneridge</td></tr>
+<tr><td class="id-col">W33</td><td><span class="sev-pill sev-s">S</span></td><td><span class="res-pill res-warn">Near</span></td><td>3-lane; slight fishhook at end</td><td class="loc-col">San Tomas &amp; Forbes</td></tr>
+<tr><td class="id-col">W34</td><td><span class="sev-pill sev-s">S</span></td><td><span class="res-pill res-warn">Near</span></td><td>3-lane; turned into second lane</td><td class="loc-col">San Tomas &amp; Saratoga</td></tr>
+<tr><td class="id-col">W35</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-warn">Near</span></td><td>3-lane; wobble at beginning, turned into second lane</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W36</td><td><span class="sev-pill sev-s">S</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; turned into 3rd lane</td><td class="loc-col">San Tomas &amp; Stevens Creek</td></tr>
+<tr><td class="id-col">W37</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-warn">Near</span></td><td>3-lane; entered second lane, slight wobble</td><td class="loc-col">San Tomas &amp; Saratoga</td></tr>
+<tr><td class="id-col">W38</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; wobble at end</td><td class="loc-col">San Tomas &amp; Moorpark</td></tr>
+<tr><td class="id-col">W39</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; jerky</td><td class="loc-col">San Tomas &amp; Stevens Creek</td></tr>
+<tr><td class="id-col">W40</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Bad</span></td><td>3-lane; early oversteer, almost hit curb</td><td class="loc-col">San Tomas &amp; Moorpark</td></tr>
+<tr><td class="id-col">W41</td><td><span class="sev-pill sev-l">L</span></td><td><span class="res-pill res-fail">Bad</span></td><td>3-lane; turned early over double yellow + wobble</td><td class="loc-col">San Tomas &amp; Homestead</td></tr>
+<tr><td class="id-col">W42</td><td><span class="sev-pill sev-l">L</span></td><td><span class="res-pill res-warn">Near</span></td><td>3-lane; wobble</td><td class="loc-col">San Tomas &amp; Forbes</td></tr>
+<tr><td class="id-col">W43</td><td><span class="sev-pill sev-l">L</span></td><td><span class="res-pill res-warn">Near</span></td><td>4-lane; fishhook at end</td><td class="loc-col">San Tomas &amp; Benton</td></tr>
+<tr><td class="id-col">W44</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>4-lane; hesitant start</td><td class="loc-col">San Tomas &amp; Homestead</td></tr>
+<tr><td class="id-col">W45</td><td><span class="sev-pill sev-l">L</span></td><td><span class="res-pill res-fail">Bad</span></td><td>4-lane; fishhook maneuver</td><td class="loc-col">San Tomas &amp; El Camino Real</td></tr>
+<tr><td class="id-col">W46</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>4-lane; slight jerk at end</td><td class="loc-col">San Tomas &amp; Benton</td></tr>
+<tr><td class="id-col">W47</td><td><span class="sev-pill sev-l">L</span></td><td><span class="res-pill res-fail">Bad</span></td><td>4-lane; understeer into carpool lane, fishhook</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W48</td><td><span class="sev-pill sev-l">L</span></td><td><span class="res-pill res-fail">Bad</span></td><td>4-lane; fishhook at end</td><td class="loc-col">San Tomas &amp; El Camino Real</td></tr>
+<tr><td class="id-col">W49</td><td><span class="sev-pill sev-s">S</span></td><td><span class="res-pill res-pass">Good</span></td><td>4-lane; good turn</td><td class="loc-col">San Tomas &amp; Monroe</td></tr>
+<tr><td class="id-col">W50</td><td><span class="sev-pill sev-l">L</span></td><td><span class="res-pill res-fail">Bad</span></td><td>4-lane; wide turn into carpool lane, fishhook</td><td class="loc-col">San Tomas &amp; Cabrillo</td></tr>
+<tr><td class="id-col">W51</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>3-lane; disengaged mid U-turn</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W52</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>3-lane; made left turn instead</td><td class="loc-col">Central &amp; Bowers</td></tr>
+<tr><td class="id-col">W53</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>3-lane; missed turn</td><td class="loc-col">Walsh &amp; Bowers</td></tr>
+<tr><td class="id-col">W54</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; very slow</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W55</td><td><span class="sev-pill sev-s">S</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; good turn</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W56</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; not attempted</td><td class="loc-col">Lafayette &amp; Laurelwood</td></tr>
+<tr><td class="id-col">W57</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Bad</span></td><td>3-lane; unprotected U-turn, went deep into oncoming &#x26A0;</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W58</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Bad</span></td><td>2-lane; drive-off on red &#x26A0;&#x26A0;</td><td class="loc-col">Lafayette &amp; Aldo</td></tr>
+<tr><td class="id-col">W59</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; no attempt, no lane markings &mdash; lane keep inoperative, ROV failures noted</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W62</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; not attempted</td><td class="loc-col">Scott &amp; Olcot</td></tr>
+<tr><td class="id-col">W63</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; no attempt with rail present</td><td class="loc-col">Jay &amp; Scott</td></tr>
+<tr><td class="id-col">W64</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; no attempt with rail present</td><td class="loc-col">Scott &amp; Bowers</td></tr>
+<tr><td class="id-col">W65</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; unprotected U-turn</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W66</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; not attempted</td><td class="loc-col">Scott &amp; Coronado</td></tr>
+<tr><td class="id-col">W67</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>2-lane; no attempt with rail present</td><td class="loc-col">Scott &amp; Coronado</td></tr>
+<tr><td class="id-col">W69a</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="res-pill res-fail">Missed</span></td><td>3-lane; not attempted with rail</td><td class="loc-col">Central &amp; Bowers</td></tr>
+<tr><td class="id-col">W69b</td><td><span class="sev-pill sev-s">S</span></td><td><span class="res-pill res-pass">Good</span></td><td>2-lane; good turn</td><td class="loc-col">&mdash;</td></tr>
+<tr><td class="id-col">W70</td><td><span class="sev-pill sev-m">M</span></td><td><span class="res-pill res-pass">Good</span></td><td>3-lane; slightly slow into 3rd lane</td><td class="loc-col">Central &amp; Scott</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+function showTab(id) {
+  ['r1','r2','r3','fs'].forEach(function(r) {
+    document.getElementById('tab-' + r).classList.add('hidden');
+  });
+  document.getElementById('tab-' + id).classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+    btn.classList.toggle('active', ['r1','r2','r3','fs'][i] === id);
+  });
+}
+</script>
+</body>
+</html>

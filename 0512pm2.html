@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 18px; font-size: 13px; }
+  h1 { font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 3px; }
+  .subtitle { font-size: 11px; color: #94a3b8; margin-bottom: 12px; }
+  .key-summary { background: #1a1f2e; border: 1px solid #2d3348; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .ks-item { display: flex; align-items: flex-start; gap: 8px; }
+  .ks-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .ks-label { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .ks-desc { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+  .top-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card { background: #1e2230; border-radius: 8px; padding: 10px 12px; border: 1px solid #2d3348; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-bottom: 3px; }
+  .stat-value { font-size: 22px; font-weight: 700; }
+  .stat-sub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+  .stat-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+  .stat-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #2d3348; color: #94a3b8; }
+  .red { color: #f87171; } .orange { color: #fb923c; } .blue { color: #60a5fa; } .green { color: #4ade80; } .purple { color: #c084fc; }
+  .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+  .routes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .route-card { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; }
+  .route-name { font-size: 13px; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; border-bottom: 1px solid #2d3348; padding-bottom: 6px; }
+  .route-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+  .rk { font-size: 11px; color: #94a3b8; }
+  .rv { font-size: 11px; font-weight: 700; }
+  .severity-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; margin-top: 8px; gap: 1px; }
+  .bar-xl { background: #ef4444; } .bar-l { background: #fb923c; } .bar-m { background: #3b82f6; } .bar-s { background: #22c55e; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .panel { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; }
+  .trend-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid #1a1f2e; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-label { font-size: 11px; color: #94a3b8; flex: 1; }
+  .trend-bar-wrap { width: 80px; height: 5px; background: #2d3348; border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; }
+  .trend-count { font-size: 11px; font-weight: 700; min-width: 18px; text-align: right; }
+  .tab-buttons { display: flex; gap: 4px; margin-bottom: 8px; }
+  .tab-btn { padding: 4px 12px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #2d3348; background: #1a1f2e; color: #94a3b8; }
+  .tab-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #3b82f6; }
+  .log-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .log-table th { text-align: left; padding: 5px 8px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; }
+  .log-table td { padding: 4px 8px; border-bottom: 1px solid #1a1f2e; vertical-align: top; line-height: 1.4; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: #1a1f2e; }
+  .sev-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .sev-xl { background: #431407; color: #fdba74; }
+  .sev-l  { background: #422006; color: #fb923c; }
+  .sev-m  { background: #1e3a5f; color: #93c5fd; }
+  .sev-s  { background: #14532d; color: #86efac; }
+  .id-col { font-weight: 700; color: #64748b; white-space: nowrap; font-size: 11px; }
+  .cat-col { font-size: 10px; color: #64748b; }
+  .hidden { display: none; }
+  .alert-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #f97316; background: #2d1800; margin-top: 8px; font-size: 11px; color: #fdba74; line-height: 1.5; }
+  .info-box  { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; background: #0f2040; margin-top: 8px; font-size: 11px; color: #93c5fd; line-height: 1.5; }
+  .pos-row { display: flex; align-items: flex-start; gap: 6px; padding: 5px 0; border-bottom: 1px solid #1a1f2e; }
+  .pos-row:last-child { border-bottom: none; }
+  .pos-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; margin-top: 3px; flex-shrink: 0; }
+  .pos-text { font-size: 11px; color: #cbd5e1; line-height: 1.4; }
+  .pos-src { font-size: 10px; color: #64748b; }
+  .pass-bar-wrap { height: 8px; background: #2d3348; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+  .pass-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #22c55e, #3b82f6); }
+</style>
+</head>
+<body>
+
+<h1>IFORV: Mitigate FP U-Turn Test Summary</h1>
+<div class="subtitle">Route 1: U-turn Route &nbsp;&middot;&nbsp; Route 2: Route 61 &nbsp;&middot;&nbsp; Route 3: P2P Palo Alto &nbsp;&middot;&nbsp; Tester: W</div>
+
+<div class="key-summary">
+  <div class="ks-item">
+    <div class="ks-icon">&#x2705;</div>
+    <div><div class="ks-label">No FP U-turns</div><div class="ks-desc">No false-positive U-turns triggered across all routes</div></div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">&#x2705;</div>
+    <div><div class="ks-label">No Obvious Regression</div><div class="ks-desc">Behavior consistent with prior sessions; no new failure modes identified</div></div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">&#x26A0;&#xFE0F;</div>
+    <div><div class="ks-label">Hesitant &amp; Inconsistent U-turns</div><div class="ks-desc">Slow starts, wobbles, under/oversteer; pass/fail varies by lane count and location</div></div>
+  </div>
+</div>
+
+<!-- Severity cards with behavior tags -->
+<div class="top-grid">
+  <div class="stat-card">
+    <div class="stat-label">XL</div>
+    <div class="stat-value red">12</div>
+    <div class="stat-tags">
+      <span class="stat-tag">missed U-turn</span>
+      <span class="stat-tag">oversteer</span>
+      <span class="stat-tag">drive-off red</span>
+      <span class="stat-tag">SILC stuck</span>
+      <span class="stat-tag">hard brake</span>
+      <span class="stat-tag">jerk mid-turn</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">L</div>
+    <div class="stat-value orange">29</div>
+    <div class="stat-tags">
+      <span class="stat-tag">ghost brake</span>
+      <span class="stat-tag">wobble</span>
+      <span class="stat-tag">lane drift</span>
+      <span class="stat-tag">understeer</span>
+      <span class="stat-tag">hesitant</span>
+      <span class="stat-tag">lane hug</span>
+      <span class="stat-tag">into bike lane</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">M</div>
+    <div class="stat-value blue">9</div>
+    <div class="stat-tags">
+      <span class="stat-tag">brake tap</span>
+      <span class="stat-tag">slight hard brake</span>
+      <span class="stat-tag">lane hug</span>
+      <span class="stat-tag">understeer</span>
+      <span class="stat-tag">speed bump FP</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">S</div>
+    <div class="stat-value green">11</div>
+    <div class="stat-tags">
+      <span class="stat-tag">good U-turn</span>
+      <span class="stat-tag">good DRT</span>
+      <span class="stat-tag">TN U-turn pass</span>
+      <span class="stat-tag">route start</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Pass Rate (M+S)</div>
+    <div class="stat-value purple">33%</div>
+    <div class="stat-sub">20 of 61 events</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:33%"></div></div>
+  </div>
+</div>
+
+<div class="section-title">Route Breakdown</div>
+<div class="routes-grid">
+  <div class="route-card">
+    <div class="route-name">&#x1F501; Route 1 &mdash; U-turn Route</div>
+    <div class="route-row"><span class="rk">XL</span><span class="rv red">5</span></div>
+    <div class="route-row"><span class="rk">L</span><span class="rv orange">6</span></div>
+    <div class="route-row"><span class="rk">S</span><span class="rv green">1</span></div>
+    <div class="route-row"><span class="rk">Pass (M+S)</span><span class="rv green">8%</span></div>
+    <div class="severity-bar">
+      <div class="bar-xl" style="width:42%"></div>
+      <div class="bar-l" style="width:50%"></div>
+      <div class="bar-s" style="width:8%"></div>
+    </div>
+  </div>
+  <div class="route-card">
+    <div class="route-name">&#x1F6E3; Route 2 &mdash; Route 61</div>
+    <div class="route-row"><span class="rk">XL</span><span class="rv red">2</span></div>
+    <div class="route-row"><span class="rk">L</span><span class="rv orange">14</span></div>
+    <div class="route-row"><span class="rk">M</span><span class="rv blue">4</span></div>
+    <div class="route-row"><span class="rk">S</span><span class="rv green">2</span></div>
+    <div class="route-row"><span class="rk">Pass (M+S)</span><span class="rv green">27%</span></div>
+    <div class="severity-bar">
+      <div class="bar-xl" style="width:9%"></div>
+      <div class="bar-l" style="width:64%"></div>
+      <div class="bar-m" style="width:18%"></div>
+      <div class="bar-s" style="width:9%"></div>
+    </div>
+  </div>
+  <div class="route-card">
+    <div class="route-name">&#x1F3D9; Route 3 &mdash; P2P Palo Alto</div>
+    <div class="route-row"><span class="rk">XL</span><span class="rv red">3</span></div>
+    <div class="route-row"><span class="rk">L</span><span class="rv orange">9</span></div>
+    <div class="route-row"><span class="rk">M</span><span class="rv blue">2</span></div>
+    <div class="route-row"><span class="rk">S</span><span class="rv green">8</span></div>
+    <div class="route-row"><span class="rk">Pass (M+S)</span><span class="rv green">45%</span></div>
+    <div class="severity-bar">
+      <div class="bar-xl" style="width:13%"></div>
+      <div class="bar-l" style="width:41%"></div>
+      <div class="bar-m" style="width:9%"></div>
+      <div class="bar-s" style="width:37%"></div>
+    </div>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="panel">
+    <div class="section-title">Issue Frequency</div>
+    <div class="trend-row"><span class="trend-label">Lane drift / hug left</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#fb923c;"></div></div><span class="trend-count orange">8</span></div>
+    <div class="trend-row"><span class="trend-label">U-turn bad / missed / hesitant</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:88%;background:#ef4444;"></div></div><span class="trend-count red">7</span></div>
+    <div class="trend-row"><span class="trend-label">Hesitant at junction (ULT/DRT)</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:63%;background:#fb923c;"></div></div><span class="trend-count orange">5</span></div>
+    <div class="trend-row"><span class="trend-label">Wobble (split / U-turn / curve)</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:63%;background:#fb923c;"></div></div><span class="trend-count orange">5</span></div>
+    <div class="trend-row"><span class="trend-label">Braking issues (ghost / hard / pulse)</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:63%;background:#3b82f6;"></div></div><span class="trend-count blue">5</span></div>
+    <div class="trend-row"><span class="trend-label">Missed / late SILC</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:50%;background:#fb923c;"></div></div><span class="trend-count orange">4</span></div>
+    <div class="trend-row"><span class="trend-label">Under / oversteer</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:38%;background:#ef4444;"></div></div><span class="trend-count red">3</span></div>
+    <div class="alert-box">&#x26A0;&#xFE0F; Most serious: R61 drive-off on red (15) &mdash; immediate safety concern</div>
+  </div>
+  <div class="panel">
+    <div class="section-title">Positives</div>
+    <div class="pos-row"><div class="pos-dot"></div><div><div class="pos-text">U-turn good 3-lane; correct turn into 3rd lane</div><div class="pos-src">Route 1 &middot; 5</div></div></div>
+    <div class="pos-row"><div class="pos-dot"></div><div><div class="pos-text">Good DRT yielding to cross traffic</div><div class="pos-src">Route 2 &middot; 7</div></div></div>
+    <div class="pos-row"><div class="pos-dot"></div><div><div class="pos-text">Route start nominal</div><div class="pos-src">Route 2 &middot; Start</div></div></div>
+    <div class="pos-row"><div class="pos-dot"></div><div><div class="pos-text">U-turn good 4-lane (San Tomas &amp; Monroe)</div><div class="pos-src">Route 3 &middot; 1</div></div></div>
+    <div class="pos-row"><div class="pos-dot"></div><div><div class="pos-text">U-turn good 4-lane into 4th lane (San Tomas &amp; Scott)</div><div class="pos-src">Route 3 &middot; 2</div></div></div>
+    <div class="pos-row"><div class="pos-dot"></div><div><div class="pos-text">TN U-turn &mdash; no reaction to median opening left &times;4</div><div class="pos-src">Route 3 &middot; 11, 13, 15, 18</div></div></div>
+    <div class="pos-row"><div class="pos-dot"></div><div><div class="pos-text">FP speed bump detection</div><div class="pos-src">Route 3 &middot; 22</div></div></div>
+    <div class="info-box">&#x2139;&#xFE0F; All TN U-turn scenarios passed &mdash; no false positives triggered across any route</div>
+  </div>
+</div>
+
+<div class="section-title">Detailed Issue Log</div>
+<div class="tab-buttons">
+  <button class="tab-btn active" onclick="showTab('r1')">Route 1 &mdash; U-turn</button>
+  <button class="tab-btn" onclick="showTab('r2')">Route 2 &mdash; R61</button>
+  <button class="tab-btn" onclick="showTab('r3')">Route 3 &mdash; P2P PA</button>
+</div>
+
+<div class="panel" style="padding:0;overflow:hidden;">
+
+<div id="tab-r1">
+<table class="log-table">
+<thead><tr><th>#</th><th>Sev</th><th>Description</th><th>Category</th></tr></thead>
+<tbody>
+<tr><td class="id-col">1</td><td><span class="sev-pill sev-xl">XL</span></td><td>Bad U-turn 4-lane; strong host brake at start with contender behind</td><td class="cat-col">U-turn &middot; Braking</td></tr>
+<tr><td class="id-col">2a</td><td><span class="sev-pill sev-xl">XL</span></td><td>APTO SILC stuck; assist to clear way for contender</td><td class="cat-col">SILC &middot; Safety</td></tr>
+<tr><td class="id-col">2b</td><td><span class="sev-pill sev-xl">XL</span></td><td>Late SILC into lane split; steering assist required</td><td class="cat-col">SILC &middot; Steering</td></tr>
+<tr><td class="id-col">2c</td><td><span class="sev-pill sev-xl">XL</span></td><td>Multiple SILCs in a row missed</td><td class="cat-col">Nav &middot; SILC</td></tr>
+<tr><td class="id-col">5</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good 3-lane; correct turn into 3rd lane</td><td class="cat-col">U-turn &#x2713;</td></tr>
+<tr><td class="id-col">6</td><td><span class="sev-pill sev-l">L</span></td><td>Ghost brake</td><td class="cat-col">Braking</td></tr>
+<tr><td class="id-col">7</td><td><span class="sev-pill sev-l">L</span></td><td>Ghost brake at dedicated right turn</td><td class="cat-col">Braking</td></tr>
+<tr><td class="id-col">8</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn good 2-lane; very slow start, otherwise acceptable</td><td class="cat-col">U-turn ~</td></tr>
+<tr><td class="id-col">9</td><td><span class="sev-pill sev-l">L</span></td><td>Understeer into wrong lane</td><td class="cat-col">Steering</td></tr>
+<tr><td class="id-col">10</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed 2-lane; no attempt with rail present</td><td class="cat-col">U-turn &#x2717; &middot; Nav</td></tr>
+<tr><td class="id-col">11</td><td><span class="sev-pill sev-l">L</span></td><td>Wobble before U-turn</td><td class="cat-col">Steering</td></tr>
+<tr><td class="id-col">12</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad 3-lane; oversteer into road boundary</td><td class="cat-col">U-turn &#x2717; &middot; Steering</td></tr>
+</tbody>
+</table>
+</div>
+
+<div id="tab-r2" class="hidden">
+<table class="log-table">
+<thead><tr><th>#</th><th>Sev</th><th>Description</th><th>Category</th></tr></thead>
+<tbody>
+<tr><td class="id-col">Start</td><td><span class="sev-pill sev-s">S</span></td><td>Route start nominal</td><td class="cat-col">General</td></tr>
+<tr><td class="id-col">2</td><td><span class="sev-pill sev-m">M</span></td><td>Medium brake tap</td><td class="cat-col">Braking</td></tr>
+<tr><td class="id-col">3</td><td><span class="sev-pill sev-l">L</span></td><td>Lane drift left</td><td class="cat-col">Steering</td></tr>
+<tr><td class="id-col">4</td><td><span class="sev-pill sev-l">L</span></td><td>Lane drift left into yellow lane</td><td class="cat-col">Steering</td></tr>
+<tr><td class="id-col">5</td><td><span class="sev-pill sev-m">M</span></td><td>Harder braking before stop sign</td><td class="cat-col">Braking</td></tr>
+<tr><td class="id-col">6</td><td><span class="sev-pill sev-l">L</span></td><td>Very hesitant at ULT with no contenders</td><td class="cat-col">Intersection</td></tr>
+<tr><td class="id-col">7</td><td><span class="sev-pill sev-s">S</span></td><td>Good DRT yielding to cross traffic</td><td class="cat-col">Intersection &#x2713;</td></tr>
+<tr><td class="id-col">8</td><td><span class="sev-pill sev-l">L</span></td><td>Wobble before and after split; close to contender</td><td class="cat-col">Steering &middot; Split</td></tr>
+<tr><td class="id-col">9</td><td><span class="sev-pill sev-l">L</span></td><td>Lane drift left on curvature</td><td class="cat-col">Steering</td></tr>
+<tr><td class="id-col">10</td><td><span class="sev-pill sev-l">L</span></td><td>Lane drift left over reflectors; overnudging for parked cars right</td><td class="cat-col">Steering</td></tr>
+<tr><td class="id-col">11</td><td><span class="sev-pill sev-l">L</span></td><td>Very hesitant at ULT with contenders on both ends</td><td class="cat-col">Intersection</td></tr>
+<tr><td class="id-col">12</td><td><span class="sev-pill sev-l">L</span></td><td>Hard braking + jerk left with lead turning right</td><td class="cat-col">Braking &middot; Steering</td></tr>
+<tr><td class="id-col">13</td><td><span class="sev-pill sev-l">L</span></td><td>Lane change jerky at split</td><td class="cat-col">SILC &middot; Steering</td></tr>
+<tr><td class="id-col">14</td><td><span class="sev-pill sev-l">L</span></td><td>Pulse braking before TL</td><td class="cat-col">Braking</td></tr>
+<tr><td class="id-col">15</td><td><span class="sev-pill sev-xl">XL</span></td><td>Drive-off on red &#x26A0;</td><td class="cat-col">Safety Critical</td></tr>
+<tr><td class="id-col">16</td><td><span class="sev-pill sev-xl">XL</span></td><td>Hesitant at ramp with contenders; APTO takeover</td><td class="cat-col">Intersection &middot; APTO</td></tr>
+<tr><td class="id-col">17</td><td><span class="sev-pill sev-l">L</span></td><td>Wobble on highway</td><td class="cat-col">Steering</td></tr>
+<tr><td class="id-col">18</td><td><span class="sev-pill sev-l">L</span></td><td>Wobble during SILC to follow route</td><td class="cat-col">SILC &middot; Steering</td></tr>
+<tr><td class="id-col">19</td><td><span class="sev-pill sev-m">M</span></td><td>Slightly hard brake approaching red TL</td><td class="cat-col">Braking</td></tr>
+<tr><td class="id-col">20</td><td><span class="sev-pill sev-l">L</span></td><td>Lane hugging close to contender</td><td class="cat-col">Steering</td></tr>
+<tr><td class="id-col">21</td><td><span class="sev-pill sev-m">M</span></td><td>Lane hug left</td><td class="cat-col">Steering</td></tr>
+<tr><td class="id-col">22</td><td><span class="sev-pill sev-l">L</span></td><td>AV main CPU consistently at 94%+</td><td class="cat-col">Platform &middot; Thermal</td></tr>
+</tbody>
+</table>
+</div>
+
+<div id="tab-r3" class="hidden">
+<table class="log-table">
+<thead><tr><th>#</th><th>Sev</th><th>Description</th><th>Category</th></tr></thead>
+<tbody>
+<tr><td class="id-col">1</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn good HD map 4-lane; wide turn &mdash; San Tomas &amp; Monroe</td><td class="cat-col">U-turn ~</td></tr>
+<tr><td class="id-col">2</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good HD map 4-lane into 4th lane &mdash; San Tomas &amp; Scott</td><td class="cat-col">U-turn &#x2713;</td></tr>
+<tr><td class="id-col">3</td><td><span class="sev-pill sev-l">L</span></td><td>SILC left close to LVIP</td><td class="cat-col">SILC &middot; Safety</td></tr>
+<tr><td class="id-col">4</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn good HD map 4-lane; slow start and slow at end &mdash; San Tomas &amp; Monroe</td><td class="cat-col">U-turn ~</td></tr>
+<tr><td class="id-col">5</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn good HD map 3rd of 4 lanes; too early + wobble at end</td><td class="cat-col">U-turn ~</td></tr>
+<tr><td class="id-col">6</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn good HD map 4-lane; hesitant/wobble at end &mdash; San Tomas &amp; El Camino Real</td><td class="cat-col">U-turn ~</td></tr>
+<tr><td class="id-col">7</td><td><span class="sev-pill sev-l">L</span></td><td>Wobble before split going straight</td><td class="cat-col">Steering</td></tr>
+<tr><td class="id-col">8</td><td><span class="sev-pill sev-l">L</span></td><td>SILC right out of turning lane; not following routing</td><td class="cat-col">Nav &middot; SILC</td></tr>
+<tr><td class="id-col">9</td><td><span class="sev-pill sev-l">L</span></td><td>Hesitant at unprotected junction; APTO</td><td class="cat-col">Intersection</td></tr>
+<tr><td class="id-col">D11</td><td><span class="sev-pill sev-l">L</span></td><td>Not yielding to merging contender; contender unable to close gap</td><td class="cat-col">Contender Handling</td></tr>
+<tr><td class="id-col">11</td><td><span class="sev-pill sev-s">S</span></td><td>TN U-turn &mdash; no reaction to median opening left</td><td class="cat-col">U-turn TN &#x2713;</td></tr>
+<tr><td class="id-col">12</td><td><span class="sev-pill sev-l">L</span></td><td>FN nudge; plenty of room to nudge</td><td class="cat-col">Nudge</td></tr>
+<tr><td class="id-col">13</td><td><span class="sev-pill sev-s">S</span></td><td>TN U-turn &mdash; no reaction to median opening left</td><td class="cat-col">U-turn TN &#x2713;</td></tr>
+<tr><td class="id-col">14</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed; aborted</td><td class="cat-col">U-turn &#x2717; &middot; Nav</td></tr>
+<tr><td class="id-col">15</td><td><span class="sev-pill sev-s">S</span></td><td>TN U-turn &mdash; no reaction to median opening left</td><td class="cat-col">U-turn TN &#x2713;</td></tr>
+<tr><td class="id-col">16</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn bad HD map 3-lane; U-turn into bike lane</td><td class="cat-col">U-turn &#x2717;</td></tr>
+<tr><td class="id-col">17</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn bad 3-lane; understeer into bike lane</td><td class="cat-col">U-turn &#x2717; &middot; Steering</td></tr>
+<tr><td class="id-col">18</td><td><span class="sev-pill sev-s">S</span></td><td>TN U-turn &mdash; no reaction to median opening left</td><td class="cat-col">U-turn TN &#x2713;</td></tr>
+<tr><td class="id-col">19</td><td><span class="sev-pill sev-xl">XL</span></td><td>Hard braking at turn; almost got rear-ended</td><td class="cat-col">Braking &middot; Safety</td></tr>
+<tr><td class="id-col">20</td><td><span class="sev-pill sev-xl">XL</span></td><td>Jerk mid-turn; APTO</td><td class="cat-col">Steering &middot; APTO</td></tr>
+<tr><td class="id-col">21</td><td><span class="sev-pill sev-m">M</span></td><td>Understeer at sharp left turn</td><td class="cat-col">Steering</td></tr>
+<tr><td class="id-col">22</td><td><span class="sev-pill sev-m">M</span></td><td>FP speed bump detection</td><td class="cat-col">Perception</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+function showTab(id) {
+  ['r1','r2','r3'].forEach(function(r) {
+    document.getElementById('tab-' + r).classList.add('hidden');
+  });
+  document.getElementById('tab-' + id).classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+    btn.classList.toggle('active', ['r1','r2','r3'][i] === id);
+  });
+}
+</script>
+</body>
+</html>
