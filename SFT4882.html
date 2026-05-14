@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 18px; font-size: 13px; }
+  h1 { font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 3px; }
+  .subtitle { font-size: 11px; color: #94a3b8; margin-bottom: 12px; }
+
+  .key-summary { background: #1a1f2e; border: 1px solid #2d3348; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .ks-item { display: flex; align-items: flex-start; gap: 8px; }
+  .ks-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .ks-label { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .ks-desc { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+
+  .top-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card { background: #1e2230; border-radius: 8px; padding: 10px 12px; border: 1px solid #2d3348; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-bottom: 3px; }
+  .stat-value { font-size: 22px; font-weight: 700; }
+  .stat-sub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+  .stat-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+  .stat-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #2d3348; color: #94a3b8; }
+  .red { color: #f87171; } .orange { color: #fb923c; } .blue { color: #60a5fa; } .green { color: #4ade80; } .purple { color: #c084fc; } .pink { color: #f472b6; }
+
+  .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+
+  .routes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .route-card { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; }
+  .route-name { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; border-bottom: 1px solid #2d3348; padding-bottom: 6px; }
+  .route-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+  .rk { font-size: 11px; color: #94a3b8; }
+  .rv { font-size: 11px; font-weight: 700; }
+  .severity-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; margin-top: 8px; gap: 1px; }
+  .bar-xxl { background: #dc2626; } .bar-xl { background: #f97316; } .bar-l { background: #fb923c; } .bar-m { background: #3b82f6; } .bar-s { background: #22c55e; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .panel { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; }
+
+  .trend-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid #1a1f2e; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-label { font-size: 11px; color: #94a3b8; flex: 1; }
+  .trend-bar-wrap { width: 80px; height: 5px; background: #2d3348; border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; }
+  .trend-count { font-size: 11px; font-weight: 700; min-width: 20px; text-align: right; }
+
+  .tab-buttons { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+  .tab-btn { padding: 4px 12px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #2d3348; background: #1a1f2e; color: #94a3b8; }
+  .tab-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #3b82f6; }
+
+  .log-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .log-table th { text-align: left; padding: 6px 8px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .log-table td { padding: 5px 8px; border-bottom: 1px solid #1a1f2e; vertical-align: top; line-height: 1.5; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: #1a1f2e; }
+
+  .sev-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .sev-xxl { background: #4c0519; color: #fca5a5; }
+  .sev-xl  { background: #431407; color: #fdba74; }
+  .sev-l   { background: #422006; color: #fb923c; }
+  .sev-m   { background: #1e3a5f; color: #93c5fd; }
+  .sev-s   { background: #14532d; color: #86efac; }
+
+  .id-col { font-weight: 700; color: #64748b; white-space: nowrap; font-size: 11px; }
+  .loc-col { font-size: 10px; color: #475569; font-style: italic; }
+  .event-link { font-size: 10px; color: #3b82f6; text-decoration: none; font-family: monospace; display: block; line-height: 1.6; }
+  .event-link:hover { color: #60a5fa; text-decoration: underline; }
+
+  .hidden { display: none; }
+  .alert-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #f97316; background: #2d1800; margin-top: 8px; font-size: 11px; color: #fdba74; line-height: 1.6; }
+  .pass-bar-wrap { height: 8px; background: #2d3348; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+  .pass-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #22c55e, #3b82f6); }
+</style>
+</head>
+<body>
+
+<h1>SFT-4882 ML route - SF</h1>
+<div class="subtitle">R119 &nbsp;&middot;&nbsp; R94 Pt.1 &nbsp;&middot;&nbsp; R94 Pt.2 &nbsp;&middot;&nbsp; R81 &nbsp;&middot;&nbsp; Tester: W</div>
+
+<div class="key-summary">
+  <div class="ks-item">
+    <div class="ks-icon">&#x1F6A8;</div>
+    <div><div class="ks-label">Platform Concerns</div><div class="ks-desc">2 self-disengagements (R94 Pt.1 W5, R81 W28); 1 unrecoverable; pattern at same spot in R81</div></div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">&#x26A0;&#xFE0F;</div>
+    <div><div class="ks-label">No Drive-off Issues</div><div class="ks-desc">Recurring failure to drive off at stop signs and AWS across all routes</div></div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">&#x26A0;&#xFE0F;</div>
+    <div><div class="ks-label">Understeer & Contender Handling</div><div class="ks-desc">Repeated understeer on turns; poor yielding to merging/cutting vehicles in R94 Pt.2</div></div>
+  </div>
+</div>
+
+<!-- Severity cards -->
+<div class="top-grid">
+  <div class="stat-card">
+    <div class="stat-label">XXL</div>
+    <div class="stat-value" style="color:#f87171;">1</div>
+    <div class="stat-tags">
+      <span class="stat-tag">understeer into pillar</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">XL</div>
+    <div class="stat-value red">13</div>
+    <div class="stat-tags">
+      <span class="stat-tag">self-disengage</span>
+      <span class="stat-tag">stuck at SS</span>
+      <span class="stat-tag">wrong lane RT</span>
+      <span class="stat-tag">no yield</span>
+      <span class="stat-tag">entered loading zone</span>
+      <span class="stat-tag">ghost brake junction</span>
+      <span class="stat-tag">stop on CW</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">L</div>
+    <div class="stat-value orange">52</div>
+    <div class="stat-tags">
+      <span class="stat-tag">no drive-off</span>
+      <span class="stat-tag">understeer</span>
+      <span class="stat-tag">wobble</span>
+      <span class="stat-tag">hesitant</span>
+      <span class="stat-tag">pulse brake</span>
+      <span class="stat-tag">ghost brake</span>
+      <span class="stat-tag">lane drift</span>
+      <span class="stat-tag">FN gridlock</span>
+      <span class="stat-tag">SILC abort</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">M</div>
+    <div class="stat-value blue">9</div>
+    <div class="stat-tags">
+      <span class="stat-tag">hard brake</span>
+      <span class="stat-tag">brake tap</span>
+      <span class="stat-tag">slight understeer</span>
+      <span class="stat-tag">wobble RT</span>
+      <span class="stat-tag">stopped at KCZ</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">S</div>
+    <div class="stat-value green">10</div>
+    <div class="stat-tags">
+      <span class="stat-tag">good nudge</span>
+      <span class="stat-tag">good LT</span>
+      <span class="stat-tag">good SILC</span>
+      <span class="stat-tag">good DPV</span>
+    </div>
+  </div>
+  <div class="stat-card" style="grid-column:span 2;">
+    <div class="stat-label">Trends — most common issues</div>
+    <div class="stat-tags" style="gap:5px;margin-top:6px;">
+      <span class="stat-tag" style="background:#431407;color:#fdba74;font-size:10px;padding:3px 8px;">⬆ No drive-off SS/AWS ×12</span>
+      <span class="stat-tag" style="background:#422006;color:#fb923c;font-size:10px;padding:3px 8px;">⬆ Understeer on turns ×10</span>
+      <span class="stat-tag" style="background:#422006;color:#fb923c;font-size:10px;padding:3px 8px;">Pulse / ghost brake ×9</span>
+      <span class="stat-tag" style="background:#1e3a5f;color:#93c5fd;font-size:10px;padding:3px 8px;">Wobble / jerky turns ×7</span>
+      <span class="stat-tag" style="background:#1e3a5f;color:#93c5fd;font-size:10px;padding:3px 8px;">Hesitant at junction ×6</span>
+      <span class="stat-tag" style="background:#431407;color:#fdba74;font-size:10px;padding:3px 8px;">FN gridlock / stuck CW ×3</span>
+      <span class="stat-tag" style="background:#431407;color:#fdba74;font-size:10px;padding:3px 8px;">No yield to contender ×2</span>
+      <span class="stat-tag" style="background:#4c0519;color:#fca5a5;font-size:10px;padding:3px 8px;">⬆ Self-disengage ×2</span>
+    </div>
+    <div style="font-size:9px;color:#475569;margin-top:6px;">Tag color = severity of associated events &nbsp;·&nbsp; ⬆ = highest severity or safety impact</div>
+  </div>
+</div>
+
+<!-- Route breakdown -->
+<div class="section-title">Route Breakdown</div>
+<div class="routes-grid">
+  <div class="route-card">
+    <div class="route-name">R119</div>
+    <div class="route-row"><span class="rk">XL</span><span class="rv red">1</span></div>
+    <div class="route-row"><span class="rk">L</span><span class="rv orange">19</span></div>
+    <div class="route-row"><span class="rk">M</span><span class="rv blue">3</span></div>
+    <div class="route-row"><span class="rk">S</span><span class="rv green">3</span></div>
+    <div class="route-row"><span class="rk">Pass (M+S)</span><span class="rv green">23%</span></div>
+    <div class="severity-bar">
+      <div class="bar-xl" style="width:4%"></div>
+      <div class="bar-l" style="width:73%"></div>
+      <div class="bar-m" style="width:11%"></div>
+      <div class="bar-s" style="width:12%"></div>
+    </div>
+  </div>
+  <div class="route-card">
+    <div class="route-name">R94 Pt.1</div>
+    <div class="route-row"><span class="rk">XL</span><span class="rv red">1</span></div>
+    <div class="route-row"><span class="rk">L</span><span class="rv orange">2</span></div>
+    <div class="route-row"><span class="rk">M</span><span class="rv blue">1</span></div>
+    <div class="route-row"><span class="rk">S</span><span class="rv green">1</span></div>
+    <div class="route-row"><span class="rk">Pass (M+S)</span><span class="rv green">40%</span></div>
+    <div class="route-row"><span class="rk">Self-disengage</span><span class="rv red">1 (unrecoverable)</span></div>
+    <div class="severity-bar">
+      <div class="bar-xl" style="width:20%"></div>
+      <div class="bar-l" style="width:40%"></div>
+      <div class="bar-m" style="width:20%"></div>
+      <div class="bar-s" style="width:20%"></div>
+    </div>
+  </div>
+  <div class="route-card">
+    <div class="route-name">R94 Pt.2</div>
+    <div class="route-row"><span class="rk">XL</span><span class="rv red">6</span></div>
+    <div class="route-row"><span class="rk">L</span><span class="rv orange">13</span></div>
+    <div class="route-row"><span class="rk">M</span><span class="rv blue">2</span></div>
+    <div class="route-row"><span class="rk">S</span><span class="rv green">4</span></div>
+    <div class="route-row"><span class="rk">Pass (M+S)</span><span class="rv green">24%</span></div>
+    <div class="severity-bar">
+      <div class="bar-xl" style="width:24%"></div>
+      <div class="bar-l" style="width:52%"></div>
+      <div class="bar-m" style="width:8%"></div>
+      <div class="bar-s" style="width:16%"></div>
+    </div>
+  </div>
+  <div class="route-card">
+    <div class="route-name">R81</div>
+    <div class="route-row"><span class="rk">XXL</span><span class="rv" style="color:#f87171;">1</span></div>
+    <div class="route-row"><span class="rk">XL</span><span class="rv red">5</span></div>
+    <div class="route-row"><span class="rk">L</span><span class="rv orange">18</span></div>
+    <div class="route-row"><span class="rk">M</span><span class="rv blue">3</span></div>
+    <div class="route-row"><span class="rk">S</span><span class="rv green">2</span></div>
+    <div class="route-row"><span class="rk">Pass (M+S)</span><span class="rv green">17%</span></div>
+    <div class="severity-bar">
+      <div class="bar-xxl" style="width:3%"></div>
+      <div class="bar-xl" style="width:17%"></div>
+      <div class="bar-l" style="width:62%"></div>
+      <div class="bar-m" style="width:10%"></div>
+      <div class="bar-s" style="width:8%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Trends -->
+<div class="two-col">
+  <div class="panel">
+    <div class="section-title">Issue Frequency</div>
+    <div class="trend-row"><span class="trend-label">No drive-off at SS / AWS</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#fb923c;"></div></div><span class="trend-count orange">12</span></div>
+    <div class="trend-row"><span class="trend-label">Understeer (turns / LT / RT)</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:83%;background:#fb923c;"></div></div><span class="trend-count orange">10</span></div>
+    <div class="trend-row"><span class="trend-label">Pulse / ghost braking</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:75%;background:#fb923c;"></div></div><span class="trend-count orange">9</span></div>
+    <div class="trend-row"><span class="trend-label">Wobble / jerky turns</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:58%;background:#3b82f6;"></div></div><span class="trend-count blue">7</span></div>
+    <div class="trend-row"><span class="trend-label">Hesitant at junction / AWS</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:50%;background:#fb923c;"></div></div><span class="trend-count orange">6</span></div>
+    <div class="trend-row"><span class="trend-label">FN gridlock / stuck in CW</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:25%;background:#ef4444;"></div></div><span class="trend-count red">3</span></div>
+    <div class="trend-row"><span class="trend-label">No yield to merging contender</span><div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:17%;background:#ef4444;"></div></div><span class="trend-count red">2</span></div>
+    <div class="alert-box">
+      &#x26A0;&#xFE0F; R81 W27 XXL: Understeer into pillar on corner &mdash; APTO<br>
+      &#x26A0;&#xFE0F; R94 Pt.1 W5: Self-disengagement, unrecoverable<br>
+      &#x26A0;&#xFE0F; R81 W28 XL: Self-disengagement at same spot as prior run; self-recovered<br>
+      &#x26A0;&#xFE0F; R94 Pt.2 W5: Understeer into median during RT (HD mapped) &mdash; APTO
+    </div>
+  </div>
+  <div class="panel">
+    <div class="section-title">Notable Patterns</div>
+    <div class="trend-row"><span class="trend-label">No drive-off at SS (R81)</span><span class="trend-count red">×5</span></div>
+    <div class="trend-row"><span class="trend-label">Understeer on RT (R94 Pt.2)</span><span class="trend-count orange">×3</span></div>
+    <div class="trend-row"><span class="trend-label">Pulse braking at AWS (R81)</span><span class="trend-count orange">×3</span></div>
+    <div class="trend-row"><span class="trend-label">FN nudge issues (R119)</span><span class="trend-count orange">×2</span></div>
+    <div class="trend-row"><span class="trend-label">SILC abort into buslane (R119)</span><span class="trend-count orange">×1</span></div>
+    <div class="trend-row"><span class="trend-label">Self-disengage same location (R81)</span><span class="trend-count red">×2 runs</span></div>
+    <div class="trend-row"><span class="trend-label">Stopped in / on CW (R94 Pt.2, R81)</span><span class="trend-count red">×2</span></div>
+  </div>
+</div>
+
+<!-- Detailed log -->
+<div class="section-title">Detailed Event Log</div>
+<div class="tab-buttons">
+  <button class="tab-btn active" onclick="showTab('r119')">R119</button>
+  <button class="tab-btn" onclick="showTab('r94a')">R94 Pt.1</button>
+  <button class="tab-btn" onclick="showTab('r94b')">R94 Pt.2</button>
+  <button class="tab-btn" onclick="showTab('r81')">R81</button>
+</div>
+
+<div class="panel" style="padding:0;overflow:hidden;">
+
+<!-- R119 -->
+<div id="tab-r119">
+<table class="log-table">
+<thead><tr><th style="width:80px;">Event</th><th style="width:40px;">#</th><th style="width:36px;">Sev</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a97e7643-16df-4860-9fdf-24d6d0d16508/a97e7643-16df-4860-9fdf-24d6d0d16508" target="_blank">a97e7643</a></td><td class="id-col">W1</td><td><span class="sev-pill sev-m">M</span></td><td>Hard braking with red TL</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1807ea78-8db1-4855-947c-50a5ee3a1707/1807ea78-8db1-4855-947c-50a5ee3a1707" target="_blank">1807ea78</a></td><td class="id-col">W2</td><td><span class="sev-pill sev-l">L</span></td><td>FN gridlock; stopping at CW</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f7e2b546-0a2d-427a-a7c5-452a9f5c39af/f7e2b546-0a2d-427a-a7c5-452a9f5c39af" target="_blank">f7e2b546</a></td><td class="id-col">W3</td><td><span class="sev-pill sev-l">L</span></td><td>Proceeded too deep for UPL; slightly blocking oncoming</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f0ecab6a-1ba3-447b-9367-af141ad63d08/f0ecab6a-1ba3-447b-9367-af141ad63d08" target="_blank">f0ecab6a</a></td><td class="id-col">W4</td><td><span class="sev-pill sev-l">L</span></td><td>Understeer into bus lane then corrected</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/8c0d561c-a43f-48fd-941b-6d351a081f68/8c0d561c-a43f-48fd-941b-6d351a081f68" target="_blank">8c0d561c</a></td><td class="id-col">W6</td><td><span class="sev-pill sev-l">L</span></td><td>Understeer and wobble during RT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/84609bc5-eac5-44d7-a1ae-11d0241d7b38/84609bc5-eac5-44d7-a1ae-11d0241d7b38" target="_blank">84609bc5</a></td><td class="id-col">W6</td><td><span class="sev-pill sev-l">L</span></td><td>Uncomfortable SILC abort into bus lane</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7f181e81-d7e1-4562-a0c3-4fa68c8b1cc9/7f181e81-d7e1-4562-a0c3-4fa68c8b1cc9" target="_blank">7f181e81</a></td><td class="id-col">W7</td><td><span class="sev-pill sev-s">S</span></td><td>Good LT; yielded to ped at CW</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/03ac7a74-d330-4bce-bd24-c863166e84ac/03ac7a74-d330-4bce-bd24-c863166e84ac" target="_blank">03ac7a74</a></td><td class="id-col">W8</td><td><span class="sev-pill sev-l">L</span></td><td>Too close to moto cut-out left</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/6c3b63a5-ec7f-4214-a40b-3af0e47c95cd/6c3b63a5-ec7f-4214-a40b-3af0e47c95cd" target="_blank">6c3b63a5</a></td><td class="id-col">W9</td><td><span class="sev-pill sev-l">L</span></td><td>Lane drift left over lane line and yellow on curvature</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4180b1a2-03cc-4493-a504-5fa5dfa8c44a/4180b1a2-03cc-4493-a504-5fa5dfa8c44a" target="_blank">4180b1a2</a></td><td class="id-col">W10</td><td><span class="sev-pill sev-m">M</span></td><td>Lane drift right on curvature over broken white lane</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/23c69eef-708f-4722-ba32-042fc886fa0e/23c69eef-708f-4722-ba32-042fc886fa0e" target="_blank">23c69eef</a></td><td class="id-col">W11</td><td><span class="sev-pill sev-l">L</span></td><td>Double stop before LT at AWS</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a66b72fd-157b-4b7b-a71a-7d096e71260f/a66b72fd-157b-4b7b-a71a-7d096e71260f" target="_blank">a66b72fd</a></td><td class="id-col">W12</td><td><span class="sev-pill sev-l">L</span></td><td>Wobbly LT at AWS; too close to parked vehicle right at end</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/bd21f2e2-b419-420c-bc08-908063aff685/bd21f2e2-b419-420c-bc08-908063aff685" target="_blank">bd21f2e2</a></td><td class="id-col">W13</td><td><span class="sev-pill sev-l">L</span></td><td>Pulse braking at AWS</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/603e2cc1-9815-4bd9-bafa-f5cf4a3c8a3c/603e2cc1-9815-4bd9-bafa-f5cf4a3c8a3c" target="_blank">603e2cc1</a></td><td class="id-col">W14</td><td><span class="sev-pill sev-l">L</span></td><td>Wobbly LT at AWS</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/16bd8b31-aff0-42ab-962f-cc417226ee50/16bd8b31-aff0-42ab-962f-cc417226ee50" target="_blank">16bd8b31</a></td><td class="id-col">W15</td><td><span class="sev-pill sev-l">L</span></td><td>Hesitation at AWS with no contenders</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4904f9ed-01ed-4f69-834c-1d1a4b6f7ea5/4904f9ed-01ed-4f69-834c-1d1a4b6f7ea5" target="_blank">4904f9ed</a></td><td class="id-col">W16</td><td><span class="sev-pill sev-l">L</span></td><td>No drive-off at SS &mdash; APTO</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/88f2b7e7-5ee7-497c-9b5d-b8415adc1ccc/88f2b7e7-5ee7-497c-9b5d-b8415adc1ccc" target="_blank">88f2b7e7</a></td><td class="id-col">W17</td><td><span class="sev-pill sev-l">L</span></td><td>Slow hesitant stop at SS (HD mapped)</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/03e8b699-d61d-4182-9b6b-e6b14a7eeb5f/03e8b699-d61d-4182-9b6b-e6b14a7eeb5f" target="_blank">03e8b699</a></td><td class="id-col">W19</td><td><span class="sev-pill sev-l">L</span></td><td>FN gridlock; stuck in CW with ped on CW; impeding traffic &mdash; APTO</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/6774bf3c-9b71-484a-9220-5adb2e523585/6774bf3c-9b71-484a-9220-5adb2e523585" target="_blank">6774bf3c</a></td><td class="id-col">W19</td><td><span class="sev-pill sev-s">S</span></td><td>Good slight nudge through contenders</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7a2b7690-ab6a-406a-bf28-c70daa8bfb45/7a2b7690-ab6a-406a-bf28-c70daa8bfb45" target="_blank">7a2b7690</a></td><td class="id-col">W20</td><td><span class="sev-pill sev-m">M</span></td><td>Brake tap in junction</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/11c1a376-1815-4428-8ff1-7dfbcb105d80/11c1a376-1815-4428-8ff1-7dfbcb105d80" target="_blank">11c1a376</a></td><td class="id-col">W21</td><td><span class="sev-pill sev-xl">XL</span></td><td>Stuck before SS &mdash; APTO &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/58858c34-814f-44ac-bbea-cb0f72777993/58858c34-814f-44ac-bbea-cb0f72777993" target="_blank">58858c34</a></td><td class="id-col">W22</td><td><span class="sev-pill sev-s">S</span></td><td>Good DPV nudge</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c74e030d-ee77-4ca7-abd0-6f5d54ad5fa3/c74e030d-ee77-4ca7-abd0-6f5d54ad5fa3" target="_blank">c74e030d</a></td><td class="id-col">W23</td><td><span class="sev-pill sev-l">L</span></td><td>RT with ped at CW nearing</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e0509c84-3b7f-4822-a37f-363f0fc3b72e/e0509c84-3b7f-4822-a37f-363f0fc3b72e" target="_blank">e0509c84</a></td><td class="id-col">W24</td><td><span class="sev-pill sev-m">M</span></td><td>Understeer during LT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c36f2039-1c37-456e-a796-6374c0dfef32/c36f2039-1c37-456e-a796-6374c0dfef32" target="_blank">c36f2039</a></td><td class="id-col">W25</td><td><span class="sev-pill sev-l">L</span></td><td>Hesitant LT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ebfb32a5-7ab2-4bd9-b62c-8a38b6955dc2/ebfb32a5-7ab2-4bd9-b62c-8a38b6955dc2" target="_blank">ebfb32a5</a></td><td class="id-col">W26</td><td><span class="sev-pill sev-l">L</span></td><td>FN nudge with RVIP &mdash; APTO</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/6ac26d81-bba6-4de9-90c1-4aa246f23696/6ac26d81-bba6-4de9-90c1-4aa246f23696" target="_blank">6ac26d81</a></td><td class="id-col">W27</td><td><span class="sev-pill sev-l">L</span></td><td>FN nudge with RVIP slightly in path</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/056e39c1-ce8e-4461-a8b0-ee3e0836a132/056e39c1-ce8e-4461-a8b0-ee3e0836a132" target="_blank">056e39c1</a></td><td class="id-col">W28</td><td><span class="sev-pill sev-l">L</span></td><td>Pulse braking with perpendicular cut-in</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/488cd950-6684-4db9-8425-be4d93b26d90/488cd950-6684-4db9-8425-be4d93b26d90" target="_blank">488cd950</a></td><td class="id-col">W29</td><td><span class="sev-pill sev-s">S</span></td><td>Good RT into right lane (correct despite routing)</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- R94 Pt1 -->
+<div id="tab-r94a" class="hidden">
+<table class="log-table">
+<thead><tr><th style="width:80px;">Event</th><th style="width:40px;">#</th><th style="width:36px;">Sev</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ecaa7b68-a912-4b8b-bc61-d95a7a97479d/ecaa7b68-a912-4b8b-bc61-d95a7a97479d" target="_blank">ecaa7b68</a></td><td class="id-col">W1</td><td><span class="sev-pill sev-s">S</span></td><td>Good DPV nudge</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/284d9f4c-dc58-458a-b596-02f63843769c/284d9f4c-dc58-458a-b596-02f63843769c" target="_blank">284d9f4c</a></td><td class="id-col">W2</td><td><span class="sev-pill sev-l">L</span></td><td>Wobbly LT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4cc41de9-f1b7-4fbd-9aa3-20043e2ed4b7/4cc41de9-f1b7-4fbd-9aa3-20043e2ed4b7" target="_blank">4cc41de9</a></td><td class="id-col">W3</td><td><span class="sev-pill sev-m">M</span></td><td>Brake tap during PLT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2bd0353d-8a6c-493b-bf87-0417b9453b58/2bd0353d-8a6c-493b-bf87-0417b9453b58" target="_blank">2bd0353d</a></td><td class="id-col">W4</td><td><span class="sev-pill sev-l">L</span></td><td>Ghost brake during RT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f15919eb-5e90-448b-b84d-791398ec0690/f15919eb-5e90-448b-b84d-791398ec0690" target="_blank">f15919eb</a></td><td class="id-col">W5</td><td><span class="sev-pill sev-xl">XL</span></td><td>Self-disengagement, unrecoverable &#x26A0;&#x26A0;</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- R94 Pt2 -->
+<div id="tab-r94b" class="hidden">
+<table class="log-table">
+<thead><tr><th style="width:80px;">Event</th><th style="width:40px;">#</th><th style="width:36px;">Sev</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/0bf1c3c9-cacb-4328-87cd-9c524e492e91/0bf1c3c9-cacb-4328-87cd-9c524e492e91" target="_blank">0bf1c3c9</a></td><td class="id-col">W1</td><td><span class="sev-pill sev-s">S</span></td><td>Good left DPV nudge</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ef195a32-5f0d-495e-a4f1-22e46ebe6d92/ef195a32-5f0d-495e-a4f1-22e46ebe6d92" target="_blank">ef195a32</a></td><td class="id-col">W2</td><td><span class="sev-pill sev-xl">XL</span></td><td>SILC left into parking lane before RT a block away &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/854d5e06-d4e6-4f07-9590-fbf1ac5a8536/854d5e06-d4e6-4f07-9590-fbf1ac5a8536" target="_blank">854d5e06</a></td><td class="id-col">W3</td><td><span class="sev-pill sev-l">L</span></td><td>Pulse braking before RT with green TL</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e7b5fd9e-aa82-4cdd-86ac-aa2773df480f/e7b5fd9e-aa82-4cdd-86ac-aa2773df480f" target="_blank">e7b5fd9e</a></td><td class="id-col">W4</td><td><span class="sev-pill sev-l">L</span></td><td>Understeer RT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/52b599f5-fb95-4a0f-88c7-0094ea483539/52b599f5-fb95-4a0f-88c7-0094ea483539" target="_blank">52b599f5</a></td><td class="id-col">W5</td><td><span class="sev-pill sev-xl">XL</span></td><td>Understeer into median during RT (HD mapped) &mdash; APTO &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4fcaaec5-4509-451d-96bd-c12f37e60dbf/4fcaaec5-4509-451d-96bd-c12f37e60dbf" target="_blank">4fcaaec5</a></td><td class="id-col">W6</td><td><span class="sev-pill sev-xl">XL</span></td><td>Attempting RT from wrong lane &mdash; APTO &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1c42f7e6-adfa-4215-b489-38ad52d9dc4e/1c42f7e6-adfa-4215-b489-38ad52d9dc4e" target="_blank">1c42f7e6</a></td><td class="id-col">W7</td><td><span class="sev-pill sev-xl">XL</span></td><td>Not yielding to slow merging vehicle (hesitant contender) &mdash; APTO &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/6fc19f19-7a41-4b91-9bf8-58f6e6ec2c92/6fc19f19-7a41-4b91-9bf8-58f6e6ec2c92" target="_blank">6fc19f19</a></td><td class="id-col">W8</td><td><span class="sev-pill sev-xl">XL</span></td><td>Not yielding to slow cut-in left from parking lane &mdash; APTO &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a95c8e57-fe1f-4958-bdfc-5b096a01a378/a95c8e57-fe1f-4958-bdfc-5b096a01a378" target="_blank">a95c8e57</a></td><td class="id-col">W9</td><td><span class="sev-pill sev-s">S</span></td><td>Good LT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/40c89612-9a8c-42fb-8bf2-18fbf03e42d4/40c89612-9a8c-42fb-8bf2-18fbf03e42d4" target="_blank">40c89612</a></td><td class="id-col">W10</td><td><span class="sev-pill sev-xl">XL</span></td><td>Entered loading zone behind parked contender then stuck &mdash; APTO &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e51c8636-0f43-46de-a88e-afaa4715427e/e51c8636-0f43-46de-a88e-afaa4715427e" target="_blank">e51c8636</a></td><td class="id-col">W11</td><td><span class="sev-pill sev-l">L</span></td><td>Stopped while proceeding straight</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/58b0a249-d738-49b9-8236-b2d6e07d3166/58b0a249-d738-49b9-8236-b2d6e07d3166" target="_blank">58b0a249</a></td><td class="id-col">W12</td><td><span class="sev-pill sev-l">L</span></td><td>Stopped in KCZ</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/faf4284a-22e8-4aea-bd21-c63ff19ddd0a/faf4284a-22e8-4aea-bd21-c63ff19ddd0a" target="_blank">faf4284a</a></td><td class="id-col">W13</td><td><span class="sev-pill sev-l">L</span></td><td>No drive-off with green TL &mdash; APTO; enraging drivers behind</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/dfc86580-a76c-4be3-bc94-f535f5d54b97/dfc86580-a76c-4be3-bc94-f535f5d54b97" target="_blank">dfc86580</a></td><td class="id-col">W14</td><td><span class="sev-pill sev-l">L</span></td><td>Understeer RT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/78c519af-f864-4801-b746-a0f31f0ca3da/78c519af-f864-4801-b746-a0f31f0ca3da" target="_blank">78c519af</a></td><td class="id-col">W15</td><td><span class="sev-pill sev-l">L</span></td><td>Missed route SILC due to traffic &mdash; APTO (hard case)</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d84d3d8e-7535-49dd-8234-cad55e0c1d14/d84d3d8e-7535-49dd-8234-cad55e0c1d14" target="_blank">d84d3d8e</a></td><td class="id-col">W17</td><td><span class="sev-pill sev-l">L</span></td><td>Harsh SILC abort with contender right</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/af27c912-c7d5-45af-b9ea-ad53ded26492/af27c912-c7d5-45af-b9ea-ad53ded26492" target="_blank">af27c912</a></td><td class="id-col">W17</td><td><span class="sev-pill sev-s">S</span></td><td>Good nudge with large parked vehicle right and contender left</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f8b11bcb-e04e-4feb-8a0b-0b9d4c509d47/f8b11bcb-e04e-4feb-8a0b-0b9d4c509d47" target="_blank">f8b11bcb</a></td><td class="id-col">W18</td><td><span class="sev-pill sev-l">L</span></td><td>Lane drift left or SILC with no signal</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/72aafe0a-8f2b-496c-831a-6c32688712a9/72aafe0a-8f2b-496c-831a-6c32688712a9" target="_blank">72aafe0a</a></td><td class="id-col">W20</td><td><span class="sev-pill sev-s">S</span></td><td>Good assertive SILC between contenders</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/6923bddd-7848-4161-b11e-3bba225ee4b3/6923bddd-7848-4161-b11e-3bba225ee4b3" target="_blank">6923bddd</a></td><td class="id-col">W20</td><td><span class="sev-pill sev-m">M</span></td><td>Slight wobble at end of RT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/865a3113-82cd-4b6a-a800-a0432459fc53/865a3113-82cd-4b6a-a800-a0432459fc53" target="_blank">865a3113</a></td><td class="id-col">W21</td><td><span class="sev-pill sev-l">L</span></td><td>Uncomfortable SILC too close to CVIP</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2a39dba5-3117-45d0-92dd-8d99076351dc/2a39dba5-3117-45d0-92dd-8d99076351dc" target="_blank">2a39dba5</a></td><td class="id-col">W22</td><td><span class="sev-pill sev-l">L</span></td><td>Understeer LT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/3e96c8a7-7eb4-4a3c-8c92-b6949f757a98/3e96c8a7-7eb4-4a3c-8c92-b6949f757a98" target="_blank">3e96c8a7</a></td><td class="id-col">W23</td><td><span class="sev-pill sev-l">L</span></td><td>Ghost brake</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/50f4771f-1a65-4704-950a-c0ea5cdffd06/50f4771f-1a65-4704-950a-c0ea5cdffd06" target="_blank">50f4771f</a></td><td class="id-col">W24</td><td><span class="sev-pill sev-s">S</span></td><td>Good nudge with CVIP cut-out right</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/bcb50653-c5fa-4939-b2e3-690e11d3fd07/bcb50653-c5fa-4939-b2e3-690e11d3fd07" target="_blank">bcb50653</a></td><td class="id-col">W25</td><td><span class="sev-pill sev-m">M</span></td><td>Hard braking with yellow TL</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/da7f522f-7308-47bb-b32c-1e96355f2ce8/da7f522f-7308-47bb-b32c-1e96355f2ce8" target="_blank">da7f522f</a></td><td class="id-col">W26</td><td><span class="sev-pill sev-l">L</span></td><td>LT in between lanes</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ed0a6567-a006-456a-a860-f0b2bc1f2ed9/ed0a6567-a006-456a-a860-f0b2bc1f2ed9" target="_blank">ed0a6567</a></td><td class="id-col">W27</td><td><span class="sev-pill sev-l">L</span></td><td>Understeer and wobble at end of LT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/6999656a-8a49-4484-9737-3fdee2a7c10c/6999656a-8a49-4484-9737-3fdee2a7c10c" target="_blank">6999656a</a></td><td class="id-col">W29</td><td><span class="sev-pill sev-l">L</span></td><td>No drive-off at AWS &mdash; APTO</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- R81 -->
+<div id="tab-r81" class="hidden">
+<table class="log-table">
+<thead><tr><th style="width:80px;">Event</th><th style="width:40px;">#</th><th style="width:36px;">Sev</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4c7c6378-87f3-4e3d-bf74-a16c357d6a67/4c7c6378-87f3-4e3d-bf74-a16c357d6a67" target="_blank">4c7c6378</a></td><td class="id-col">W1</td><td><span class="sev-pill sev-l">L</span></td><td>Lane drift on curvature</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/6beab057-1b3d-4f3d-b0cb-9cf588b91d7b/6beab057-1b3d-4f3d-b0cb-9cf588b91d7b" target="_blank">6beab057</a></td><td class="id-col">W2</td><td><span class="sev-pill sev-l">L</span></td><td>No drive-off at SS &mdash; APTO</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/40820120-c509-49df-befe-cb86b4d67b2c/40820120-c509-49df-befe-cb86b4d67b2c" target="_blank">40820120</a></td><td class="id-col">W3</td><td><span class="sev-pill sev-m">M</span></td><td>Light pulse brake at AWS with CT contender present</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7fcb2256-210f-4e62-abb5-c237bbde57ea/7fcb2256-210f-4e62-abb5-c237bbde57ea" target="_blank">7fcb2256</a></td><td class="id-col">W4</td><td><span class="sev-pill sev-l">L</span></td><td>Understeer into left lane during RT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/61387b20-0615-4f9f-b9e0-c01411aabe77/61387b20-0615-4f9f-b9e0-c01411aabe77" target="_blank">61387b20</a></td><td class="id-col">W5</td><td><span class="sev-pill sev-m">M</span></td><td>Slight understeer during PLT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/84865ff2-8c88-4637-9352-ebe23e8186a2/84865ff2-8c88-4637-9352-ebe23e8186a2" target="_blank">84865ff2</a></td><td class="id-col">W7</td><td><span class="sev-pill sev-l">L</span></td><td>Very hesitant at AWS</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/799188f2-0790-45cd-a7e4-0ec29342fd08/799188f2-0790-45cd-a7e4-0ec29342fd08" target="_blank">799188f2</a></td><td class="id-col">W7</td><td><span class="sev-pill sev-l">L</span></td><td>Pulse braking at AWS with ped on CW ahead</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/be49d3f7-8e22-4964-b61f-579d28ab6de6/be49d3f7-8e22-4964-b61f-579d28ab6de6" target="_blank">be49d3f7</a></td><td class="id-col">W8</td><td><span class="sev-pill sev-l">L</span></td><td>No drive-off at SS (HD mapped)</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ad485e3b-36cf-4dfc-bcd1-e272bb0f93b0/ad485e3b-36cf-4dfc-bcd1-e272bb0f93b0" target="_blank">ad485e3b</a></td><td class="id-col">W10</td><td><span class="sev-pill sev-l">L</span></td><td>Lateral jerk (faded lane marking?)</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f19dcf54-222e-46cc-b6a5-25da370d10fc/f19dcf54-222e-46cc-b6a5-25da370d10fc" target="_blank">f19dcf54</a></td><td class="id-col">W10</td><td><span class="sev-pill sev-l">L</span></td><td>Ghost brake nearing empty CW</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/6ae30f9e-f4f8-4332-817e-ab00865f5fca/6ae30f9e-f4f8-4332-817e-ab00865f5fca" target="_blank">6ae30f9e</a></td><td class="id-col">W12</td><td><span class="sev-pill sev-l">L</span></td><td>Pulse braking at AWS</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/8375bd65-52b5-48a6-a60f-8455407bf1b4/8375bd65-52b5-48a6-a60f-8455407bf1b4" target="_blank">8375bd65</a></td><td class="id-col">W12</td><td><span class="sev-pill sev-xl">XL</span></td><td>Too close to bus left during LT &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/16c0cf33-d030-45b6-b3fc-d96db4941472/16c0cf33-d030-45b6-b3fc-d96db4941472" target="_blank">16c0cf33</a></td><td class="id-col">W13</td><td><span class="sev-pill sev-xl">XL</span></td><td>Harsh ghost brake in junction with green left arrow; bus behind &mdash; APTO &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/124c905b-894b-4716-9bc9-c4666234cf6a/124c905b-894b-4716-9bc9-c4666234cf6a" target="_blank">124c905b</a></td><td class="id-col">W14</td><td><span class="sev-pill sev-l">L</span></td><td>No drive-off at SS at incline &mdash; APTO</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7bb2697d-3e50-47f5-9533-3c2db134c6aa/7bb2697d-3e50-47f5-9533-3c2db134c6aa" target="_blank">7bb2697d</a></td><td class="id-col">W15</td><td><span class="sev-pill sev-l">L</span></td><td>Excessive CSA on slow curvature</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/014ebf29-f3fa-4989-a5fa-33ab3deab3aa/014ebf29-f3fa-4989-a5fa-33ab3deab3aa" target="_blank">014ebf29</a></td><td class="id-col">W16</td><td><span class="sev-pill sev-l">L</span></td><td>No drive-off at SS before downhill</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f0841227-68c7-4b98-9083-fe217baf9cd0/f0841227-68c7-4b98-9083-fe217baf9cd0" target="_blank">f0841227</a></td><td class="id-col">W17</td><td><span class="sev-pill sev-l">L</span></td><td>Pulse braking downhill</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e08894fa-28b5-4009-8129-c086c3464e86/e08894fa-28b5-4009-8129-c086c3464e86" target="_blank">e08894fa</a></td><td class="id-col">W18</td><td><span class="sev-pill sev-xl">XL</span></td><td>Stopping on exit CW &mdash; APTO &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/dcfe4e44-1b71-416f-8767-7f66f863bd94/dcfe4e44-1b71-416f-8767-7f66f863bd94" target="_blank">dcfe4e44</a></td><td class="id-col">W19</td><td><span class="sev-pill sev-l">L</span></td><td>Understeer and wobbly RT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/bc153750-177c-45d8-8949-48a2e558adf8/bc153750-177c-45d8-8949-48a2e558adf8" target="_blank">bc153750</a></td><td class="id-col">W20</td><td><span class="sev-pill sev-l">L</span></td><td>No drive-off at SS</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/b063a303-6b50-423f-a439-d313e63c8377/b063a303-6b50-423f-a439-d313e63c8377" target="_blank">b063a303</a></td><td class="id-col">W21</td><td><span class="sev-pill sev-l">L</span></td><td>No drive-off at SS</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/94f87642-52a9-4eca-aa7d-8c77bc16ae82/94f87642-52a9-4eca-aa7d-8c77bc16ae82" target="_blank">94f87642</a></td><td class="id-col">W22</td><td><span class="sev-pill sev-xl">XL</span></td><td>Pulse braking when stuck at SS &mdash; APTO &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1411175d-48a4-49a3-bdb9-e18c72188fb6/1411175d-48a4-49a3-bdb9-e18c72188fb6" target="_blank">1411175d</a></td><td class="id-col">W23</td><td><span class="sev-pill sev-s">S</span></td><td>Good nudge with parking car right</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/dad6590f-a9c9-4eee-b915-f0d7bebcbc6d/dad6590f-a9c9-4eee-b915-f0d7bebcbc6d" target="_blank">dad6590f</a></td><td class="id-col">W24</td><td><span class="sev-pill sev-l">L</span></td><td>Ghost brake</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/475f3bf1-396f-4e7e-b301-2decead6c68b/475f3bf1-396f-4e7e-b301-2decead6c68b" target="_blank">475f3bf1</a></td><td class="id-col">W25</td><td><span class="sev-pill sev-l">L</span></td><td>Lane hug too close to foliage on ramp at high speed</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/281dfc0e-a349-4625-bbf2-ad1902273d47/281dfc0e-a349-4625-bbf2-ad1902273d47" target="_blank">281dfc0e</a></td><td class="id-col">W27</td><td><span class="sev-pill sev-xxl">XXL</span></td><td>Understeer LT into pillar on corner &mdash; APTO &#x26A0;&#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/5ae41fb9-3237-4198-9c4e-68eb1a14c82e/5ae41fb9-3237-4198-9c4e-68eb1a14c82e" target="_blank">5ae41fb9</a></td><td class="id-col">W27</td><td><span class="sev-pill sev-m">M</span></td><td>Stopped before KCZ but clearance ahead</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7403add0-377b-48d4-b16f-0e0a1d1c58b5/7403add0-377b-48d4-b16f-0e0a1d1c58b5" target="_blank">7403add0</a></td><td class="id-col">W28</td><td><span class="sev-pill sev-xl">XL</span></td><td>Self-disengagement at same spot as prior run; self-recovered &#x26A0;</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+function showTab(id) {
+  ['r119','r94a','r94b','r81'].forEach(function(r) {
+    document.getElementById('tab-' + r).classList.add('hidden');
+  });
+  document.getElementById('tab-' + id).classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+    btn.classList.toggle('active', ['r119','r94a','r94b','r81'][i] === id);
+  });
+}
+</script>
+</body>
+</html>
