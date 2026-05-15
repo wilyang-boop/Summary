@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 18px; font-size: 13px; }
+  h1 { font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 3px; }
+  .subtitle { font-size: 11px; color: #94a3b8; margin-bottom: 12px; }
+
+  .key-summary { background: #1a1f2e; border: 1px solid #2d3348; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .ks-item { display: flex; align-items: flex-start; gap: 8px; }
+  .ks-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .ks-label { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .ks-desc { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+
+  .top-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card { background: #1e2230; border-radius: 8px; padding: 10px 12px; border: 1px solid #2d3348; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-bottom: 3px; }
+  .stat-value { font-size: 22px; font-weight: 700; }
+  .stat-sub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+  .stat-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+  .stat-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #2d3348; color: #94a3b8; }
+  .red { color: #f87171; } .orange { color: #fb923c; } .blue { color: #60a5fa; } .green { color: #4ade80; } .purple { color: #c084fc; }
+
+  .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+
+  .panel { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; margin-bottom: 14px; }
+
+  .trend-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #1a1f2e; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-label { font-size: 11px; color: #94a3b8; flex: 1; }
+  .trend-bar-wrap { width: 90px; height: 6px; background: #2d3348; border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; }
+  .trend-count { font-size: 11px; font-weight: 700; min-width: 20px; text-align: right; }
+  .trend-sev { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+  .sev-xl-tag { background: #431407; color: #fdba74; }
+  .sev-l-tag  { background: #422006; color: #fb923c; }
+  .sev-m-tag  { background: #1e3a5f; color: #93c5fd; }
+
+  .log-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .log-table th { text-align: left; padding: 6px 8px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .log-table td { padding: 5px 8px; border-bottom: 1px solid #1a1f2e; vertical-align: top; line-height: 1.5; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: #1a1f2e; }
+
+  .sev-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .sev-xl { background: #431407; color: #fdba74; }
+  .sev-l  { background: #422006; color: #fb923c; }
+  .sev-m  { background: #1e3a5f; color: #93c5fd; }
+  .sev-s  { background: #14532d; color: #86efac; }
+
+  .id-col { font-weight: 700; color: #64748b; white-space: nowrap; font-size: 11px; }
+  .loc-col { font-size: 10px; color: #475569; font-style: italic; }
+  .event-link { font-size: 10px; color: #3b82f6; text-decoration: none; font-family: monospace; display: block; line-height: 1.8; }
+  .event-link:hover { color: #60a5fa; text-decoration: underline; }
+
+  .pass-bar-wrap { height: 8px; background: #2d3348; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+  .pass-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #22c55e, #3b82f6); }
+  .alert-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #f97316; background: #2d1800; margin-top: 8px; font-size: 11px; color: #fdba74; line-height: 1.6; }
+  .info-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; background: #0f2040; margin-top: 8px; font-size: 11px; color: #93c5fd; line-height: 1.6; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+</style>
+</head>
+<body>
+
+<h1>AMO FP U-Turn Build + RS Feasibility Filter Experiment</h1>
+<div class="subtitle">No HD Map &nbsp;&middot;&nbsp; 2-lane, 3-lane, 4-lane + bike lane configurations &nbsp;&middot;&nbsp; Tester: W</div>
+
+<div class="key-summary">
+  <div class="ks-item">
+    <div class="ks-icon">&#x26A0;&#xFE0F;</div>
+    <div><div class="ks-label">2-lane + bike lane struggles</div><div class="ks-desc">Repeated aborts, oversteer, fishhook, and LK degradation on narrow 2-lane + bike configurations</div></div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">&#x1F6A8;</div>
+    <div><div class="ks-label">LK Degradation</div><div class="ks-desc">TDS → ACC drops mid-turn (W11, W24, W25); pattern on 2-3 lane no HD map</div></div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">&#x2705;</div>
+    <div><div class="ks-label">3-4 Lane Performing Better</div><div class="ks-desc">Most S events on 3-4 lane; 2 perfect manual U-turns logged (W28, W29)</div></div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="top-grid">
+  <div class="stat-card">
+    <div class="stat-label">XL</div>
+    <div class="stat-value red">11</div>
+    <div class="stat-tags">
+      <span class="stat-tag">abort mid-turn</span>
+      <span class="stat-tag">missed</span>
+      <span class="stat-tag">oversteer</span>
+      <span class="stat-tag">LK degrade</span>
+      <span class="stat-tag">creep w/ oncoming</span>
+      <span class="stat-tag">jerk mid-turn</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">L</div>
+    <div class="stat-value orange">5</div>
+    <div class="stat-tags">
+      <span class="stat-tag">slow unprotected</span>
+      <span class="stat-tag">understeer</span>
+      <span class="stat-tag">hesitant stop</span>
+      <span class="stat-tag">fishhook bike lane</span>
+      <span class="stat-tag">very slow</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">M</div>
+    <div class="stat-value blue">5</div>
+    <div class="stat-tags">
+      <span class="stat-tag">fishhook smooth</span>
+      <span class="stat-tag">slow start</span>
+      <span class="stat-tag">jerky fishhook</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">S</div>
+    <div class="stat-value green">8</div>
+    <div class="stat-tags">
+      <span class="stat-tag">good turn</span>
+      <span class="stat-tag">nominal</span>
+      <span class="stat-tag">perfect manual</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Pass Rate (L+M+S)</div>
+    <div class="stat-value purple">62%</div>
+    <div class="stat-sub">18 of 29 events</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:62%"></div></div>
+  </div>
+</div>
+
+<!-- Trends -->
+<div class="two-col">
+  <div class="panel">
+    <div class="section-title">Trends — Most Common Issues</div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Abort mid-turn (2-lane + bike)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#ef4444;"></div></div>
+      <span class="trend-count red">4</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">LK degradation TDS→ACC</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:75%;background:#ef4444;"></div></div>
+      <span class="trend-count red">3</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-m-tag">M</span>
+      <span class="trend-label">Fishhook at end of turn</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:75%;background:#3b82f6;"></div></div>
+      <span class="trend-count blue">3</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">Hesitant / slow with oncoming</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:50%;background:#fb923c;"></div></div>
+      <span class="trend-count orange">2</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Oversteer / jerk mid-turn</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:50%;background:#ef4444;"></div></div>
+      <span class="trend-count red">2</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">Understeer into adj lane</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:25%;background:#fb923c;"></div></div>
+      <span class="trend-count orange">1</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Creeping U-turn w/ oncoming</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:25%;background:#ef4444;"></div></div>
+      <span class="trend-count red">1</span>
+    </div>
+    <div class="alert-box">
+      &#x26A0;&#xFE0F; W22: Oversteer at Lafayette &amp; Palm — very bad, APTO<br>
+      &#x26A0;&#xFE0F; W11: LK degraded TDS→ACC mid-session<br>
+      &#x26A0;&#xFE0F; W13: Creeping U-turn into oncoming — CPTO
+    </div>
+  </div>
+  <div class="panel">
+    <div class="section-title">Performance by Configuration</div>
+    <div class="trend-row">
+      <span class="trend-label">2-lane + bike lane — XL rate</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#ef4444;"></div></div>
+      <span class="trend-count red">~70%</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-label">2-lane standard — XL rate</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:60%;background:#f97316;"></div></div>
+      <span class="trend-count orange">~50%</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-label">3-lane — XL rate</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:35%;background:#3b82f6;"></div></div>
+      <span class="trend-count blue">~30%</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-label">4-lane — XL rate</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:25%;background:#22c55e;"></div></div>
+      <span class="trend-count green">~25%</span>
+    </div>
+    <div style="margin-top:10px;" class="section-title">Recurring Failure Locations</div>
+    <div class="trend-row"><span class="trend-label">Lafayette (various cross streets)</span><span class="trend-count red">XL ×5</span></div>
+    <div class="trend-row"><span class="trend-label">Central &amp; Lafayette</span><span class="trend-count red">XL ×2 (LK degrade)</span></div>
+    <div class="trend-row"><span class="trend-label">Bowers &amp; Central</span><span class="trend-count red">XL ×2</span></div>
+    <div class="info-box">&#x2139;&#xFE0F; W28 &amp; W29 perfect manual U-turns logged — useful baseline reference for expected behavior</div>
+  </div>
+</div>
+
+<!-- Detailed log -->
+<div class="section-title">Detailed Event Log</div>
+<div class="panel" style="padding:0;overflow:hidden;">
+<table class="log-table">
+<thead>
+  <tr>
+    <th style="width:80px;">Event</th>
+    <th style="width:40px;">#</th>
+    <th style="width:36px;">Sev</th>
+    <th>Description</th>
+    <th>Location</th>
+  </tr>
+</thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/5da1a347-58f3-447b-a013-24cf55fa504d/5da1a347-58f3-447b-a013-24cf55fa504d" target="_blank">5da1a347</a></td><td class="id-col">W1</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3-lane, no HD map</td><td class="loc-col">Bowers &amp; Walsh</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ae6eae12-2354-45a8-a283-1d2019437cde/ae6eae12-2354-45a8-a283-1d2019437cde" target="_blank">ae6eae12</a></td><td class="id-col">W2</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, 4-lane slanted intersection; gave up when throttle assisted &mdash; APTO &#x26A0;</td><td class="loc-col">Bowers &amp; Central</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/5f354ab6-77d2-4cb5-9fa8-9e78cdd5dc0c/5f354ab6-77d2-4cb5-9fa8-9e78cdd5dc0c" target="_blank">5f354ab6</a></td><td class="id-col">W3</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3-lane, no HD map; nominal</td><td class="loc-col">Bowers &amp; Walsh</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/fb2b7b96-ce0d-4f2a-9bdc-892148309b74/fb2b7b96-ce0d-4f2a-9bdc-892148309b74" target="_blank">fb2b7b96</a></td><td class="id-col">W4</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn bad, median, slow unprotected with oncoming approaching &mdash; APTO; throttle</td><td class="loc-col">Oakmead</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f3a3edae-3489-44a5-a97b-0fad94717a41/f3a3edae-3489-44a5-a97b-0fad94717a41" target="_blank">f3a3edae</a></td><td class="id-col">W5</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3-lane, no HD map</td><td class="loc-col">&mdash;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d42ef9b1-7d22-448c-8e07-12093c4dfd06/d42ef9b1-7d22-448c-8e07-12093c4dfd06" target="_blank">d42ef9b1</a></td><td class="id-col">W6</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane + bike lane; fishhook but smooth</td><td class="loc-col">Bowers &amp; Chromite</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/29483e13-95b7-4d4f-8d17-6e0e61b2fcd9/29483e13-95b7-4d4f-8d17-6e0e61b2fcd9" target="_blank">29483e13</a></td><td class="id-col">W6</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 3-lane + bike lane; slow start</td><td class="loc-col">Bowers &amp; Scott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f192afaf-2ffa-4c39-8176-ad7938cee604/f192afaf-2ffa-4c39-8176-ad7938cee604" target="_blank">f192afaf</a></td><td class="id-col">W8</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn good, 4-lane; understeer into DRT lane</td><td class="loc-col">Bowers &amp; Central</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/bd3d2943-5796-48ca-8468-8685ad980f86/bd3d2943-5796-48ca-8468-8685ad980f86" target="_blank">bd3d2943</a></td><td class="id-col">W9</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 4-lane, no HD map</td><td class="loc-col">Bowers &amp; Scott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d603f1df-dccb-4184-af80-6de5b0b6e60c/d603f1df-dccb-4184-af80-6de5b0b6e60c" target="_blank">d603f1df</a></td><td class="id-col">W10</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 4-lane; jerk right mid-turn &#x26A0;</td><td class="loc-col">Bowers &amp; Central</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/b7b28c92-b1bb-44d9-ae80-ccf14775c648/b7b28c92-b1bb-44d9-ae80-ccf14775c648" target="_blank">b7b28c92</a></td><td class="id-col">W11</td><td><span class="sev-pill sev-xl">XL</span></td><td>LK degraded &mdash; TDS dropped to ACC &#x26A0;</td><td class="loc-col">&mdash;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ecc620d8-a432-4ba2-b78e-65240c9f9d1b/ecc620d8-a432-4ba2-b78e-65240c9f9d1b" target="_blank">ecc620d8</a></td><td class="id-col">W12</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane + bike lane; slightly jerky fishhook at end</td><td class="loc-col">Scott &amp; Jay</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/da50bbde-6942-4a88-a339-331f01c46a8c/da50bbde-6942-4a88-a339-331f01c46a8c" target="_blank">da50bbde</a></td><td class="id-col">W13</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 2-lane + bike lane; creeping U-turn with oncoming contenders &mdash; CPTO &#x26A0;</td><td class="loc-col">Scott &amp; Coronado</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/90790fd7-ea33-4cb5-86c6-4a14b8d48083/90790fd7-ea33-4cb5-86c6-4a14b8d48083" target="_blank">90790fd7</a></td><td class="id-col">W14</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane + bike lane; fishhook jerky</td><td class="loc-col">Laurelwood &amp; Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f7dbe1aa-2f5d-4bf5-8efc-95642b2dd304/f7dbe1aa-2f5d-4bf5-8efc-95642b2dd304" target="_blank">f7dbe1aa</a></td><td class="id-col">W15</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 2-lane + bike lane; elevation difference, aborted &#x26A0;</td><td class="loc-col">Comstock &amp; Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d38c411a-7cf9-499c-9b43-7ae56ab020d2/d38c411a-7cf9-499c-9b43-7ae56ab020d2" target="_blank">d38c411a</a></td><td class="id-col">W15</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 2-lane + bike lane; stuck &mdash; APTO &#x26A0;</td><td class="loc-col">Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f3a99122-431e-466e-83c2-69b647e74a78/f3a99122-431e-466e-83c2-69b647e74a78" target="_blank">f3a99122</a></td><td class="id-col">W16</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane + bike lane; fishhook</td><td class="loc-col">Laurelwood &amp; Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ad01dc08-02f1-4cf3-b64c-3e23c3b8176d/ad01dc08-02f1-4cf3-b64c-3e23c3b8176d" target="_blank">ad01dc08</a></td><td class="id-col">W18</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn good, 2-lane; very hesitant, stopping in middle, very tight turn</td><td class="loc-col">Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/57d27224-10c0-4ae3-9eb5-a5fef8946dc4/57d27224-10c0-4ae3-9eb5-a5fef8946dc4" target="_blank">57d27224</a></td><td class="id-col">W19</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn good, 2-lane + bike lane; fishhook into bike lane, very slow with oncoming present</td><td class="loc-col">Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d23faae7-b772-449a-ac7f-814cd1d2724e/d23faae7-b772-449a-ac7f-814cd1d2724e" target="_blank">d23faae7</a></td><td class="id-col">W20</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 2-lane + bike lane; abort mid-turn &mdash; APTO &#x26A0;</td><td class="loc-col">Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f423dfaa-097e-4f35-94ba-9d43dc8b6990/f423dfaa-097e-4f35-94ba-9d43dc8b6990" target="_blank">f423dfaa</a></td><td class="id-col">W21</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 2-lane + bike lane; abort mid-turn &#x26A0;</td><td class="loc-col">Comstock &amp; Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/5efc1ffc-21b2-4525-99a5-60257c0272b3/5efc1ffc-21b2-4525-99a5-60257c0272b3" target="_blank">5efc1ffc</a></td><td class="id-col">W22</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 2-lane + bike lane; oversteer &mdash; APTO, very bad &#x26A0;&#x26A0;</td><td class="loc-col">Lafayette &amp; Palm</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/83c6193f-c864-4e55-9d26-e37f37aa19f1/83c6193f-c864-4e55-9d26-e37f37aa19f1" target="_blank">83c6193f</a></td><td class="id-col">W23</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3-lane, no HD map</td><td class="loc-col">Central</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f106da13-ca3b-49e9-a5c8-c66807232232/f106da13-ca3b-49e9-a5c8-c66807232232" target="_blank">f106da13</a></td><td class="id-col">W24</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 3-lane; LK degradation mid-turn &mdash; APTO &#x26A0;</td><td class="loc-col">Central &amp; Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/0ad3e3a2-965b-4761-8eb3-f924df32504a/0ad3e3a2-965b-4761-8eb3-f924df32504a" target="_blank">0ad3e3a2</a></td><td class="id-col">W25</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 3-lane; LK degradation &#x26A0;</td><td class="loc-col">Central &amp; Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e1108962-686d-4dca-8274-dd46324f1cfa/e1108962-686d-4dca-8274-dd46324f1cfa" target="_blank">e1108962</a></td><td class="id-col">W25</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn good, 2-lane + bike lane; very slow</td><td class="loc-col">Monroe median</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/711428e6-bc7b-4fe8-acac-06620fbca0c1/711428e6-bc7b-4fe8-acac-06620fbca0c1" target="_blank">711428e6</a></td><td class="id-col">W26</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3-lane + bike lane, no HD map</td><td class="loc-col">Central</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1511b917-efb9-405c-9fff-965470664fe5/1511b917-efb9-405c-9fff-965470664fe5" target="_blank">1511b917</a></td><td class="id-col">W28</td><td><span class="sev-pill sev-s">S</span></td><td>Perfect manual U-turn &#x2605;</td><td class="loc-col">&mdash;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/26cbd0b9-4c3b-443c-afd8-05c1d5a5e02c/26cbd0b9-4c3b-443c-afd8-05c1d5a5e02c" target="_blank">26cbd0b9</a></td><td class="id-col">W29</td><td><span class="sev-pill sev-s">S</span></td><td>Perfect manual U-turn &#x2605;</td><td class="loc-col">&mdash;</td></tr>
+</tbody>
+</table>
+</div>
+
+</body>
+</html>
