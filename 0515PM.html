@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 18px; font-size: 13px; }
+  h1 { font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 3px; }
+  .subtitle { font-size: 11px; color: #94a3b8; margin-bottom: 12px; }
+
+  .key-summary { background: #1a1f2e; border: 1px solid #2d3348; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .ks-item { display: flex; align-items: flex-start; gap: 8px; }
+  .ks-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .ks-label { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .ks-desc { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+
+  .top-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card { background: #1e2230; border-radius: 8px; padding: 10px 12px; border: 1px solid #2d3348; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-bottom: 3px; }
+  .stat-value { font-size: 22px; font-weight: 700; }
+  .stat-sub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+  .stat-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+  .stat-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #2d3348; color: #94a3b8; }
+  .red { color: #f87171; } .orange { color: #fb923c; } .blue { color: #60a5fa; } .green { color: #4ade80; } .purple { color: #c084fc; }
+
+  .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+
+  .panel { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; margin-bottom: 14px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+  .trend-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #1a1f2e; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-label { font-size: 11px; color: #94a3b8; flex: 1; }
+  .trend-bar-wrap { width: 90px; height: 6px; background: #2d3348; border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; }
+  .trend-count { font-size: 11px; font-weight: 700; min-width: 20px; text-align: right; }
+  .trend-sev { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+  .sev-xl-tag { background: #431407; color: #fdba74; }
+  .sev-l-tag  { background: #422006; color: #fb923c; }
+  .sev-m-tag  { background: #1e3a5f; color: #93c5fd; }
+  .sev-s-tag  { background: #14532d; color: #86efac; }
+
+  .log-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .log-table th { text-align: left; padding: 6px 8px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .log-table td { padding: 5px 8px; border-bottom: 1px solid #1a1f2e; vertical-align: top; line-height: 1.5; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: #1a1f2e; }
+
+  .sev-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .sev-xl { background: #431407; color: #fdba74; }
+  .sev-l  { background: #422006; color: #fb923c; }
+  .sev-m  { background: #1e3a5f; color: #93c5fd; }
+  .sev-s  { background: #14532d; color: #86efac; }
+
+  .turn-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; white-space: nowrap; background: #1e2535; color: #60a5fa; }
+
+  .id-col { font-weight: 700; color: #64748b; white-space: nowrap; font-size: 11px; }
+  .event-link { font-size: 10px; color: #3b82f6; text-decoration: none; font-family: monospace; display: block; line-height: 1.8; }
+  .event-link:hover { color: #60a5fa; text-decoration: underline; }
+
+  .tab-buttons { display: flex; gap: 4px; margin-bottom: 8px; }
+  .tab-btn { padding: 4px 12px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #2d3348; background: #1a1f2e; color: #94a3b8; }
+  .tab-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #3b82f6; }
+  .hidden { display: none; }
+
+  .pass-bar-wrap { height: 8px; background: #2d3348; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+  .pass-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #22c55e, #3b82f6); }
+  .alert-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #f97316; background: #2d1800; margin-top: 8px; font-size: 11px; color: #fdba74; line-height: 1.6; }
+  .info-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; background: #0f2040; margin-top: 8px; font-size: 11px; color: #93c5fd; line-height: 1.6; }
+
+  /* Turn quality breakdown */
+  .turn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .turn-card { background: #1e2230; border-radius: 8px; padding: 10px 12px; border: 1px solid #2d3348; }
+  .turn-card-title { font-size: 11px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; border-bottom: 1px solid #2d3348; padding-bottom: 4px; }
+  .turn-stat-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 11px; }
+  .turn-stat-key { color: #94a3b8; }
+  .turn-stat-val { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<h1>SFT-5089 ML Route</h1>
+<div class="subtitle">Pt. 1 &nbsp;&middot;&nbsp; Pt. 2 &nbsp;&middot;&nbsp; Focus: Turn Quality Analysis &nbsp;&middot;&nbsp; Tester: T</div>
+
+<div class="key-summary">
+  <div class="ks-item">
+    <div class="ks-icon">&#x2705;</div>
+    <div><div class="ks-label">Strong Turn Performance Overall</div><div class="ks-desc">Majority of RT and LT events rated S; good protected and unprotected turns throughout</div></div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">&#x26A0;&#xFE0F;</div>
+    <div><div class="ks-label">Understeer & Hesitation Recurring</div><div class="ks-desc">Understeer on turns and hesitation at UPL/DRT seen across both parts; PLT into bike lane noted twice</div></div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">&#x1F6A8;</div>
+    <div><div class="ks-label">Safety Criticals</div><div class="ks-desc">T23 Pt1: Drive off curb on RT; T13 Pt2: Very late fast jerky RT unsafe; T19 Pt2: No yield to cyclists; T6 Pt2: No brake for red arrow</div></div>
+  </div>
+</div>
+
+<!-- Severity counts -->
+<div class="top-grid">
+  <div class="stat-card">
+    <div class="stat-label">XL</div>
+    <div class="stat-value red">9</div>
+    <div class="stat-tags">
+      <span class="stat-tag">wrong turn</span>
+      <span class="stat-tag">drive off curb</span>
+      <span class="stat-tag">no red brake</span>
+      <span class="stat-tag">no yield cyclists</span>
+      <span class="stat-tag">jerky abort SILC</span>
+      <span class="stat-tag">missed U-turn</span>
+      <span class="stat-tag">late fast RT</span>
+      <span class="stat-tag">abort mid U-turn</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">L</div>
+    <div class="stat-value orange">26</div>
+    <div class="stat-tags">
+      <span class="stat-tag">understeer</span>
+      <span class="stat-tag">hesitant UPL</span>
+      <span class="stat-tag">wrong lane</span>
+      <span class="stat-tag">into bike lane</span>
+      <span class="stat-tag">jerky</span>
+      <span class="stat-tag">lane drift</span>
+      <span class="stat-tag">oversteer</span>
+      <span class="stat-tag">slow PLT</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">M</div>
+    <div class="stat-value blue">14</div>
+    <div class="stat-tags">
+      <span class="stat-tag">slight understeer</span>
+      <span class="stat-tag">ghost brake</span>
+      <span class="stat-tag">jerky UPL</span>
+      <span class="stat-tag">late SILC</span>
+      <span class="stat-tag">hard brake yield</span>
+      <span class="stat-tag">lane drift</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">S</div>
+    <div class="stat-value green">33</div>
+    <div class="stat-tags">
+      <span class="stat-tag">good RT</span>
+      <span class="stat-tag">good LT</span>
+      <span class="stat-tag">good PLT</span>
+      <span class="stat-tag">good DRT</span>
+      <span class="stat-tag">good UPL</span>
+      <span class="stat-tag">good U-turn</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Pass Rate (L+M+S)</div>
+    <div class="stat-value purple">89%</div>
+    <div class="stat-sub">73 of 82 events</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:89%"></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">RT Good / Total</div>
+    <div class="stat-value green">74%</div>
+    <div class="stat-sub">17 of 23 events</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:74%"></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">LT Good / Total</div>
+    <div class="stat-value green">76%</div>
+    <div class="stat-sub">13 of 17 events</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:76%"></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">UPL Good / Total</div>
+    <div class="stat-value orange">50%</div>
+    <div class="stat-sub">4 of 8 events</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:50%;background:linear-gradient(90deg,#fb923c,#f97316);"></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">U-Turn Good / Total</div>
+    <div class="stat-value orange">25%</div>
+    <div class="stat-sub">1 of 4 events</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:25%;background:linear-gradient(90deg,#fb923c,#f97316);"></div></div>
+  </div>
+</div>
+
+<!-- Turn quality breakdown -->
+<div class="section-title">Turn Quality Breakdown</div>
+<div class="turn-grid">
+  <div class="turn-card">
+    <div class="turn-card-title">Right Turn (RT) &nbsp;<span style="font-size:10px;color:#4ade80;">74% good</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Good / S</span><span class="turn-stat-val green">17</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Understeer</span><span class="turn-stat-val orange">4</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Wrong lane / turn</span><span class="turn-stat-val orange">3</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Oversteer / into bike lane</span><span class="turn-stat-val orange">2</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Late / fast / unsafe (XL)</span><span class="turn-stat-val red">1</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Drive off curb (XL)</span><span class="turn-stat-val red">1</span></div>
+  </div>
+  <div class="turn-card">
+    <div class="turn-card-title">Left Turn (LT) &nbsp;<span style="font-size:10px;color:#4ade80;">76% good</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Good / S</span><span class="turn-stat-val green">13</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Understeer</span><span class="turn-stat-val orange">2</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Hesitant / jerky</span><span class="turn-stat-val orange">1</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Too close to parked cars</span><span class="turn-stat-val orange">1</span></div>
+  </div>
+  <div class="turn-card">
+    <div class="turn-card-title">UPL / PLT &nbsp;<span style="font-size:10px;color:#fb923c;">50% good</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Good / S</span><span class="turn-stat-val green">4</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Hesitant / very slow</span><span class="turn-stat-val orange">3</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Understeer into bike lane</span><span class="turn-stat-val orange">2</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Stuck / wrong lane</span><span class="turn-stat-val orange">1</span></div>
+  </div>
+  <div class="turn-card">
+    <div class="turn-card-title">U-Turn &nbsp;<span style="font-size:10px;color:#f87171;">25% good</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Good / S</span><span class="turn-stat-val green">1</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Missed (invisible)</span><span class="turn-stat-val red">1</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Missed (rail missing)</span><span class="turn-stat-val red">1</span></div>
+    <div class="turn-stat-row"><span class="turn-stat-key">Abort mid-turn</span><span class="turn-stat-val red">1</span></div>
+  </div>
+</div>
+
+<!-- Trends -->
+<div class="two-col">
+  <div class="panel">
+    <div class="section-title">Trends — Most Common Issues</div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">Understeer on turns (RT/LT/PLT)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#fb923c;"></div></div>
+      <span class="trend-count orange">9</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">Hesitant / very slow (UPL/DRT/SS)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:78%;background:#fb923c;"></div></div>
+      <span class="trend-count orange">7</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">Lane drift (curvature / contender)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:56%;background:#fb923c;"></div></div>
+      <span class="trend-count orange">5</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Wrong turn / wrong lane</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:44%;background:#ef4444;"></div></div>
+      <span class="trend-count red">4</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Missed / aborted U-turn</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:33%;background:#ef4444;"></div></div>
+      <span class="trend-count red">3</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">Oversteer / into bike lane</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:33%;background:#fb923c;"></div></div>
+      <span class="trend-count orange">3</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-m-tag">M</span>
+      <span class="trend-label">Jerky at split / SILC</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:22%;background:#3b82f6;"></div></div>
+      <span class="trend-count blue">2</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-m-tag">M</span>
+      <span class="trend-label">Ghost brake</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:22%;background:#3b82f6;"></div></div>
+      <span class="trend-count blue">2</span>
+    </div>
+    <div class="alert-box">
+      &#x26A0;&#xFE0F; Pt1 T23 XL: Drive off curb during RT<br>
+      &#x26A0;&#xFE0F; Pt2 T13 XL: Very late, fast, jerky RT &mdash; unsafe<br>
+      &#x26A0;&#xFE0F; Pt2 T19 XL: Did not yield to cyclists crossing<br>
+      &#x26A0;&#xFE0F; Pt2 T6 XL: No braking for red arrow TL after jerky split
+    </div>
+  </div>
+  <div class="panel">
+    <div class="section-title">Turn Quality by Type</div>
+    <div class="trend-row">
+      <span class="trend-label">Left Turn &mdash; good rate</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:76%;background:#22c55e;"></div></div>
+      <span class="trend-count green">76%</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-label">Right Turn &mdash; good rate</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:74%;background:#22c55e;"></div></div>
+      <span class="trend-count green">74%</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-label">DRT &mdash; good rate</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:67%;background:#22c55e;"></div></div>
+      <span class="trend-count green">~67%</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-label">UPL / PLT &mdash; good rate</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:50%;background:#f97316;"></div></div>
+      <span class="trend-count orange">50%</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-label">U-Turn &mdash; good rate</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:25%;background:#ef4444;"></div></div>
+      <span class="trend-count red">25%</span>
+    </div>
+    <div class="info-box">&#x2139;&#xFE0F; RT and LT performing similarly well. UPL/PLT consistently struggles with hesitation and understeer into bike lane. U-turns remain the weakest category.</div>
+  </div>
+</div>
+
+<!-- Detailed log with tabs -->
+<div class="section-title">Detailed Event Log</div>
+<div class="tab-buttons">
+  <button class="tab-btn active" onclick="showTab('p1')">Pt. 1</button>
+  <button class="tab-btn" onclick="showTab('p2')">Pt. 2</button>
+</div>
+
+<div class="panel" style="padding:0;overflow:hidden;">
+
+<!-- Pt 1 -->
+<div id="tab-p1">
+<table class="log-table">
+<thead><tr><th style="width:80px;">Event</th><th style="width:40px;">#</th><th style="width:36px;">Sev</th><th style="width:70px;">Turn Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/5e9f9f9a-76e7-413b-8352-733ade852138/5e9f9f9a-76e7-413b-8352-733ade852138" target="_blank">5e9f9f9a</a></td><td class="id-col">T1</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">DRT</span></td><td>Good yield during DRT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/002f6e00-b2b7-4f57-a431-8963438ac065/002f6e00-b2b7-4f57-a431-8963438ac065" target="_blank">002f6e00</a></td><td class="id-col">T2</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">Split</span></td><td>Jerky at split in road</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/47e3f834-36e6-44c1-9106-22383e6bc18f/47e3f834-36e6-44c1-9106-22383e6bc18f" target="_blank">47e3f834</a></td><td class="id-col">T3</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Wrong right turn (noted as S — acceptable outcome)</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/fc446de3-450f-47fa-b665-dda300851d5e/fc446de3-450f-47fa-b665-dda300851d5e" target="_blank">fc446de3</a></td><td class="id-col">T4</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c2e7b2a8-8541-4aa0-93a8-9ab35bd04548/c2e7b2a8-8541-4aa0-93a8-9ab35bd04548" target="_blank">c2e7b2a8</a></td><td class="id-col">T5</td><td><span class="sev-pill sev-m">M</span></td><td><span class="turn-pill">SILC</span></td><td>Failed multi SILC — hard case</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1b0406f0-8da6-4003-87a2-94f6c86bc809/1b0406f0-8da6-4003-87a2-94f6c86bc809" target="_blank">1b0406f0</a></td><td class="id-col">T6</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">LT</span></td><td>Good left turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/386a32bd-3b5b-4ba7-9024-31653fd2a8e5/386a32bd-3b5b-4ba7-9024-31653fd2a8e5" target="_blank">386a32bd</a></td><td class="id-col">T7</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">LT</span></td><td>Good left turn at intersection</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/b8efddf3-5660-4c7b-85bf-29847c299742/b8efddf3-5660-4c7b-85bf-29847c299742" target="_blank">b8efddf3</a></td><td class="id-col">T8</td><td><span class="sev-pill sev-m">M</span></td><td><span class="turn-pill">U-Turn</span></td><td>Missed U-turn — invisible</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2588ebdc-8a44-4685-9da1-212b80a7aadd/2588ebdc-8a44-4685-9da1-212b80a7aadd" target="_blank">2588ebdc</a></td><td class="id-col">T9</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn at intersection</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f50b16de-edef-4aec-b8be-c7b098218151/f50b16de-edef-4aec-b8be-c7b098218151" target="_blank">f50b16de</a></td><td class="id-col">T10</td><td><span class="sev-pill sev-m">M</span></td><td><span class="turn-pill">LT</span></td><td>LT minor to major UPL, slightly jerky</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a98e3eb1-b1f0-45cb-9864-257553d10256/a98e3eb1-b1f0-45cb-9864-257553d10256" target="_blank">a98e3eb1</a></td><td class="id-col">T11</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">RT</span></td><td>Wrong lane selection before right turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/332fc9d6-0243-4275-98da-1e74d1bae3c8/332fc9d6-0243-4275-98da-1e74d1bae3c8" target="_blank">332fc9d6</a></td><td class="id-col">T12</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">RT</span></td><td>RT at TLJ from wrong lane — still ok decision</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/320c53aa-929e-4cbe-9377-f9ba8933c795/320c53aa-929e-4cbe-9377-f9ba8933c795" target="_blank">320c53aa</a></td><td class="id-col">T13</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good protected right turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/21142a36-e91a-413c-9b72-dc61f7d37f38/21142a36-e91a-413c-9b72-dc61f7d37f38" target="_blank">21142a36</a></td><td class="id-col">T14</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn at TLJ</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/cebda2e3-01ae-4047-a0dd-aad62c65aa78/cebda2e3-01ae-4047-a0dd-aad62c65aa78" target="_blank">cebda2e3</a></td><td class="id-col">T15</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">LT</span></td><td>Left turn at T-junction with TL</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/59111dcf-ab10-4c7c-9f25-c9db3794b346/59111dcf-ab10-4c7c-9f25-c9db3794b346" target="_blank">59111dcf</a></td><td class="id-col">T16</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">Exit</span></td><td>Good exit off freeway</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/fcdad4c3-f1cd-4877-8a46-5c6cb98be87a/fcdad4c3-f1cd-4877-8a46-5c6cb98be87a" target="_blank">fcdad4c3</a></td><td class="id-col">T17</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">DRT</span></td><td>Coming to stop before DRT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ea11a4a8-b905-4a15-bbb1-c4c250f9efee/ea11a4a8-b905-4a15-bbb1-c4c250f9efee" target="_blank">ea11a4a8</a></td><td class="id-col">T18</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">DRT</span></td><td>Good DRT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4543a006-dcd1-441d-91a4-f6f55d6b8dd2/4543a006-dcd1-441d-91a4-f6f55d6b8dd2" target="_blank">4543a006</a></td><td class="id-col">T19</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">LT</span></td><td>LT at TLJ with understeer — still rated S</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/bbf7671d-e30d-49b6-a8f4-2d0e9c11bf7b/bbf7671d-e30d-49b6-a8f4-2d0e9c11bf7b" target="_blank">bbf7671d</a></td><td class="id-col">T20</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/63f23e4f-ad79-48a5-ac6f-904a3aa0c8c6/63f23e4f-ad79-48a5-ac6f-904a3aa0c8c6" target="_blank">63f23e4f</a></td><td class="id-col">T21</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">Other</span></td><td>FN speed bump detection</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/39ffb97d-424c-4b15-87b1-015728d50447/39ffb97d-424c-4b15-87b1-015728d50447" target="_blank">39ffb97d</a></td><td class="id-col">T22</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn at stop sign in parking lot</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c08faad3-1002-43dc-98c7-3be6cc003225/c08faad3-1002-43dc-98c7-3be6cc003225" target="_blank">c08faad3</a></td><td class="id-col">T23</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="turn-pill">RT</span></td><td>Drive off curb during right turn &#x26A0;&#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/bf8f2392-c0e0-4a0c-88f2-57e57d13a3ca/bf8f2392-c0e0-4a0c-88f2-57e57d13a3ca" target="_blank">bf8f2392</a></td><td class="id-col">T24</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">LT</span></td><td>Good left turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/5474b95a-a619-45a6-867c-1779cd940cce/5474b95a-a619-45a6-867c-1779cd940cce" target="_blank">5474b95a</a></td><td class="id-col">T25</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">UPL</span></td><td>UPL at 2-stop junction — good</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/567bdf61-537b-4d43-ab19-814069bd7d0e/567bdf61-537b-4d43-ab19-814069bd7d0e" target="_blank">567bdf61</a></td><td class="id-col">T26</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">RT</span></td><td>Unprotected right turn into left lane</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/62996e93-d6d2-4bed-97ce-327fce43dc1a/62996e93-d6d2-4bed-97ce-327fce43dc1a" target="_blank">62996e93</a></td><td class="id-col">T27</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">PLT</span></td><td>Good PLT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/b43bc7c7-1a42-4d14-83c7-d2ce747ab0a1/b43bc7c7-1a42-4d14-83c7-d2ce747ab0a1" target="_blank">b43bc7c7</a></td><td class="id-col">T28</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">RT</span></td><td>RT at always stop — oversteer into bike lane</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/893b3fb3-5484-4491-9247-ed4583741415/893b3fb3-5484-4491-9247-ed4583741415" target="_blank">893b3fb3</a></td><td class="id-col">T29</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn at always stop</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/3e75d4c3-e0a2-462a-87cf-c60060952f3c/3e75d4c3-e0a2-462a-87cf-c60060952f3c" target="_blank">3e75d4c3</a></td><td class="id-col">T30</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn at always stop</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/18a0ac3e-6d80-4988-8cfd-bb1df87ef3bf/18a0ac3e-6d80-4988-8cfd-bb1df87ef3bf" target="_blank">18a0ac3e</a></td><td class="id-col">T31</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn at TLJ</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/3ee164fc-d130-4590-942a-8a7b6e52b400/3ee164fc-d130-4590-942a-8a7b6e52b400" target="_blank">3ee164fc</a></td><td class="id-col">T32</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">LT</span></td><td>Good unprotected left turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1133bec0-0611-4e39-8f8b-6db0dbcc7722/1133bec0-0611-4e39-8f8b-6db0dbcc7722" target="_blank">1133bec0</a></td><td class="id-col">T33</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn at intersection</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/fc286076-8f3e-4441-842d-02be8befcda9/fc286076-8f3e-4441-842d-02be8befcda9" target="_blank">fc286076</a></td><td class="id-col">T34</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">SS</span></td><td>Very hesitant at stop sign with contender on cross right</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7b390c21-71f3-424b-927b-1a8f20c254ab/7b390c21-71f3-424b-927b-1a8f20c254ab" target="_blank">7b390c21</a></td><td class="id-col">T35</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="turn-pill">Nav</span></td><td>Wrong turn &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/98b2f9da-1f40-4770-a0fd-d72a853a57d8/98b2f9da-1f40-4770-a0fd-d72a853a57d8" target="_blank">98b2f9da</a></td><td class="id-col">T36</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">PLT</span></td><td>Slow hesitant PLT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/6742b2f8-2693-4a0d-9efa-b7ec19946abe/6742b2f8-2693-4a0d-9efa-b7ec19946abe" target="_blank">6742b2f8</a></td><td class="id-col">T37</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="turn-pill">U-Turn</span></td><td>Missed U-turn &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c2aba2b9-db13-498c-8964-7504bf2fe3fa/c2aba2b9-db13-498c-8964-7504bf2fe3fa" target="_blank">c2aba2b9</a></td><td class="id-col">T38</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="turn-pill">U-Turn</span></td><td>Abort mid U-turn &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e16adebf-c1a1-49ef-8a50-3479dfaf41c1/e16adebf-c1a1-49ef-8a50-3479dfaf41c1" target="_blank">e16adebf</a></td><td class="id-col">T39</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/bd7c4849-89dd-43ac-ab7f-ced468cf18b6/bd7c4849-89dd-43ac-ab7f-ced468cf18b6" target="_blank">bd7c4849</a></td><td class="id-col">T40</td><td><span class="sev-pill sev-m">M</span></td><td><span class="turn-pill">LT</span></td><td>Slight understeer after LT at 4-way stop</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4a1563fa-7fdd-4bb6-8a8b-7be98e3e7c62/4a1563fa-7fdd-4bb6-8a8b-7be98e3e7c62" target="_blank">4a1563fa</a></td><td class="id-col">T41</td><td><span class="sev-pill sev-m">M</span></td><td><span class="turn-pill">SS</span></td><td>Ghost brake at stop sign</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9514843b-c79c-4abb-89aa-0087c936ffdb/9514843b-c79c-4abb-89aa-0087c936ffdb" target="_blank">9514843b</a></td><td class="id-col">T42</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Right turn at TLJ with median</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/6ccb0a0b-3275-4274-a24e-158f4b9b83a2/6ccb0a0b-3275-4274-a24e-158f4b9b83a2" target="_blank">6ccb0a0b</a></td><td class="id-col">T43</td><td><span class="sev-pill sev-m">M</span></td><td><span class="turn-pill">SILC</span></td><td>SILC'd left for CZ cones ahead — a bit late</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/48ee7495-9c8a-4710-9353-c0f1c2a99905/48ee7495-9c8a-4710-9353-c0f1c2a99905" target="_blank">48ee7495</a></td><td class="id-col">T44</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">PLT</span></td><td>Good PLT</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- Pt 2 -->
+<div id="tab-p2" class="hidden">
+<table class="log-table">
+<thead><tr><th style="width:80px;">Event</th><th style="width:40px;">#</th><th style="width:36px;">Sev</th><th style="width:70px;">Turn Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d887e876-2901-48f0-b3a1-1afd2c91ef1e/d887e876-2901-48f0-b3a1-1afd2c91ef1e" target="_blank">d887e876</a></td><td class="id-col">T1</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">UPL</span></td><td>Very hesitant UPL — APTO throttle</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/fc633988-40f0-4f7e-8450-73bbc8cd4e2d/fc633988-40f0-4f7e-8450-73bbc8cd4e2d" target="_blank">fc633988</a></td><td class="id-col">T2</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">RoR</span></td><td>Stuck during RoR; turned into left lane — APTO throttle</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/260737f2-3d6b-4309-a84c-f8eeac3f7816/260737f2-3d6b-4309-a84c-f8eeac3f7816" target="_blank">260737f2</a></td><td class="id-col">T3</td><td><span class="sev-pill sev-m">M</span></td><td><span class="turn-pill">LT</span></td><td>Slight understeer during left turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/76b3a546-797c-4c26-bd2a-bf18bfa8fdfb/76b3a546-797c-4c26-bd2a-bf18bfa8fdfb" target="_blank">76b3a546</a></td><td class="id-col">T4</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn at AWS</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/5076a299-c97e-44b5-bcc1-99e1bfea0ea8/5076a299-c97e-44b5-bcc1-99e1bfea0ea8" target="_blank">5076a299</a></td><td class="id-col">T5</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">RT</span></td><td>Right turn with understeer</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/20db0cc1-11ec-49d0-8252-14709d9a18b4/20db0cc1-11ec-49d0-8252-14709d9a18b4" target="_blank">20db0cc1</a></td><td class="id-col">T6</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="turn-pill">Split</span></td><td>Jerky at split; no braking for red arrow TL afterwards &#x26A0;&#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/821aaec9-4988-419e-9fd2-a88e7d307999/821aaec9-4988-419e-9fd2-a88e7d307999" target="_blank">821aaec9</a></td><td class="id-col">T7</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">U-Turn</span></td><td>Missed U-turn — rail missing</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ddfe18e9-8842-41fb-8dbb-4a6193a02b06/ddfe18e9-8842-41fb-8dbb-4a6193a02b06" target="_blank">ddfe18e9</a></td><td class="id-col">T8</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn from M to m</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2922d8bb-1881-4e86-bb18-b63d1cbe1839/2922d8bb-1881-4e86-bb18-b63d1cbe1839" target="_blank">2922d8bb</a></td><td class="id-col">T9</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">Nav</span></td><td>Wrong turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9622e0a1-219d-41a5-87c6-6862624fcf3e/9622e0a1-219d-41a5-87c6-6862624fcf3e" target="_blank">9622e0a1</a></td><td class="id-col">T10</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">LT</span></td><td>Slightly jerky and too close to parked cars during LT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d9a32931-dfc4-43e3-a384-b050ea4001e3/d9a32931-dfc4-43e3-a384-b050ea4001e3" target="_blank">d9a32931</a></td><td class="id-col">T11</td><td><span class="sev-pill sev-m">M</span></td><td><span class="turn-pill">RT</span></td><td>Slight understeer on right turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d71a9cf1-bfa2-44b6-b53f-d66794bef0db/d71a9cf1-bfa2-44b6-b53f-d66794bef0db" target="_blank">d71a9cf1</a></td><td class="id-col">T12</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn at AWS</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/daaaa9b8-ccb1-4807-a9af-9f167868fcb9/daaaa9b8-ccb1-4807-a9af-9f167868fcb9" target="_blank">daaaa9b8</a></td><td class="id-col">T13</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="turn-pill">RT</span></td><td>Very late RT — fast, jerky, unsafe &#x26A0;&#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2c615e19-5036-42eb-8b9b-42f7b31bea5b/2c615e19-5036-42eb-8b9b-42f7b31bea5b" target="_blank">2c615e19</a></td><td class="id-col">T14</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/8ca10a21-c36d-49d7-9b75-b6653321dfad/8ca10a21-c36d-49d7-9b75-b6653321dfad" target="_blank">8ca10a21</a></td><td class="id-col">T15</td><td><span class="sev-pill sev-m">M</span></td><td><span class="turn-pill">RT</span></td><td>Ghost brake for right turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a98acacf-b11a-472c-9f56-45a31079990b/a98acacf-b11a-472c-9f56-45a31079990b" target="_blank">a98acacf</a></td><td class="id-col">T16</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">UPL</span></td><td>Very hesitant UPL (m to M) — APTO throttle</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2c2922e2-4b44-4be1-9096-79f68224a365/2c2922e2-4b44-4be1-9096-79f68224a365" target="_blank">2c2922e2</a></td><td class="id-col">T17</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">DRT</span></td><td>Smooth DRT but ended wobbly before merge</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/17e16b69-09cc-4447-a534-40025f55831d/17e16b69-09cc-4447-a534-40025f55831d" target="_blank">17e16b69</a></td><td class="id-col">T18</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">Lane</span></td><td>Lane drift on curvature</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/295717bb-6e1a-43fa-bd58-2f7673aa85c6/295717bb-6e1a-43fa-bd58-2f7673aa85c6" target="_blank">295717bb</a></td><td class="id-col">T19</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="turn-pill">Yield</span></td><td>Did not yield to cyclists crossing — OOT bikes &#x26A0;&#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/40b03dd1-e5ec-40b0-a83b-70ea8d368552/40b03dd1-e5ec-40b0-a83b-70ea8d368552" target="_blank">40b03dd1</a></td><td class="id-col">T20</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="turn-pill">SILC</span></td><td>Attempting double SILC with jerky abort &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f7244576-4319-4d51-ad34-65339d3221f3/f7244576-4319-4d51-ad34-65339d3221f3" target="_blank">f7244576</a></td><td class="id-col">T21</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">PLT</span></td><td>Good PLT</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/db6e06fb-fc1e-4cc1-a2d9-c111cea3d78f/db6e06fb-fc1e-4cc1-a2d9-c111cea3d78f" target="_blank">db6e06fb</a></td><td class="id-col">T22</td><td><span class="sev-pill sev-m">M</span></td><td><span class="turn-pill">Lane</span></td><td>Lane drift left</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/fef2d54b-fde1-404a-aa22-3d5b2920e628/fef2d54b-fde1-404a-aa22-3d5b2920e628" target="_blank">fef2d54b</a></td><td class="id-col">T23</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">Other</span></td><td>Good TN reaction to jaywalker in median</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c6a4b86b-bda1-4d93-aecc-a47127092ca9/c6a4b86b-bda1-4d93-aecc-a47127092ca9" target="_blank">c6a4b86b</a></td><td class="id-col">T24</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="turn-pill">RT</span></td><td>Jerky fast right turn &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/45181b94-508e-4817-9d49-37a562b9167f/45181b94-508e-4817-9d49-37a562b9167f" target="_blank">45181b94</a></td><td class="id-col">T25</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">LT</span></td><td>Very slow hesitant LT at 2-way stop</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c9c035ad-b070-4509-b83d-8c90577414c8/c9c035ad-b070-4509-b83d-8c90577414c8" target="_blank">c9c035ad</a></td><td class="id-col">T26</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">Other</span></td><td>Forest before Bascom — dips noted</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ad276fc3-77c3-4a5f-af08-cb1e36214e18/ad276fc3-77c3-4a5f-af08-cb1e36214e18" target="_blank">ad276fc3</a></td><td class="id-col">T27</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">PLT</span></td><td>PLT understeer into bike lane</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4217c7dc-ff5a-4bd6-a214-9ca87b75a637/4217c7dc-ff5a-4bd6-a214-9ca87b75a637" target="_blank">4217c7dc</a></td><td class="id-col">T28</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">UPL</span></td><td>Good UPL (M to m)</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9796d0a1-cdb7-47f0-b0aa-f96bce3cf6e5/9796d0a1-cdb7-47f0-b0aa-f96bce3cf6e5" target="_blank">9796d0a1</a></td><td class="id-col">T29</td><td><span class="sev-pill sev-m">M</span></td><td><span class="turn-pill">DRT</span></td><td>DRT with hard brake while yielding to cross traffic</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7fb9ca87-4945-4290-8752-309a6364a958/7fb9ca87-4945-4290-8752-309a6364a958" target="_blank">7fb9ca87</a></td><td class="id-col">T30</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">PLT</span></td><td>Large understeer PLT into bike lane</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c42dcca9-eac5-4c89-8002-41ef21ca46e0/c42dcca9-eac5-4c89-8002-41ef21ca46e0" target="_blank">c42dcca9</a></td><td class="id-col">T31</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">LT</span></td><td>Good left turn at AWS</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/68bf37e9-dda4-4e2c-9a0b-9a9d6a7ec41b/68bf37e9-dda4-4e2c-9a0b-9a9d6a7ec41b" target="_blank">68bf37e9</a></td><td class="id-col">T32</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn at AWS</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/88326105-7cc6-4f48-9b82-36c54f7e0991/88326105-7cc6-4f48-9b82-36c54f7e0991" target="_blank">88326105</a></td><td class="id-col">T33</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">UPL</span></td><td>Good m to M</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f27b7524-6ef3-4894-862a-5a512d3f99ca/f27b7524-6ef3-4894-862a-5a512d3f99ca" target="_blank">f27b7524</a></td><td class="id-col">T34</td><td><span class="sev-pill sev-m">M</span></td><td><span class="turn-pill">RT</span></td><td>Slight understeer during right turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/71ba76c4-5dab-4c82-8dae-cc2c5e9ba067/71ba76c4-5dab-4c82-8dae-cc2c5e9ba067" target="_blank">71ba76c4</a></td><td class="id-col">T35</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">UPL</span></td><td>Hesitant UPL — APTO throttle</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/58d9db50-7d4c-49e5-8d6d-3934718bc607/58d9db50-7d4c-49e5-8d6d-3934718bc607" target="_blank">58d9db50</a></td><td class="id-col">T36</td><td><span class="sev-pill sev-l">L</span></td><td><span class="turn-pill">Lane</span></td><td>Lane drift left next to contender</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/581a9d66-0596-429d-aa88-fcaa87b9fa2d/581a9d66-0596-429d-aa88-fcaa87b9fa2d" target="_blank">581a9d66</a></td><td class="id-col">T37</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">U-Turn</span></td><td>Good U-turn at 4-way</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4c978957-3f70-4228-8e3e-a86f3cc4414d/4c978957-3f70-4228-8e3e-a86f3cc4414d" target="_blank">4c978957</a></td><td class="id-col">T38</td><td><span class="sev-pill sev-s">S</span></td><td><span class="turn-pill">RT</span></td><td>Good right turn</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+function showTab(id) {
+  ['p1','p2'].forEach(function(r) {
+    document.getElementById('tab-' + r).classList.add('hidden');
+  });
+  document.getElementById('tab-' + id).classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+    btn.classList.toggle('active', ['p1','p2'][i] === id);
+  });
+}
+</script>
+</body>
+</html>
