@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 18px; font-size: 13px; }
+  h1 { font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 3px; }
+  .subtitle { font-size: 11px; color: #94a3b8; margin-bottom: 14px; }
+
+  .key-summary { background: #1a1f2e; border: 1px solid #2d3348; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .ks-item { display: flex; align-items: flex-start; gap: 8px; }
+  .ks-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .ks-label { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .ks-desc { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+
+  .top-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card { background: #1e2230; border-radius: 8px; padding: 10px 12px; border: 1px solid #2d3348; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-bottom: 3px; }
+  .stat-value { font-size: 22px; font-weight: 700; }
+  .stat-sub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+  .stat-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+  .stat-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #2d3348; color: #94a3b8; }
+  .pass-bar-wrap { height: 6px; background: #2d3348; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+  .pass-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #22c55e, #3b82f6); }
+  .red { color: #f87171; } .orange { color: #fb923c; } .blue { color: #60a5fa; } .green { color: #4ade80; } .yellow { color: #facc15; }
+
+  .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+  .panel { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; margin-bottom: 14px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+  .trend-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #1a1f2e; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-label { font-size: 11px; color: #94a3b8; flex: 1; }
+  .trend-bar-wrap { width: 90px; height: 5px; background: #2d3348; border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; }
+  .trend-count { font-size: 11px; font-weight: 700; min-width: 20px; text-align: right; }
+  .trend-sev { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+  .sev-xxl-tag { background: #4c0519; color: #fca5a5; }
+  .sev-xl-tag  { background: #431407; color: #fdba74; }
+  .sev-l-tag   { background: #422006; color: #fb923c; }
+  .sev-m-tag   { background: #1e3a5f; color: #93c5fd; }
+
+  .log-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .log-table th { text-align: left; padding: 6px 8px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .log-table td { padding: 5px 8px; border-bottom: 1px solid #1a1f2e; vertical-align: top; line-height: 1.5; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: #1a1f2e; }
+
+  .sev-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .sev-xxl { background: #4c0519; color: #fca5a5; }
+  .sev-xl  { background: #431407; color: #fdba74; }
+  .sev-l   { background: #422006; color: #fb923c; }
+  .sev-m   { background: #1e3a5f; color: #93c5fd; }
+  .sev-s   { background: #14532d; color: #86efac; }
+
+  .id-col { font-weight: 700; color: #64748b; white-space: nowrap; font-size: 11px; }
+  .event-link { font-size: 10px; color: #3b82f6; text-decoration: none; font-family: monospace; display: block; line-height: 1.8; }
+  .event-link:hover { color: #60a5fa; text-decoration: underline; }
+  .alert-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #f97316; background: #2d1800; margin-top: 8px; font-size: 11px; color: #fdba74; line-height: 1.6; }
+  .info-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; background: #0f2040; margin-top: 8px; font-size: 11px; color: #93c5fd; line-height: 1.6; }
+  .warn-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #dc2626; background: #2d0a0a; margin-top: 8px; font-size: 11px; color: #fca5a5; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<h1>U-Turn Test — SF</h1>
+<div class="subtitle">
+  2026-05-19 &nbsp;&middot;&nbsp; 3rd St Corridor, San Francisco &nbsp;&middot;&nbsp;
+  Build: <a href="http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45500875&vid=2" target="_blank" style="color:#3b82f6;text-decoration:none;">45500875.2</a> &nbsp;&middot;&nbsp;
+  Model: sft-4815 + Feasibility Filter &nbsp;&middot;&nbsp;
+  Session: <a href="https://maglev.nvda.ai/av/drivescrubber/drives/666773" target="_blank" style="color:#3b82f6;text-decoration:none;">ebc9128a</a> &nbsp;&middot;&nbsp;
+  Tester: W &nbsp;&middot;&nbsp; Veh: 174-745
+</div>
+
+<!-- Key findings -->
+<div class="key-summary">
+  <div class="ks-item">
+    <div class="ks-icon">✅</div>
+    <div>
+      <div class="ks-label">Strong 3rd St Performance</div>
+      <div class="ks-desc">Majority of turns along 3rd St corridor completed cleanly, including no-HD-map conditions. Multiple S-rated turns at Mariposa, 20th, 23rd, and Cesar Chavez.</div>
+    </div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">⚠️</div>
+    <div>
+      <div class="ks-label">Roundabout Mapping Issue</div>
+      <div class="ks-desc">Two critical events (W14, W16) at unmapped roundabout — system cut through roundabout, W16 resulted in FN yield to oncoming traffic and CPTO. Roundabout needs to be mapped.</div>
+    </div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">🚨</div>
+    <div>
+      <div class="ks-label">Safety Critical Events</div>
+      <div class="ks-desc">W16: XXL — cut roundabout with FN yield to oncoming traffic (CPTO). W3: XL — self-disengagement. W6: XL — missed U-turn. W15: XL — understeer requiring APTO.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Stat cards -->
+<div class="top-grid">
+  <div class="stat-card">
+    <div class="stat-label">XXL</div>
+    <div class="stat-value red">1</div>
+    <div class="stat-tags">
+      <span class="stat-tag">roundabout FN yield</span>
+      <span class="stat-tag">CPTO</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">XL</div>
+    <div class="stat-value orange">3</div>
+    <div class="stat-tags">
+      <span class="stat-tag">self-disengage</span>
+      <span class="stat-tag">missed U-turn</span>
+      <span class="stat-tag">cut roundabout</span>
+      <span class="stat-tag">understeer APTO</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">L</div>
+    <div class="stat-value orange">1</div>
+    <div class="stat-tags">
+      <span class="stat-tag">oversteer APTO</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">M</div>
+    <div class="stat-value blue">6</div>
+    <div class="stat-tags">
+      <span class="stat-tag">slight understeer</span>
+      <span class="stat-tag">fishhook correction</span>
+      <span class="stat-tag">oversteer self-corrected</span>
+      <span class="stat-tag">brake tap</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">S</div>
+    <div class="stat-value green">10</div>
+    <div class="stat-tags">
+      <span class="stat-tag">good U-turn</span>
+      <span class="stat-tag">no HD map</span>
+      <span class="stat-tag">correct skip</span>
+    </div>
+  </div>
+</div>
+
+<!-- Pass rate -->
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-bottom:14px;">
+  <div class="stat-card">
+    <div class="stat-label">U-Turn Pass Rate</div>
+    <div class="stat-value green">84%</div>
+    <div class="stat-sub">16 of 19 U-turn attempts</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:84%"></div></div>
+    <div style="font-size:9px;color:#64748b;margin-top:4px;">Excludes W3 (self-disengage) and W17 (correct no U-turn)</div>
+  </div>
+</div>
+
+<!-- Trends -->
+<div class="two-col">
+  <div class="panel">
+    <div class="section-title">Trends — Issues</div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xxl-tag">XXL</span>
+      <span class="trend-label">Roundabout cut + FN yield to oncoming (CPTO)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#dc2626;"></div></div>
+      <span class="trend-count red">1</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Roundabout cut (unmapped — needs mapping)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:67%;background:#ef4444;"></div></div>
+      <span class="trend-count red">2</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Self-disengagement</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:33%;background:#ef4444;"></div></div>
+      <span class="trend-count red">1</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Missed U-turn</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:33%;background:#ef4444;"></div></div>
+      <span class="trend-count red">1</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-m-tag">M</span>
+      <span class="trend-label">Fishhook / oversteer (self-corrected)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#3b82f6;"></div></div>
+      <span class="trend-count blue">3</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-m-tag">M</span>
+      <span class="trend-label">Slight understeer</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:67%;background:#3b82f6;"></div></div>
+      <span class="trend-count blue">2</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-m-tag">M</span>
+      <span class="trend-label">Brake tap during turn</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:33%;background:#3b82f6;"></div></div>
+      <span class="trend-count blue">1</span>
+    </div>
+    <div class="warn-box">
+      &#x1F6A8; W14 + W16: Roundabout at Evans &amp; 3rd not mapped — system treated as standard intersection. W16 resulted in CPTO (FN yield to oncoming traffic). Roundabout mapping required before re-testing.<br>
+      &#x26A0;&#xFE0F; W3: Self-disengagement — root cause unknown, requires investigation.
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="section-title">Recurring Locations</div>
+    <div class="trend-row"><span class="trend-label">Evans &amp; 3rd St (roundabout)</span><span class="trend-count red">XXL + XL</span></div>
+    <div class="trend-row"><span class="trend-label">3rd &amp; 20th St</span><span class="trend-count blue">M × 2</span></div>
+    <div class="trend-row"><span class="trend-label">3rd &amp; 19th St</span><span class="trend-count blue">M × 1</span></div>
+    <div class="trend-row"><span class="trend-label">3rd &amp; 23rd St</span><span class="trend-count blue">M × 1</span></div>
+    <div class="trend-row"><span class="trend-label">3rd &amp; Mariposa</span><span class="trend-count green">S</span></div>
+    <div class="trend-row"><span class="trend-label">Cesar Chavez &amp; 3rd</span><span class="trend-count green">S</span></div>
+    <div class="trend-row"><span class="trend-label">Hudson &amp; 3rd</span><span class="trend-count blue">M (self-corrected)</span></div>
+    <div class="info-box">
+      &#x2139;&#xFE0F; No-HD-map turns performed well throughout — W4, W5, W7, W8, W9 all S or M along 3rd St corridor. Consistent behavior without map data is a positive signal for SF route coverage.
+    </div>
+    <div style="margin-top:10px;" class="section-title">Build / Route Context</div>
+    <div class="trend-row"><span class="trend-label">Build</span><span class="trend-count" style="color:#94a3b8;font-weight:400;">45500875.2</span></div>
+    <div class="trend-row"><span class="trend-label">Model</span><span class="trend-count" style="color:#94a3b8;font-weight:400;">sft-4815 + Filter</span></div>
+    <div class="trend-row"><span class="trend-label">City</span><span class="trend-count" style="color:#94a3b8;font-weight:400;">San Francisco</span></div>
+    <div class="trend-row"><span class="trend-label">Route focus</span><span class="trend-count" style="color:#94a3b8;font-weight:400;">3rd St corridor</span></div>
+    <div class="trend-row"><span class="trend-label">HD Map coverage</span><span class="trend-count" style="color:#94a3b8;font-weight:400;">Partial</span></div>
+  </div>
+</div>
+
+<!-- Detailed log -->
+<div class="section-title">Detailed Event Log</div>
+<div class="panel" style="padding:0;overflow:hidden;">
+<table class="log-table">
+<thead>
+  <tr>
+    <th style="width:80px;">Event</th>
+    <th style="width:40px;">#</th>
+    <th style="width:36px;">Sev</th>
+    <th>Description</th>
+    <th style="width:160px;">Location</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1077fd03-bb56-4776-bb31-447af10cd71d/1077fd03-bb56-4776-bb31-447af10cd71d" target="_blank">1077fd03</a></td>
+    <td class="id-col">W1</td>
+    <td><span class="sev-pill sev-s">S</span></td>
+    <td>U-turn good overall; too close to median at start — APTO, steering assist</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/639bb0fd-a156-4f88-9003-a40cb52ba9f0/639bb0fd-a156-4f88-9003-a40cb52ba9f0" target="_blank">639bb0fd</a></td>
+    <td class="id-col">W2</td>
+    <td><span class="sev-pill sev-s">S</span></td>
+    <td>U-turn good</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Mariposa</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d17bdca5-5945-4e4d-a5b5-bc231d268c0c/d17bdca5-5945-4e4d-a5b5-bc231d268c0c" target="_blank">d17bdca5</a></td>
+    <td class="id-col">W3</td>
+    <td><span class="sev-pill sev-xl">XL</span></td>
+    <td>Self-disengagement &#x26A0;</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a3bb2627-1a4f-4b50-a829-aefc4334b2fb/a3bb2627-1a4f-4b50-a829-aefc4334b2fb" target="_blank">a3bb2627</a></td>
+    <td class="id-col">W4</td>
+    <td><span class="sev-pill sev-s">S</span></td>
+    <td>U-turn good — no HD map</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; 20th St</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/084bae2d-6c41-4d6f-86f8-5d90c177627b/084bae2d-6c41-4d6f-86f8-5d90c177627b" target="_blank">084bae2d</a></td>
+    <td class="id-col">W5</td>
+    <td><span class="sev-pill sev-m">M</span></td>
+    <td>U-turn good — no HD map; wobble at end</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; 19th St</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7e092744-93b4-42cf-a1e5-61e529f3ed2e/7e092744-93b4-42cf-a1e5-61e529f3ed2e" target="_blank">7e092744</a></td>
+    <td class="id-col">W6</td>
+    <td><span class="sev-pill sev-xl">XL</span></td>
+    <td>U-turn missed &#x26A0;</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/75b11ee0-cd99-4075-87dc-1a0e14c29278/75b11ee0-cd99-4075-87dc-1a0e14c29278" target="_blank">75b11ee0</a></td>
+    <td class="id-col">W7</td>
+    <td><span class="sev-pill sev-s">S</span></td>
+    <td>U-turn good — no HD map</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1e5919f0-503b-413d-944e-103aeeb1d87b/1e5919f0-503b-413d-944e-103aeeb1d87b" target="_blank">1e5919f0</a></td>
+    <td class="id-col">W8</td>
+    <td><span class="sev-pill sev-s">S</span></td>
+    <td>U-turn good — no HD map</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/b0daa2bb-6d02-471f-989e-ae301d38dca3/b0daa2bb-6d02-471f-989e-ae301d38dca3" target="_blank">b0daa2bb</a></td>
+    <td class="id-col">W9</td>
+    <td><span class="sev-pill sev-m">M</span></td>
+    <td>U-turn good — no HD map; brake tap during turn</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; 23rd St</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1128e579-a2d9-4573-be32-b9db98c7ea08/1128e579-a2d9-4573-be32-b9db98c7ea08" target="_blank">1128e579</a></td>
+    <td class="id-col">W10</td>
+    <td><span class="sev-pill sev-s">S</span></td>
+    <td>U-turn good</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f9753423-2579-4d75-a879-1c495290e399/f9753423-2579-4d75-a879-1c495290e399" target="_blank">f9753423</a></td>
+    <td class="id-col">W11</td>
+    <td><span class="sev-pill sev-s">S</span></td>
+    <td>U-turn good</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">Cesar Chavez &amp; 3rd</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7007ff1e-eb88-47c9-a199-d35752121a4f/7007ff1e-eb88-47c9-a199-d35752121a4f" target="_blank">7007ff1e</a></td>
+    <td class="id-col">W12</td>
+    <td><span class="sev-pill sev-m">M</span></td>
+    <td>U-turn good; oversteer into median, self-corrected</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">Hudson &amp; 3rd</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/de1742b3-1de1-4ba2-8317-433cd707bba2/de1742b3-1de1-4ba2-8317-433cd707bba2" target="_blank">de1742b3</a></td>
+    <td class="id-col">W13</td>
+    <td><span class="sev-pill sev-l">L</span></td>
+    <td>U-turn bad; oversteer at end — APTO</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">Evans &amp; 3rd</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/036ff136-2fd8-4f32-8f14-8ea7f04b64f3/036ff136-2fd8-4f32-8f14-8ea7f04b64f3" target="_blank">036ff136</a></td>
+    <td class="id-col">W14</td>
+    <td><span class="sev-pill sev-xl">XL</span></td>
+    <td>Cut roundabout — roundabout not mapped &#x26A0; (needs mapping)</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">Evans &amp; 3rd (roundabout)</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1bbe8254-d150-458d-9145-ba269c3088c6/1bbe8254-d150-458d-9145-ba269c3088c6" target="_blank">1bbe8254</a></td>
+    <td class="id-col">W15</td>
+    <td><span class="sev-pill sev-xl">XL</span></td>
+    <td>U-turn bad; understeer — APTO &#x26A0;</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/994b04ff-c400-4ef1-b357-9c912eb4ecdd/994b04ff-c400-4ef1-b357-9c912eb4ecdd" target="_blank">994b04ff</a></td>
+    <td class="id-col">W16</td>
+    <td><span class="sev-pill sev-xxl">XXL</span></td>
+    <td>Cut roundabout; FN yield to oncoming traffic — CPTO &#x26A0;&#x26A0;</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">Evans &amp; 3rd (roundabout)</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ec6a7666-0912-419e-9e72-9118aa7d7d0b/ec6a7666-0912-419e-9e72-9118aa7d7d0b" target="_blank">ec6a7666</a></td>
+    <td class="id-col">W17</td>
+    <td><span class="sev-pill sev-s">S</span></td>
+    <td>Correct no U-turn at left-turn-only ground sign</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7427f0e0-a952-4fb9-84ac-bb86434c2fea/7427f0e0-a952-4fb9-84ac-bb86434c2fea" target="_blank">7427f0e0</a></td>
+    <td class="id-col">W18</td>
+    <td><span class="sev-pill sev-m">M</span></td>
+    <td>U-turn good; slight understeer</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; 20th</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/704d0316-a4f0-44f7-b566-e8229e89242b/704d0316-a4f0-44f7-b566-e8229e89242b" target="_blank">704d0316</a></td>
+    <td class="id-col">W19</td>
+    <td><span class="sev-pill sev-m">M</span></td>
+    <td>U-turn good; slight fishhook correction</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/23eaa966-bca5-4f60-b32b-a616406d2780/23eaa966-bca5-4f60-b32b-a616406d2780" target="_blank">23eaa966</a></td>
+    <td class="id-col">W20</td>
+    <td><span class="sev-pill sev-m">M</span></td>
+    <td>U-turn good; slight fishhook at end</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td>
+  </tr>
+  <tr>
+    <td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/fdcf0994-5563-42d6-bf67-3fa9648a377b/fdcf0994-5563-42d6-bf67-3fa9648a377b" target="_blank">fdcf0994</a></td>
+    <td class="id-col">W21</td>
+    <td><span class="sev-pill sev-s">S</span></td>
+    <td>U-turn good</td>
+    <td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; 20th</td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+</body>
+</html>
