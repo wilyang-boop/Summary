@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 18px; font-size: 13px; }
+  h1 { font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 3px; }
+  .subtitle { font-size: 11px; color: #94a3b8; margin-bottom: 14px; }
+
+  .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+  .panel { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; margin-bottom: 14px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .three-col { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+
+  /* Key findings */
+  .findings { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+  .finding-card { background: #1a1f2e; border: 1px solid #2d3348; border-radius: 8px; padding: 12px 14px; }
+  .finding-build { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+  .finding-text { font-size: 11px; color: #cbd5e1; line-height: 1.5; }
+  .finding-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+  .ftag { font-size: 9px; padding: 2px 6px; border-radius: 3px; }
+  .ftag-green { background: #14532d; color: #86efac; }
+  .ftag-red   { background: #431407; color: #fdba74; }
+  .ftag-blue  { background: #1e3a5f; color: #93c5fd; }
+  .ftag-yellow{ background: #422006; color: #fde68a; }
+
+  /* Build comparison cards */
+  .build-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .build-card { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; }
+  .build-name { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .build-meta { font-size: 10px; color: #64748b; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #2d3348; line-height: 1.6; }
+  .build-meta a { color: #3b82f6; text-decoration: none; }
+  .build-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 11px; }
+  .bk { color: #94a3b8; }
+  .bv { font-weight: 700; }
+  .pass-bar-wrap { height: 6px; background: #2d3348; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+  .pass-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg,#22c55e,#3b82f6); }
+  .severity-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; margin-top: 8px; gap: 1px; }
+  .bar-xl { background: #ef4444; } .bar-l { background: #fb923c; } .bar-m { background: #3b82f6; } .bar-s { background: #22c55e; }
+
+  /* Lane breakdown */
+  .lane-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .lane-table th { text-align: left; padding: 6px 10px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .lane-table td { padding: 6px 10px; border-bottom: 1px solid #1a1f2e; vertical-align: middle; }
+  .lane-table tr:last-child td { border-bottom: none; }
+  .lane-label { font-weight: 600; color: #e2e8f0; }
+  .mini-bar-wrap { width: 100px; height: 6px; background: #2d3348; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 6px; }
+  .mini-bar-fill { height: 100%; border-radius: 3px; }
+  .pct { font-weight: 700; font-size: 11px; }
+
+  /* Trends */
+  .trend-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #1a1f2e; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-label { font-size: 11px; color: #94a3b8; flex: 1; }
+  .trend-bar-wrap { width: 90px; height: 5px; background: #2d3348; border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; }
+  .trend-count { font-size: 11px; font-weight: 700; min-width: 24px; text-align: right; }
+  .trend-sev { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+  .sev-xl-tag { background: #431407; color: #fdba74; }
+  .sev-l-tag  { background: #422006; color: #fb923c; }
+  .sev-m-tag  { background: #1e3a5f; color: #93c5fd; }
+  .sev-s-tag  { background: #14532d; color: #86efac; }
+
+  /* Log table */
+  .log-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .log-table th { text-align: left; padding: 6px 8px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .log-table td { padding: 5px 8px; border-bottom: 1px solid #1a1f2e; vertical-align: top; line-height: 1.5; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: #1a1f2e; }
+  .id-col { font-weight: 700; color: #64748b; white-space: nowrap; }
+  .event-link { font-size: 10px; color: #3b82f6; text-decoration: none; font-family: monospace; display: block; line-height: 1.8; }
+  .event-link:hover { color: #60a5fa; text-decoration: underline; }
+
+  .sev-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .sev-xl  { background: #431407; color: #fdba74; }
+  .sev-l   { background: #422006; color: #fb923c; }
+  .sev-m   { background: #1e3a5f; color: #93c5fd; }
+  .sev-s   { background: #14532d; color: #86efac; }
+  .sev-skip{ background: #1e2535; color: #64748b; }
+
+  .tab-buttons { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+  .tab-btn { padding: 4px 12px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #2d3348; background: #1a1f2e; color: #94a3b8; }
+  .tab-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #3b82f6; }
+  .sub-tab-buttons { display: flex; gap: 3px; margin-bottom: 8px; flex-wrap: wrap; padding: 8px 8px 0; }
+  .sub-tab-btn { padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; border: 1px solid #2d3348; background: #0f1117; color: #64748b; }
+  .sub-tab-btn.active { background: #1a2535; color: #60a5fa; border-color: #3b82f6; }
+  .hidden { display: none; }
+
+  .alert-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #f97316; background: #2d1800; margin-top: 8px; font-size: 11px; color: #fdba74; line-height: 1.6; }
+  .info-box  { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; background: #0f2040; margin-top: 8px; font-size: 11px; color: #93c5fd; line-height: 1.6; }
+  .note-box  { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #8b5cf6; background: #1a0f2e; margin-top: 8px; font-size: 11px; color: #c4b5fd; line-height: 1.6; }
+
+  .red { color: #f87171; } .orange { color: #fb923c; } .blue { color: #60a5fa; } .green { color: #4ade80; }
+</style>
+</head>
+<body>
+
+<h1>U-Turn Build Comparison — AM vs PM</h1>
+<div class="subtitle">
+  2026-05-20 &nbsp;&middot;&nbsp; San Tomas / El Camino / Lafayette Corridor &nbsp;&middot;&nbsp;
+  AM: <a href="https://maglev.nvda.ai/av/drivescrubber/drives/667452" target="_blank" style="color:#3b82f6;text-decoration:none;">7e4b2dc2</a> &nbsp;&middot;&nbsp;
+  PM Pt.1: <a href="https://maglev.nvda.ai/av/drivescrubber/drives/667704" target="_blank" style="color:#3b82f6;text-decoration:none;">4e2fdc0d</a> &nbsp;&middot;&nbsp;
+  PM Pt.2: <a href="https://maglev.nvda.ai/av/drivescrubber/drives/667816" target="_blank" style="color:#3b82f6;text-decoration:none;">75b3bc78</a> &nbsp;&middot;&nbsp;
+  Veh: 174-323
+</div>
+
+<!-- Key findings -->
+<div class="section-title">Key Findings</div>
+<div class="findings">
+  <div class="finding-card" style="border-color:#1d4ed8;">
+    <div class="finding-build" style="color:#60a5fa;">AM &nbsp;&middot;&nbsp; sft-5285 &nbsp;&middot;&nbsp; <a href="http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45565919&vid=9" target="_blank" style="color:#3b82f6;text-decoration:none;">45565919.9</a></div>
+    <div class="finding-text">Strong performance on 3–4 lane San Tomas corridor with near-perfect pass rate (97%). Turns completed cleanly across all configurations with no HD map. Subtle wobbles at the end of turns observed consistently across the session — a minor quality issue but present throughout. Asymmetric and narrow 2-lane intersections were avoided as expected.</div>
+    <div class="finding-tags">
+      <span class="ftag ftag-green">97% on 3+4 lane</span>
+      <span class="ftag ftag-green">Good no-HD-map</span>
+      <span class="ftag ftag-yellow">Subtle wobbles at turn end</span>
+      <span class="ftag ftag-red">16 XL missed (narrow / asymmetric)</span>
+    </div>
+  </div>
+  <div class="finding-card" style="border-color:#b45309;">
+    <div class="finding-build" style="color:#fbbf24;">PM &nbsp;&middot;&nbsp; sft-4640 &nbsp;&middot;&nbsp; <a href="http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45500875&vid=2" target="_blank" style="color:#3b82f6;text-decoration:none;">45500875.2</a></div>
+    <div class="finding-text">PM Pt.2 repeated the San Tomas corridor and showed tighter turns than the AM build — PM turns entered 3rd–4th lane position, slightly more compact radius. Wobbles still present but comparable to AM. PM Pt.1 tested Oakmead / Arques corridor and revealed repeated FN yield failures on wide 2-lane + bike configurations at Arques, most likely caused by an unstable road graph lacking topo nodes, resulting in poor prediction of oncoming contenders. Both builds equally avoided asymmetric and narrow U-turns.</div>
+    <div class="finding-tags">
+      <span class="ftag ftag-green">Tighter radius vs AM</span>
+      <span class="ftag ftag-green">Good unprotected yield (most)</span>
+      <span class="ftag ftag-red">FN yield at Arques (road graph)</span>
+      <span class="ftag ftag-red">6 XL (Arques corridor)</span>
+    </div>
+  </div>
+  <div class="finding-card" style="border-color:#4c1d95;">
+    <div class="finding-build" style="color:#a78bfa;">Shared Observations</div>
+    <div class="finding-text">Ego correctly yields to oncoming contenders during unprotected U-turns in the majority of cases across both builds. The Arques failures are likely infrastructure-specific (unstable road graph / missing topo nodes) rather than a model regression. Both builds consistently avoided asymmetric and narrow-lane U-turns. W42 AM: correct TN no U-turn where navigation showed U-turn but intersection had no U-turn sign — expected behavior.</div>
+    <div class="finding-tags">
+      <span class="ftag ftag-green">Correct unprotected yield (general)</span>
+      <span class="ftag ftag-blue">Arques: road graph issue suspected</span>
+      <span class="ftag ftag-blue">Asymmetric avoidance consistent</span>
+      <span class="ftag ftag-green">W42 correct TN (no U-turn sign)</span>
+    </div>
+  </div>
+</div>
+
+<!-- Build comparison -->
+<div class="section-title">Build Comparison</div>
+<div class="build-grid">
+  <div class="build-card" style="border-color:#1d3a6e;">
+    <div class="build-name">AM — sft-5285</div>
+    <div class="build-meta">
+      Build: <a href="http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45565919&vid=9" target="_blank">45565919.9</a><br>
+      Session: <a href="https://maglev.nvda.ai/av/drivescrubber/drives/667452" target="_blank">7e4b2dc2</a><br>
+      Route: San Tomas / El Camino / Lafayette corridor
+    </div>
+    <div class="build-row"><span class="bk">XL</span><span class="bv red">16</span></div>
+    <div class="build-row"><span class="bk">L</span><span class="bv orange">1</span></div>
+    <div class="build-row"><span class="bk">M</span><span class="bv blue">22</span></div>
+    <div class="build-row"><span class="bk">S</span><span class="bv green">13</span></div>
+    <div class="build-row"><span class="bk">U-Turn events (in stat)</span><span class="bv">52</span></div>
+    <div class="build-row"><span class="bk">U-Turn pass rate</span><span class="bv orange">69%</span></div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:69%"></div></div>
+    <div class="build-row" style="margin-top:6px;"><span class="bk">3+4 lane pass rate</span><span class="bv green">97%</span></div>
+    <div style="font-size:9px;color:#64748b;margin-top:3px;">Skipped: W42 only (correct TN — no U-turn sign)</div>
+    <div class="severity-bar" style="margin-top:8px;">
+      <div class="bar-xl" style="width:31%"></div>
+      <div class="bar-l" style="width:2%"></div>
+      <div class="bar-m" style="width:42%"></div>
+      <div class="bar-s" style="width:25%"></div>
+    </div>
+  </div>
+  <div class="build-card" style="border-color:#78350f;">
+    <div class="build-name">PM — sft-4640</div>
+    <div class="build-meta">
+      Build: <a href="http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45500875&vid=2" target="_blank">45500875.2</a><br>
+      Session Pt.1: <a href="https://maglev.nvda.ai/av/drivescrubber/drives/667704" target="_blank">4e2fdc0d</a> &nbsp;|&nbsp; Pt.2: <a href="https://maglev.nvda.ai/av/drivescrubber/drives/667816" target="_blank">75b3bc78</a><br>
+      Route: Oakmead / Arques + San Tomas repeat
+    </div>
+    <div class="build-row"><span class="bk">XL</span><span class="bv red">6</span></div>
+    <div class="build-row"><span class="bk">L</span><span class="bv orange">1</span></div>
+    <div class="build-row"><span class="bk">M</span><span class="bv blue">11</span></div>
+    <div class="build-row"><span class="bk">S</span><span class="bv green">5</span></div>
+    <div class="build-row"><span class="bk">U-Turn events (in stat)</span><span class="bv">23</span></div>
+    <div class="build-row"><span class="bk">U-Turn pass rate</span><span class="bv orange">74%</span></div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:73%"></div></div>
+    <div class="build-row" style="margin-top:6px;"><span class="bk">3+4 lane pass rate</span><span class="bv green">100%</span></div>
+    <div style="font-size:9px;color:#64748b;margin-top:3px;">No events skipped</div>
+    <div class="severity-bar" style="margin-top:8px;">
+      <div class="bar-xl" style="width:27%"></div>
+      <div class="bar-l" style="width:5%"></div>
+      <div class="bar-m" style="width:45%"></div>
+      <div class="bar-s" style="width:23%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Lane breakdown -->
+<div class="section-title">Lane Configuration Pass Rate</div>
+<div class="panel" style="padding:0;overflow:hidden;margin-bottom:14px;">
+<table class="lane-table">
+<thead>
+  <tr>
+    <th>Lane Config</th>
+    <th>AM — sft-5285</th>
+    <th>PM — sft-4640</th>
+    <th>Notes</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="lane-label">4-Lane</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:100%;background:#22c55e;"></div></div><span class="pct green">100%</span> <span style="font-size:10px;color:#64748b;">14/14</span></td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:100%;background:#22c55e;"></div></div><span class="pct green">100%</span> <span style="font-size:10px;color:#64748b;">7/7</span></td>
+    <td style="font-size:10px;color:#475569;">PM turns slightly tighter radius / 3rd–4th lane entry</td>
+  </tr>
+  <tr>
+    <td class="lane-label">3-Lane</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:93%;background:#22c55e;"></div></div><span class="pct green">93%</span> <span style="font-size:10px;color:#64748b;">17/18</span></td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:100%;background:#22c55e;"></div></div><span class="pct green">100%</span> <span style="font-size:10px;color:#64748b;">1/1</span></td>
+    <td style="font-size:10px;color:#475569;">W47 AM XL regression at Central &amp; Bowers</td>
+  </tr>
+  <tr>
+    <td class="lane-label">2-Lane + Merging</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:0%;background:#22c55e;"></div></div><span class="pct" style="color:#64748b;">N/A</span></td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:80%;background:#22c55e;"></div></div><span class="pct green">~80%</span> <span style="font-size:10px;color:#64748b;">8/10</span></td>
+    <td style="font-size:10px;color:#475569;">PM Oakmead median — unprotected yield generally good</td>
+  </tr>
+  <tr>
+    <td class="lane-label">2-Lane + Bike (wide)</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:15%;background:#ef4444;"></div></div><span class="pct red">15%</span> <span style="font-size:10px;color:#64748b;">2/13</span></td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:60%;background:#f97316;"></div></div><span class="pct orange">60%</span> <span style="font-size:10px;color:#64748b;">3/5</span></td>
+    <td style="font-size:10px;color:#f87171;">Arques corridor: FN yield failures (PM) / missed (AM) — road graph issue suspected</td>
+  </tr>
+  <tr>
+    <td class="lane-label">2-Lane (narrow / asymmetric)</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:15%;background:#ef4444;"></div></div><span class="pct red">15%</span> <span style="font-size:10px;color:#64748b;">2/13</span></td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:60%;background:#f97316;"></div></div><span class="pct orange">60%</span> <span style="font-size:10px;color:#64748b;">9/15</span></td>
+    <td style="font-size:10px;color:#475569;">Includes infeasible TN events; both builds consistently avoided tightest configs</td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!-- Trends -->
+<div class="two-col">
+  <div class="panel">
+    <div class="section-title">AM Failure Trends</div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Missed — 2-lane narrow / asymmetric (ODD)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#ef4444;"></div></div>
+      <span class="trend-count red">10</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Missed — 3-lane (Lafayette / Bowers corridor)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:44%;background:#ef4444;"></div></div>
+      <span class="trend-count red">4</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Missed — 3+bike lane El Camino / asymmetric</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:22%;background:#ef4444;"></div></div>
+      <span class="trend-count red">2</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-m-tag">M</span>
+      <span class="trend-label">Wobble / understeer (turn completed)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#3b82f6;"></div></div>
+      <span class="trend-count blue">21</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">Large wobble (San Tomas &amp; Cabrillo)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:5%;background:#fb923c;"></div></div>
+      <span class="trend-count orange">1</span>
+    </div>
+    <div class="note-box">&#x1F4CC; W47: Regression — missed 3-lane at Central &amp; Bowers; system usually completes this turn.</div>
+    <div class="info-box">&#x2139;&#xFE0F; W42: Correct TN — navigation showed U-turn but intersection had no U-turn sign; system correctly did not attempt. Not included in pass rate.</div>
+  </div>
+  <div class="panel">
+    <div class="section-title">PM Failure Trends</div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">FN yield to oncoming (Arques — road graph)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#ef4444;"></div></div>
+      <span class="trend-count red">2</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Missed — 2-lane + bike / wide lanes (Arques)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#ef4444;"></div></div>
+      <span class="trend-count red">3</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Missed — no rail (Arques)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:33%;background:#ef4444;"></div></div>
+      <span class="trend-count red">1</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-m-tag">M</span>
+      <span class="trend-label">Wobble / understeer (turn completed)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#3b82f6;"></div></div>
+      <span class="trend-count blue">10</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">Unstable road graph — 2+bike, Arques median</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:17%;background:#fb923c;"></div></div>
+      <span class="trend-count orange">1</span>
+    </div>
+    <div class="alert-box">&#x26A0;&#xFE0F; Arques corridor (PM Pt.1): Repeated FN yield failures on wide 2-lane + bike configurations (W16, W17, W19). Suspected cause: unstable road graph with missing topo nodes, resulting in poor prediction of oncoming contenders. Requires road graph investigation before further testing on this corridor.</div>
+  </div>
+</div>
+
+<!-- Detailed log -->
+<div class="section-title">Detailed Event Log</div>
+<div class="tab-buttons">
+  <button class="tab-btn active" onclick="showBuild('am')">AM — sft-5285</button>
+  <button class="tab-btn" onclick="showBuild('pm')">PM — sft-4640</button>
+</div>
+
+<div class="panel" style="padding:0;overflow:hidden;">
+
+<!-- AM log -->
+<div id="build-am">
+<table class="log-table">
+<thead><tr><th style="width:80px;">Event</th><th style="width:40px;">#</th><th style="width:36px;">Sev</th><th>Description</th><th style="width:180px;">Location</th></tr></thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7e198a1a-9c35-49ed-a04e-c03cd184399c/7e198a1a-9c35-49ed-a04e-c03cd184399c" target="_blank">7e198a1a</a></td><td class="id-col">W1</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map; understeer with wobble</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Monroe</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e31f7d82-6d5a-4eda-940b-2451dd9dcc30/e31f7d82-6d5a-4eda-940b-2451dd9dcc30" target="_blank">e31f7d82</a></td><td class="id-col">W2</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, HD map, 4-lane</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Walsh</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/fb1a698f-cbd3-491c-8303-3d604b26f156/fb1a698f-cbd3-491c-8303-3d604b26f156" target="_blank">fb1a698f</a></td><td class="id-col">W3</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn bad, no HD map, 4-lane; large wobble but completed</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Cabrillo</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9a2f7e9a-393e-4c67-b06b-d2ee0811e691/9a2f7e9a-393e-4c67-b06b-d2ee0811e691" target="_blank">9a2f7e9a</a></td><td class="id-col">W4</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 4-lane; wobble, understeer</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; El Camino Real</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/b69816fc-2b41-47e1-acfa-16538e20963f/b69816fc-2b41-47e1-acfa-16538e20963f" target="_blank">b69816fc</a></td><td class="id-col">W5</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 4-lane; wobble, understeer</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Monroe</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/60d3708f-740c-4abf-a722-29dc9cc605c9/60d3708f-740c-4abf-a722-29dc9cc605c9" target="_blank">60d3708f</a></td><td class="id-col">W6</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 4-lane; wobble, understeer</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Benton</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/491f3b26-cdca-4fdb-8322-dc4dc9b64613/491f3b26-cdca-4fdb-8322-dc4dc9b64613" target="_blank">491f3b26</a></td><td class="id-col">W7</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 4-lane; wobble, understeer</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Cabrillo</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/016f61a2-00e4-4175-a76a-b50eabb7f589/016f61a2-00e4-4175-a76a-b50eabb7f589" target="_blank">016f61a2</a></td><td class="id-col">W8</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 4-lane; understeer</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; El Camino Real</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7fe261c2-7c40-486d-8ab9-75c2048971a7/7fe261c2-7c40-486d-8ab9-75c2048971a7" target="_blank">7fe261c2</a></td><td class="id-col">W9</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, narrow 2+bike lane, no HD map; proceeded LT with oncoming approaching — CPTO &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Monroe median</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/443dad7a-40f0-49e4-9230-16033e5e0d32/443dad7a-40f0-49e4-9230-16033e5e0d32" target="_blank">443dad7a</a></td><td class="id-col">W10</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 4-lane; wobble, understeer, into 2nd/3rd lane</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Homestead</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a110f00c-b5e0-4ffb-882d-78475b1720a0/a110f00c-b5e0-4ffb-882d-78475b1720a0" target="_blank">a110f00c</a></td><td class="id-col">W11</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 4-lane; wobble, understeer</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Benton</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/36d66c5c-629a-46f9-a92c-297f97c19269/36d66c5c-629a-46f9-a92c-297f97c19269" target="_blank">36d66c5c</a></td><td class="id-col">W12</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3-lane; wobble, understeer</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Forbes</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1fcac507-060c-404d-b18b-9d9a47eb112a/1fcac507-060c-404d-b18b-9d9a47eb112a" target="_blank">1fcac507</a></td><td class="id-col">W13</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 4-lane; wobble</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Homestead</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/abf39e77-37b1-4c46-b843-008bd148feca/abf39e77-37b1-4c46-b843-008bd148feca" target="_blank">abf39e77</a></td><td class="id-col">W14</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3-lane; wobble, understeer</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Pruneridge</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ef1c8e43-1f8b-46b3-9c2f-9cff70dd4b92/ef1c8e43-1f8b-46b3-9c2f-9cff70dd4b92" target="_blank">ef1c8e43</a></td><td class="id-col">W15</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 4-lane; slight fishhook correction at end</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Forbes</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/72df65da-9c4d-4c92-973c-5a20d4546fd7/72df65da-9c4d-4c92-973c-5a20d4546fd7" target="_blank">72df65da</a></td><td class="id-col">W16</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 2nd lane of 3; slow at start</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Saratoga</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/090731c0-13e1-41ed-b32a-ce5d0e96b66a/090731c0-13e1-41ed-b32a-ce5d0e96b66a" target="_blank">090731c0</a></td><td class="id-col">W17</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 3-lane; slight understeer at end</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Pruneridge</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/0c4213b6-a419-453c-b278-951415d706b8/0c4213b6-a419-453c-b278-951415d706b8" target="_blank">0c4213b6</a></td><td class="id-col">W18</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3/4-lane; wobble at end</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Stevens Creek</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/8c2b56a2-3b58-45d8-9b55-22d3b5e1408e/8c2b56a2-3b58-45d8-9b55-22d3b5e1408e" target="_blank">8c2b56a2</a></td><td class="id-col">W19</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 3-lane</td><td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/509ca475-657c-4f4c-9cc9-bb07b4c19fae/509ca475-657c-4f4c-9cc9-bb07b4c19fae" target="_blank">509ca475</a></td><td class="id-col">W20</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3-lane; wobble throughout</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Moorpark</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/03509859-c8ba-4d2d-a9ff-88ba2c316245/03509859-c8ba-4d2d-a9ff-88ba2c316245" target="_blank">03509859</a></td><td class="id-col">W21</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 3-lane</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Stevens Creek</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d20fcd79-3184-4da4-9d1d-34547e8cfa79/d20fcd79-3184-4da4-9d1d-34547e8cfa79" target="_blank">d20fcd79</a></td><td class="id-col">W22</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 3-lane; slight oversteer</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Williams</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9bafaab8-9ec6-4784-9ad0-f648134377a0/9bafaab8-9ec6-4784-9ad0-f648134377a0" target="_blank">9bafaab8</a></td><td class="id-col">W23</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 3-lane; slight understeer at end</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Stevens Creek</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/28955963-a261-4b5c-b84c-2253149863b3/28955963-a261-4b5c-b84c-2253149863b3" target="_blank">28955963</a></td><td class="id-col">W24</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 3-lane; slow start (too close to curb or oncoming?)</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Moorpark</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c7f5c893-df0b-4228-b808-acc657439f9f/c7f5c893-df0b-4228-b808-acc657439f9f" target="_blank">c7f5c893</a></td><td class="id-col">W25</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 3-lane</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Saratoga</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f8a94691-7c1e-47e0-9947-d6331fba68cb/f8a94691-7c1e-47e0-9947-d6331fba68cb" target="_blank">f8a94691</a></td><td class="id-col">W26</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, no HD map, 3+bike lane; asymmetric &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">El Camino Real &amp; Saratoga</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/3073683c-e0f9-46d0-9b94-fbd37e1638b4/3073683c-e0f9-46d0-9b94-fbd37e1638b4" target="_blank">3073683c</a></td><td class="id-col">W27</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, no HD map, 3+bike lane &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">El Camino Real</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/af40375c-01b4-4fc0-9bf1-f2d4f4b6329a/af40375c-01b4-4fc0-9bf1-f2d4f4b6329a" target="_blank">af40375c</a></td><td class="id-col">W28</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3+bike lane; understeer into bike lane</td><td style="font-size:10px;color:#475569;font-style:italic;">El Camino Real median</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a2a636de-0f2b-44e1-8b45-d8038ab608fd/a2a636de-0f2b-44e1-8b45-d8038ab608fd" target="_blank">a2a636de</a></td><td class="id-col">W29</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3-lane; asymmetric, understeer</td><td style="font-size:10px;color:#475569;font-style:italic;">Saratoga Real</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4401e554-319d-42a2-b292-ac372bd547a5/4401e554-319d-42a2-b292-ac372bd547a5" target="_blank">4401e554</a></td><td class="id-col">W30</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, no HD map, 2 wide lane; asymmetric &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">El Camino Real &amp; Saratoga</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e34deccf-c1f2-44b3-a1aa-611a35c0d5dd/e34deccf-c1f2-44b3-a1aa-611a35c0d5dd" target="_blank">e34deccf</a></td><td class="id-col">W31</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn infeasible, no HD map, 2+bike lane — TN correct skip</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Saratoga</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/87503c0c-6afc-4094-9a49-26572bc01c38/87503c0c-6afc-4094-9a49-26572bc01c38" target="_blank">87503c0c</a></td><td class="id-col">W32</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 2-lane; hesitant, understeer</td><td style="font-size:10px;color:#475569;font-style:italic;">Keystone &amp; Saratoga</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1eae1dad-6060-43eb-9462-4eeb7049041d/1eae1dad-6060-43eb-9462-4eeb7049041d" target="_blank">1eae1dad</a></td><td class="id-col">W33</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed (infeasible?), no HD map, 2+bike lane &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Saratoga</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/b355df28-3213-471a-832c-4a265f36c332/b355df28-3213-471a-832c-4a265f36c332" target="_blank">b355df28</a></td><td class="id-col">W34</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed (infeasible?), no HD map, 2 wide lane; asymmetric, rail present and chosen &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">El Camino Real &amp; Saratoga</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/db5efe98-4475-4ee9-a422-4ddc721b3b60/db5efe98-4475-4ee9-a422-4ddc721b3b60" target="_blank">db5efe98</a></td><td class="id-col">W35</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, no HD map, 2+bike lane; unprotected &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/3b3c07c9-a4b4-4e82-a6f8-ee1939752744/3b3c07c9-a4b4-4e82-a6f8-ee1939752744" target="_blank">3b3c07c9</a></td><td class="id-col">W36</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3-lane; wobble</td><td style="font-size:10px;color:#475569;font-style:italic;">Central &amp; De La Cruz</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/387fc528-bcce-4eb8-8dd8-29327d137d33/387fc528-bcce-4eb8-8dd8-29327d137d33" target="_blank">387fc528</a></td><td class="id-col">W37</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, no HD map, 3-lane &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Laurelwood &amp; Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/709b199f-5d4c-45a1-9473-f4733fbea484/709b199f-5d4c-45a1-9473-f4733fbea484" target="_blank">709b199f</a></td><td class="id-col">W38</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, no HD map, 2-lane &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/99b42ab0-071e-4627-a297-b95859bf752f/99b42ab0-071e-4627-a297-b95859bf752f" target="_blank">99b42ab0</a></td><td class="id-col">W39</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed (infeasible?), no HD map, 2-lane; model wanted to U-turn, gave up, went straight &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Lafayette &amp; Aldo</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c141752f-a180-4e3a-b881-bd84369613f1/c141752f-a180-4e3a-b881-bd84369613f1" target="_blank">c141752f</a></td><td class="id-col">W40</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed (infeasible?), no HD map, 2-lane; unprotected &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/47cf2bfe-e6ae-474e-93ad-2a4d0e56626b/47cf2bfe-e6ae-474e-93ad-2a4d0e56626b" target="_blank">47cf2bfe</a></td><td class="id-col">W41</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed (infeasible?), no HD map, 2-lane; initiated then proceeded straight — unprotected &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Lafayette &amp; Aldo</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/6ce2b9ab-b06d-4dc9-b4e3-98909692ea1d/6ce2b9ab-b06d-4dc9-b4e3-98909692ea1d" target="_blank">6ce2b9ab</a></td><td class="id-col">W42</td><td><span class="sev-pill sev-skip">SKIP</span></td><td>Good TN — navigation showed U-turn but intersection has no U-turn sign; correct no-attempt &#x2605;</td><td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f8dd488d-0a41-4bd4-8b3c-7a0fbb672eb7/f8dd488d-0a41-4bd4-8b3c-7a0fbb672eb7" target="_blank">f8dd488d</a></td><td class="id-col">W43</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3-lane, central median with TL; wobble, fishhook correction</td><td style="font-size:10px;color:#475569;font-style:italic;">Central median</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/801207ef-5a14-44c4-a6bc-b8d7f4cb7db3/801207ef-5a14-44c4-a6bc-b8d7f4cb7db3" target="_blank">801207ef</a></td><td class="id-col">W44</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3-lane with TL; understeer</td><td style="font-size:10px;color:#475569;font-style:italic;">Central &amp; Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/20c4d1a7-0d12-4e01-acce-490cdc221d6b/20c4d1a7-0d12-4e01-acce-490cdc221d6b" target="_blank">20c4d1a7</a></td><td class="id-col">W45</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 3-lane</td><td style="font-size:10px;color:#475569;font-style:italic;">Central &amp; Scott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d330710c-5c31-4d75-98e2-33907a67c87e/d330710c-5c31-4d75-98e2-33907a67c87e" target="_blank">d330710c</a></td><td class="id-col">W46</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3-lane; wobble, understeer</td><td style="font-size:10px;color:#475569;font-style:italic;">Central &amp; Lafayette</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/b7bbbd2d-9252-4a82-9e2b-ce941ac8b3b7/b7bbbd2d-9252-4a82-9e2b-ce941ac8b3b7" target="_blank">b7bbbd2d</a></td><td class="id-col">W47</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, no HD map, 3-lane; wobble, asymmetric — regression (usually completed) &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Central &amp; Bowers</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/bf4d8f44-0542-4b7e-b884-7bdd04ab715c/bf4d8f44-0542-4b7e-b884-7bdd04ab715c" target="_blank">bf4d8f44</a></td><td class="id-col">W48</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3-lane; wobble at end</td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Walsh</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ed47a3c7-a6e4-47cc-ba32-98e16d8a55b6/ed47a3c7-a6e4-47cc-ba32-98e16d8a55b6" target="_blank">ed47a3c7</a></td><td class="id-col">W49</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3-lane, Bowers median; slow</td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers median</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7d9d63e8-15a7-44e1-9665-68f5514dc8d7/7d9d63e8-15a7-44e1-9665-68f5514dc8d7" target="_blank">7d9d63e8</a></td><td class="id-col">W50</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed (infeasible?), no HD map, 2+bike lane &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Chromite &amp; Bowers</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c7414f1f-893f-4da5-8f1f-ff975394c11a/c7414f1f-893f-4da5-8f1f-ff975394c11a" target="_blank">c7414f1f</a></td><td class="id-col">W51</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed (infeasible?), no HD map, 2+bike lane &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Kifer &amp; Bowers</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d4beb1e6-84f1-42bd-a541-05128227e89d/d4beb1e6-84f1-42bd-a541-05128227e89d" target="_blank">d4beb1e6</a></td><td class="id-col">W52</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3-lane; slightly jerky</td><td style="font-size:10px;color:#475569;font-style:italic;">Oakmead &amp; Corvin</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c7414f1f-893f-4da5-8f1f-ff975394c11a/c7414f1f-893f-4da5-8f1f-ff975394c11a" target="_blank">c7414f1f</a></td><td class="id-col">W53</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, no HD map, 2 wide lane; gave up at start, went straight — unprotected &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Corvin median</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- PM log -->
+<div id="build-pm" class="hidden">
+  <div class="sub-tab-buttons">
+    <button class="sub-tab-btn active" onclick="showSub('pt1')">PM Pt.1</button>
+    <button class="sub-tab-btn" onclick="showSub('pt2')">PM Pt.2</button>
+  </div>
+  <div id="pm-pt1">
+  <table class="log-table">
+  <thead><tr><th style="width:80px;">Event</th><th style="width:40px;">#</th><th style="width:36px;">Sev</th><th>Description</th><th style="width:180px;">Location</th></tr></thead>
+  <tbody>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1a84528d-a0ff-4898-b60a-a09962572c7a/1a84528d-a0ff-4898-b60a-a09962572c7a" target="_blank">1a84528d</a></td><td class="id-col">W12</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 2+merging lane; into merging lane</td><td style="font-size:10px;color:#475569;font-style:italic;">Arques &amp; Oakmead</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1e7b5340-25b7-4c94-afdf-6fb235574caa/1e7b5340-25b7-4c94-afdf-6fb235574caa" target="_blank">1e7b5340</a></td><td class="id-col">W13</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 2+turning lane; unprotected</td><td style="font-size:10px;color:#475569;font-style:italic;">Oakmead</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9b9878aa-009d-4418-b2ad-34ddcfc33ab2/9b9878aa-009d-4418-b2ad-34ddcfc33ab2" target="_blank">9b9878aa</a></td><td class="id-col">W14</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 3-lane; oversteer at end, fishhook</td><td style="font-size:10px;color:#475569;font-style:italic;">Lakeside &amp; Oakmead</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/23658e90-35ed-4643-a5c1-d0f4b46095b6/23658e90-35ed-4643-a5c1-d0f4b46095b6" target="_blank">23658e90</a></td><td class="id-col">W15</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 2+merging lane; unprotected</td><td style="font-size:10px;color:#475569;font-style:italic;">Oakmead median</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/89e1048f-c1c7-41de-bc0d-25b8ef005c08/89e1048f-c1c7-41de-bc0d-25b8ef005c08" target="_blank">89e1048f</a></td><td class="id-col">W16</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, no HD map, 2 wide+bike lane; FN yield to oncoming — unprotected &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Arques (wide)</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2d179f88-7a75-4747-833c-d89303a3a892/2d179f88-7a75-4747-833c-d89303a3a892" target="_blank">2d179f88</a></td><td class="id-col">W17</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, no HD map, 2 wide+bike lane; FN yield to oncoming — unprotected &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Arques</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/17ceb2ff-25ae-430e-b8d7-d00a197186d7/17ceb2ff-25ae-430e-b8d7-d00a197186d7" target="_blank">17ceb2ff</a></td><td class="id-col">W18</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, no HD map, 2 wide+bike lane &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Arques</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a446b808-6b3b-4daf-ab05-33840fe341ac/a446b808-6b3b-4daf-ab05-33840fe341ac" target="_blank">a446b808</a></td><td class="id-col">W19</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, no HD map, 2 wide+bike lane; unprotected — no rail &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Arques</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2a0d97f8-a2c3-42b0-a444-9749acd6c488/2a0d97f8-a2c3-42b0-a444-9749acd6c488" target="_blank">2a0d97f8</a></td><td class="id-col">W20</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, no HD map, 2 wide+bike lane &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Scott</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ad1d5bdb-8b5d-4134-9c3e-40fcfbc52de7/ad1d5bdb-8b5d-4134-9c3e-40fcfbc52de7" target="_blank">ad1d5bdb</a></td><td class="id-col">W21</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, no HD map, 2 wide+bike lane; possibly infeasible (very wide) &#x26A0;</td><td style="font-size:10px;color:#475569;font-style:italic;">Scott &amp; Oakmead</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ebdce732-ea55-4003-a33d-ab7ea5c83243/ebdce732-ea55-4003-a33d-ab7ea5c83243" target="_blank">ebdce732</a></td><td class="id-col">W22</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 2+merging lane; unprotected</td><td style="font-size:10px;color:#475569;font-style:italic;">Oakmead median</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <div id="pm-pt2" class="hidden">
+  <table class="log-table">
+  <thead><tr><th style="width:80px;">Event</th><th style="width:40px;">#</th><th style="width:36px;">Sev</th><th>Description</th><th style="width:180px;">Location</th></tr></thead>
+  <tbody>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/30a31d8a-9136-4bd3-bc56-d9b509137bc5/30a31d8a-9136-4bd3-bc56-d9b509137bc5" target="_blank">30a31d8a</a></td><td class="id-col">W1</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good; wobble</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Walsh</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1168058f-9cd3-44d9-b6fc-ca78992c6a82/1168058f-9cd3-44d9-b6fc-ca78992c6a82" target="_blank">1168058f</a></td><td class="id-col">W2</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good; wobble, 3rd into 4-lane — tighter than AM build</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Central</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f0c50a32-a208-4417-b536-0a6ac44d2584/f0c50a32-a208-4417-b536-0a6ac44d2584" target="_blank">f0c50a32</a></td><td class="id-col">W3</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good; slight wobble during correction</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Monroe</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/dfa2d121-18f4-408f-abb5-92021a18af15/dfa2d121-18f4-408f-abb5-92021a18af15" target="_blank">dfa2d121</a></td><td class="id-col">W4</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, HD map, 4-lane</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Walsh</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/02ed07a5-86d3-46d6-be4f-a21fab569019/02ed07a5-86d3-46d6-be4f-a21fab569019" target="_blank">02ed07a5</a></td><td class="id-col">W5</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 4-lane; wobble</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Cabrillo</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/52143473-8ce0-40f8-a362-f475c1bb2618/52143473-8ce0-40f8-a362-f475c1bb2618" target="_blank">52143473</a></td><td class="id-col">W6</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 4-lane; jerky start</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Monroe</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/42c6bc8d-2004-4781-8b6d-8df719e40473/42c6bc8d-2004-4781-8b6d-8df719e40473" target="_blank">42c6bc8d</a></td><td class="id-col">W7</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 4-lane; slight oversteer, fishhook</td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; El Camino Real</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/06a465f7-3f4e-4fc8-a7bc-f27b227cc4ea/06a465f7-3f4e-4fc8-a7bc-f27b227cc4ea" target="_blank">06a465f7</a></td><td class="id-col">W8</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 2+merging lane; unprotected, yield, wobble at end</td><td style="font-size:10px;color:#475569;font-style:italic;">Oakmead Pkwy median</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/dc3be551-7d75-4bdf-a1e4-50edc0d7df39/dc3be551-7d75-4bdf-a1e4-50edc0d7df39" target="_blank">dc3be551</a></td><td class="id-col">W9</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, no HD map, 2+merging lane</td><td style="font-size:10px;color:#475569;font-style:italic;">Oakmead &amp; Arques</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7055a1f4-0789-4f6a-a912-eb274a84db90/7055a1f4-0789-4f6a-a912-eb274a84db90" target="_blank">7055a1f4</a></td><td class="id-col">W10</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, no HD map, 2+merging lane; unprotected, yielding</td><td style="font-size:10px;color:#475569;font-style:italic;">Oakmead Pkwy median</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/16271f13-c9a4-419e-baf1-ba920e8cb9d1/16271f13-c9a4-419e-baf1-ba920e8cb9d1" target="_blank">16271f13</a></td><td class="id-col">W11</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn infeasible, no HD map, 2+bike lane — TN correct skip</td><td style="font-size:10px;color:#475569;font-style:italic;">Lakeside &amp; Arques</td></tr>
+  <tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/13677a04-ef5e-485f-a95d-c65f458c09e5/13677a04-ef5e-485f-a95d-c65f458c09e5" target="_blank">13677a04</a></td><td class="id-col">W12</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn good, no HD map, 2+bike lane; unprotected — unstable road graph, may need HD map</td><td style="font-size:10px;color:#475569;font-style:italic;">Arques median</td></tr>
+  </tbody>
+  </table>
+  </div>
+</div>
+
+</div>
+
+<script>
+function showBuild(id) {
+  ['am','pm'].forEach(function(b) {
+    var el = document.getElementById('build-' + b);
+    if (el) el.classList.add('hidden');
+  });
+  document.getElementById('build-' + id).classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+    btn.classList.toggle('active', ['am','pm'][i] === id);
+  });
+}
+function showSub(id) {
+  ['pt1','pt2'].forEach(function(s) {
+    var el = document.getElementById('pm-' + s);
+    if (el) el.classList.add('hidden');
+  });
+  document.getElementById('pm-' + id).classList.remove('hidden');
+  document.querySelectorAll('.sub-tab-btn').forEach(function(btn, i) {
+    btn.classList.toggle('active', ['pt1','pt2'][i] === id);
+  });
+}
+</script>
+</body>
+</html>
