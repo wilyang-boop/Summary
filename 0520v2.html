@@ -156,7 +156,7 @@
     <div class="build-row"><span class="bk">U-Turn events (in stat)</span><span class="bv">52</span></div>
     <div class="build-row"><span class="bk">U-Turn pass rate</span><span class="bv orange">69%</span></div>
     <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:69%"></div></div>
-    <div class="build-row" style="margin-top:6px;"><span class="bk">3+4 lane pass rate</span><span class="bv green">97%</span></div>
+    <div class="build-row" style="margin-top:6px;"><span class="bk">3+4 lane pass rate</span><span class="bv green">91% (32/35)</span></div>
     <div style="font-size:9px;color:#64748b;margin-top:3px;">Skipped: W42 only (correct TN — no U-turn sign)</div>
     <div class="severity-bar" style="margin-top:8px;">
       <div class="bar-xl" style="width:31%"></div>
@@ -179,7 +179,7 @@
     <div class="build-row"><span class="bk">U-Turn events (in stat)</span><span class="bv">23</span></div>
     <div class="build-row"><span class="bk">U-Turn pass rate</span><span class="bv orange">74%</span></div>
     <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:73%"></div></div>
-    <div class="build-row" style="margin-top:6px;"><span class="bk">3+4 lane pass rate</span><span class="bv green">100%</span></div>
+    <div class="build-row" style="margin-top:6px;"><span class="bk">3+4 lane pass rate</span><span class="bv green">100% (8/8)</span></div>
     <div style="font-size:9px;color:#64748b;margin-top:3px;">No events skipped</div>
     <div class="severity-bar" style="margin-top:8px;">
       <div class="bar-xl" style="width:27%"></div>
@@ -210,10 +210,22 @@
     <td style="font-size:10px;color:#475569;">PM turns slightly tighter radius / 3rd–4th lane entry</td>
   </tr>
   <tr>
-    <td class="lane-label">3-Lane</td>
-    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:93%;background:#22c55e;"></div></div><span class="pct green">93%</span> <span style="font-size:10px;color:#64748b;">17/18</span></td>
+    <td class="lane-label">3-Lane (incl. asymmetric)</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:86%;background:#22c55e;"></div></div><span class="pct green">86%</span> <span style="font-size:10px;color:#64748b;">18/21</span></td>
     <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:100%;background:#22c55e;"></div></div><span class="pct green">100%</span> <span style="font-size:10px;color:#64748b;">1/1</span></td>
-    <td style="font-size:10px;color:#475569;">W47 AM XL regression at Central &amp; Bowers</td>
+    <td style="font-size:10px;color:#475569;">W26, W29, W47 AM asymmetric 3-lane now included; W47 regression at Central &amp; Bowers</td>
+  </tr>
+  <tr>
+    <td class="lane-label">3+4 Lane Combined</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:91%;background:#22c55e;"></div></div><span class="pct green">91%</span> <span style="font-size:10px;color:#64748b;">32/35</span></td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:100%;background:#22c55e;"></div></div><span class="pct green">100%</span> <span style="font-size:10px;color:#64748b;">8/8</span></td>
+    <td style="font-size:10px;color:#475569;">R18 scope — includes all symmetric and asymmetric 3+4 lane events</td>
+  </tr>
+  <tr>
+    <td class="lane-label">Asymmetric Intersection</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:20%;background:#ef4444;"></div></div><span class="pct red">20%</span> <span style="font-size:10px;color:#64748b;">1/5</span></td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:0%;background:#ef4444;"></div></div><span class="pct red">0%</span> <span style="font-size:10px;color:#64748b;">0/1</span></td>
+    <td style="font-size:10px;color:#475569;">Spans 2–3 lane; W26/W29/W30/W34/W47 AM · W21 PM — asymmetric geometry consistently challenging</td>
   </tr>
   <tr>
     <td class="lane-label">2-Lane + Merging</td>
@@ -228,7 +240,7 @@
     <td style="font-size:10px;color:#f87171;">Arques corridor: FN yield failures (PM) / missed (AM) — road graph issue suspected</td>
   </tr>
   <tr>
-    <td class="lane-label">2-Lane (narrow / asymmetric)</td>
+    <td class="lane-label">2-Lane (narrow)</td>
     <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:15%;background:#ef4444;"></div></div><span class="pct red">15%</span> <span style="font-size:10px;color:#64748b;">2/13</span></td>
     <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:60%;background:#f97316;"></div></div><span class="pct orange">60%</span> <span style="font-size:10px;color:#64748b;">9/15</span></td>
     <td style="font-size:10px;color:#475569;">Includes infeasible TN events; both builds consistently avoided tightest configs</td>
