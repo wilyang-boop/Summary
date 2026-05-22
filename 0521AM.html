@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 18px; font-size: 13px; }
+  h1 { font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 3px; }
+  .subtitle { font-size: 11px; color: #94a3b8; margin-bottom: 14px; }
+
+  .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+  .panel { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; margin-bottom: 14px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+  .key-summary { background: #1a1f2e; border: 1px solid #2d3348; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .ks-item { display: flex; align-items: flex-start; gap: 8px; }
+  .ks-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .ks-label { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .ks-desc { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card { background: #1e2230; border-radius: 8px; padding: 10px 12px; border: 1px solid #2d3348; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-bottom: 3px; }
+  .stat-value { font-size: 22px; font-weight: 700; }
+  .stat-sub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+  .stat-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+  .stat-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #2d3348; color: #94a3b8; }
+  .pass-bar-wrap { height: 6px; background: #2d3348; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+  .pass-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #22c55e, #3b82f6); }
+
+  .lane-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .lane-table th { text-align: left; padding: 6px 10px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .lane-table td { padding: 6px 10px; border-bottom: 1px solid #1a1f2e; vertical-align: middle; }
+  .lane-table tr:last-child td { border-bottom: none; }
+  .lane-label { font-weight: 600; color: #e2e8f0; }
+  .mini-bar-wrap { width: 100px; height: 6px; background: #2d3348; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 6px; }
+  .mini-bar-fill { height: 100%; border-radius: 3px; }
+  .pct { font-weight: 700; font-size: 11px; }
+
+  .trend-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #1a1f2e; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-label { font-size: 11px; color: #94a3b8; flex: 1; }
+  .trend-bar-wrap { width: 90px; height: 5px; background: #2d3348; border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; }
+  .trend-count { font-size: 11px; font-weight: 700; min-width: 24px; text-align: right; }
+  .trend-sev { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+  .sev-xl-tag { background: #431407; color: #fdba74; }
+  .sev-l-tag  { background: #422006; color: #fb923c; }
+  .sev-m-tag  { background: #1e3a5f; color: #93c5fd; }
+  .sev-s-tag  { background: #14532d; color: #86efac; }
+
+  .log-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .log-table th { text-align: left; padding: 6px 8px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .log-table td { padding: 5px 8px; border-bottom: 1px solid #1a1f2e; vertical-align: top; line-height: 1.5; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: #1a1f2e; }
+  .id-col { font-weight: 700; color: #64748b; white-space: nowrap; }
+  .event-link { font-size: 10px; color: #3b82f6; text-decoration: none; font-family: monospace; display: block; line-height: 1.8; }
+  .event-link:hover { color: #60a5fa; text-decoration: underline; }
+
+  .sev-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .sev-xl { background: #431407; color: #fdba74; }
+  .sev-l  { background: #422006; color: #fb923c; }
+  .sev-m  { background: #1e3a5f; color: #93c5fd; }
+  .sev-s  { background: #14532d; color: #86efac; }
+  .map-pill { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 600; margin-left: 3px; }
+  .map-yes { background: #14532d; color: #86efac; }
+  .map-no  { background: #1e2535; color: #64748b; }
+
+  .alert-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #f97316; background: #2d1800; margin-top: 8px; font-size: 11px; color: #fdba74; line-height: 1.6; }
+  .info-box  { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; background: #0f2040; margin-top: 8px; font-size: 11px; color: #93c5fd; line-height: 1.6; }
+
+  .red { color: #f87171; } .orange { color: #fb923c; } .blue { color: #60a5fa; } .green { color: #4ade80; }
+</style>
+</head>
+<body>
+
+<h1>U-Turn Test — SF</h1>
+<div class="subtitle">
+  2026-05-21 &nbsp;&middot;&nbsp; 3rd St Corridor, San Francisco &nbsp;&middot;&nbsp;
+  Build: <a href="http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45565919&vid=9" target="_blank" style="color:#3b82f6;text-decoration:none;">45565919.9</a> &nbsp;&middot;&nbsp;
+  Model: sft-5285 &nbsp;&middot;&nbsp;
+  Session: <a href="https://maglev.nvda.ai/av/drivescrubber/drives/668747" target="_blank" style="color:#3b82f6;text-decoration:none;">bcc2bad5</a> &nbsp;&middot;&nbsp;
+  Tester: W &nbsp;&middot;&nbsp; Veh: 174-232
+</div>
+
+<!-- Key findings -->
+<div class="key-summary">
+  <div class="ks-item">
+    <div class="ks-icon">✅</div>
+    <div>
+      <div class="ks-label">HD Map Turns — Perfect</div>
+      <div class="ks-desc">All 14 HD map turns completed successfully (100%). Wide median geometry handled well across 1-lane and 2-lane configurations when map data is available.</div>
+    </div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">⚠️</div>
+    <div>
+      <div class="ks-label">No-HD-Map Struggles</div>
+      <div class="ks-desc">67% pass rate without HD map (12/18). Key failures at Cargo corridor: inconsistent results at same location — oversteer, understeer, and abort across repeated attempts (W18–W20).</div>
+    </div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">🚨</div>
+    <div>
+      <div class="ks-label">6 XL Events</div>
+      <div class="ks-desc">W7: too close to median curb (APTO). W13: oversteer into median (APTO). W18: abort after steering left. W19: understeer into curb (APTO). W20: oversteer into median (different results each attempt). W29: oversteer into median (APTO).</div>
+    </div>
+  </div>
+</div>
+
+<!-- Stat cards -->
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-label">XL</div>
+    <div class="stat-value red">6</div>
+    <div class="stat-tags">
+      <span class="stat-tag">oversteer median</span>
+      <span class="stat-tag">understeer curb</span>
+      <span class="stat-tag">abort mid-turn</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">L</div>
+    <div class="stat-value orange">2</div>
+    <div class="stat-tags">
+      <span class="stat-tag">large wobble</span>
+      <span class="stat-tag">oversteer close to median</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">M</div>
+    <div class="stat-value blue">11</div>
+    <div class="stat-tags">
+      <span class="stat-tag">understeer</span>
+      <span class="stat-tag">oversteer self-corrected</span>
+      <span class="stat-tag">fishhook</span>
+      <span class="stat-tag">wobble</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">S</div>
+    <div class="stat-value green">13</div>
+    <div class="stat-tags">
+      <span class="stat-tag">good turn</span>
+      <span class="stat-tag">ped yield</span>
+      <span class="stat-tag">fishhook minor</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">U-Turn Pass Rate</div>
+    <div class="stat-value green">81%</div>
+    <div class="stat-sub">26 of 32 events</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:81%"></div></div>
+  </div>
+</div>
+
+<!-- Lane & HD map breakdown -->
+<div class="section-title">Lane Configuration &amp; HD Map Pass Rate</div>
+<div class="panel" style="padding:0;overflow:hidden;margin-bottom:14px;">
+<table class="lane-table">
+<thead>
+  <tr>
+    <th>Config</th>
+    <th>Pass Rate</th>
+    <th>Count</th>
+    <th>Notes</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="lane-label">1-Lane + Wide Median</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:75%;background:#22c55e;"></div></div><span class="pct green">75%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">6/8</td>
+    <td style="font-size:10px;color:#475569;">W19, W20 XL at Cargo — inconsistent results each attempt</td>
+  </tr>
+  <tr>
+    <td class="lane-label">2-Lane + Wide Median</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:83%;background:#22c55e;"></div></div><span class="pct green">83%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">20/24</td>
+    <td style="font-size:10px;color:#475569;">W7, W13, W18, W29 XL; mostly oversteer/understeer at no-HD-map locations</td>
+  </tr>
+  <tr>
+    <td class="lane-label" style="color:#4ade80;">With HD Map</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:100%;background:#22c55e;"></div></div><span class="pct green">100%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">14/14</td>
+    <td style="font-size:10px;color:#475569;">Perfect — all turns completed across 1-lane and 2-lane wide median configs</td>
+  </tr>
+  <tr>
+    <td class="lane-label" style="color:#fb923c;">No HD Map</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:67%;background:#f97316;"></div></div><span class="pct orange">67%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">12/18</td>
+    <td style="font-size:10px;color:#f87171;">6 XL events all no-HD-map; Cargo corridor most problematic</td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!-- Trends -->
+<div class="two-col">
+  <div class="panel">
+    <div class="section-title">Failure Trends</div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Oversteer into median / curb — APTO</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#ef4444;"></div></div>
+      <span class="trend-count red">4</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Understeer into curb — APTO</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:33%;background:#ef4444;"></div></div>
+      <span class="trend-count red">1</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Abort mid-turn (steered then went straight)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:33%;background:#ef4444;"></div></div>
+      <span class="trend-count red">1</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">Large wobble / oversteer close to median</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:67%;background:#fb923c;"></div></div>
+      <span class="trend-count orange">2</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-m-tag">M</span>
+      <span class="trend-label">Understeer / oversteer (self-corrected)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#3b82f6;"></div></div>
+      <span class="trend-count blue">7</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-m-tag">M</span>
+      <span class="trend-label">Fishhook / wobble (turn completed)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:57%;background:#3b82f6;"></div></div>
+      <span class="trend-count blue">4</span>
+    </div>
+    <div class="alert-box">
+      &#x26A0;&#xFE0F; Cargo corridor (W18–W20): 3 consecutive XL events at same location — abort, understeer, oversteer. Inconsistent results each attempt. No HD map at this location; likely requires map coverage or further investigation.<br>
+      &#x26A0;&#xFE0F; All 6 XL events occurred on no-HD-map turns.
+    </div>
+  </div>
+  <div class="panel">
+    <div class="section-title">Recurring Locations</div>
+    <div class="trend-row"><span class="trend-label">Cargo &amp; 3rd (no HD map)</span><span class="trend-count red">XL ×3</span></div>
+    <div class="trend-row"><span class="trend-label">3rd &amp; 20th / 23rd</span><span class="trend-count blue">M ×4</span></div>
+    <div class="trend-row"><span class="trend-label">3rd &amp; Mariposa</span><span class="trend-count blue">M + S</span></div>
+    <div class="trend-row"><span class="trend-label">3rd &amp; Carroll (no HD map)</span><span class="trend-count red">XL ×1</span></div>
+    <div class="trend-row"><span class="trend-label">3rd &amp; Hudson (no HD map)</span><span class="trend-count red">XL ×1</span></div>
+    <div class="trend-row"><span class="trend-label">Mission Bay Blvd N (no HD map)</span><span class="trend-count red">XL ×1</span></div>
+    <div class="trend-row"><span class="trend-label">3rd &amp; Jamestown / Key (HD map)</span><span class="trend-count green">S ×3</span></div>
+    <div class="trend-row"><span class="trend-label">3rd &amp; King (HD map, ped yield)</span><span class="trend-count green">S ×1</span></div>
+    <div class="info-box">&#x2139;&#xFE0F; Unique to this session: wide median configurations with 1-lane setup — generally handled well with HD map. Without HD map, median geometry causes trajectory instability. W22: could have yielded more to pedestrian CW; W30: good ped yield case.</div>
+  </div>
+</div>
+
+<!-- Detailed log -->
+<div class="section-title">Detailed Event Log</div>
+<div class="panel" style="padding:0;overflow:hidden;">
+<table class="log-table">
+<thead>
+  <tr>
+    <th style="width:80px;">Event</th>
+    <th style="width:40px;">#</th>
+    <th style="width:36px;">Sev</th>
+    <th>Description</th>
+    <th style="width:170px;">Location</th>
+  </tr>
+</thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f419f9c5-c151-4435-bfc3-69c549842adc/f419f9c5-c151-4435-bfc3-69c549842adc" target="_blank">f419f9c5</a></td><td class="id-col">W1</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 1-lane wide median; slightly slow <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Jamestown</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/74aae6cb-a850-430a-9485-419cfe47f36c/74aae6cb-a850-430a-9485-419cfe47f36c" target="_blank">74aae6cb</a></td><td class="id-col">W2</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 1-lane wide median; too close to median left <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Le Comte</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/fcfd4d22-f067-4c5c-b8fc-3dc478a25079/fcfd4d22-f067-4c5c-b8fc-3dc478a25079" target="_blank">fcfd4d22</a></td><td class="id-col">W3</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane wide median; fishhook correction <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Paul</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/501c04a8-5f89-4393-985a-a1f7c05b92a2/501c04a8-5f89-4393-985a-a1f7c05b92a2" target="_blank">501c04a8</a></td><td class="id-col">W4</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 1-lane wide median; excellent <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Le Comte</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/41f1ab45-0166-4775-b5c2-27f8c6d4399b/41f1ab45-0166-4775-b5c2-27f8c6d4399b" target="_blank">41f1ab45</a></td><td class="id-col">W5</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 1-lane wide median; very good <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Jamestown</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/0e158949-a439-4219-8167-e6a4fbfa65e8/0e158949-a439-4219-8167-e6a4fbfa65e8" target="_blank">0e158949</a></td><td class="id-col">W6</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 1-lane wide median; slight brake tap at start <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Key</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/77cd33eb-7222-4231-a560-8282d9ac8f25/77cd33eb-7222-4231-a560-8282d9ac8f25" target="_blank">77cd33eb</a></td><td class="id-col">W7</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 2-lane wide median; too close to median curb — APTO &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Carroll</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/82b80359-3978-4977-adf2-e1209b13d1f3/82b80359-3978-4977-adf2-e1209b13d1f3" target="_blank">82b80359</a></td><td class="id-col">W8</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 2-lane wide median; slight wobble <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Gilman</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4cbd15bb-6440-43ef-bc6e-0784fe3a214d/4cbd15bb-6440-43ef-bc6e-0784fe3a214d" target="_blank">4cbd15bb</a></td><td class="id-col">W9</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 2-lane wide median; slight jerk at start, into first lane <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Williams</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2c85b6d6-0db4-48cc-ba38-16be0a73c7bf/2c85b6d6-0db4-48cc-ba38-16be0a73c7bf" target="_blank">2c85b6d6</a></td><td class="id-col">W10</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 2-lane wide median <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Wallace</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/698ab3fc-96e6-4fa0-b149-77e4fc5a331d/698ab3fc-96e6-4fa0-b149-77e4fc5a331d" target="_blank">698ab3fc</a></td><td class="id-col">W11</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane wide median; understeer <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Jerrold</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9e74d86d-cdfc-402d-bd5f-20863ad15c7e/9e74d86d-cdfc-402d-bd5f-20863ad15c7e" target="_blank">9e74d86d</a></td><td class="id-col">W12</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 1-lane wide median <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Evans</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a0802f70-ba66-4b8f-aa90-ded883cdb82f/a0802f70-ba66-4b8f-aa90-ded883cdb82f" target="_blank">a0802f70</a></td><td class="id-col">W13</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 2-lane wide median; oversteer into median curb — APTO &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Hudson</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/52075016-c6cc-4eba-a78f-44a284086722/52075016-c6cc-4eba-a78f-44a284086722" target="_blank">52075016</a></td><td class="id-col">W14</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane wide median; turned early through yellow lane marking <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Cesar Chavez</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/353ddc37-ca14-4409-bdfc-925d1343e718/353ddc37-ca14-4409-bdfc-925d1343e718" target="_blank">353ddc37</a></td><td class="id-col">W15</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane wide median; wobble mid-turn <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Evans</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/37845344-2fe9-45c8-a035-210022ef5a3a/37845344-2fe9-45c8-a035-210022ef5a3a" target="_blank">37845344</a></td><td class="id-col">W16</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 2-lane wide median with TL; fishhook at start, unprotected — yielded <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Cargo &amp; 3rd</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4e0ae4c0-9728-46e9-9dc5-77f885b50f47/4e0ae4c0-9728-46e9-9dc5-77f885b50f47" target="_blank">4e0ae4c0</a></td><td class="id-col">W17</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 2-lane wide median <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Cargo &amp; 3rd</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/64bce180-964c-4731-808c-44993970d589/64bce180-964c-4731-808c-44993970d589" target="_blank">64bce180</a></td><td class="id-col">W18</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 2-lane wide median; aborted after steering left, proceeded straight &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Cargo median gap</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9a5d9ab5-9bd1-4f4c-ae5c-36a9252e3ccf/9a5d9ab5-9bd1-4f4c-ae5c-36a9252e3ccf" target="_blank">9a5d9ab5</a></td><td class="id-col">W19</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 1-lane wide median; understeer into curb right — APTO &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Cargo</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/02b10e1d-0cdc-4336-964c-86d344e172b2/02b10e1d-0cdc-4336-964c-86d344e172b2" target="_blank">02b10e1d</a></td><td class="id-col">W20</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 1-lane wide median; oversteer into median left — APTO; different results each attempt &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Cargo</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a2cd0cc1-4db6-4be6-9728-eab4a5583b72/a2cd0cc1-4db6-4be6-9728-eab4a5583b72" target="_blank">a2cd0cc1</a></td><td class="id-col">W21</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 2-lane wide median; fishhook at end, hard turn <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; 20th</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1a4843d6-6a6a-4dee-88ef-ede57d22db57/1a4843d6-6a6a-4dee-88ef-ede57d22db57" target="_blank">1a4843d6</a></td><td class="id-col">W22</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane wide median; could have yielded more to ped CW <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; 23rd</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/37b10521-8296-403a-af4a-4944ea1c9178/37b10521-8296-403a-af4a-4944ea1c9178" target="_blank">37b10521</a></td><td class="id-col">W23</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane wide median; oversteer close to median left <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; 20th</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d84d3b30-6960-4d33-b95d-638d4dc82ecd/d84d3b30-6960-4d33-b95d-638d4dc82ecd" target="_blank">d84d3b30</a></td><td class="id-col">W24</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane wide median; oversteer close to median left, wobble <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; 23rd</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ca201faa-90f2-4163-8742-50cd4dbd4f73/ca201faa-90f2-4163-8742-50cd4dbd4f73" target="_blank">ca201faa</a></td><td class="id-col">W25</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane wide median; understeer <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Mariposa</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/002daebf-4de3-4d7c-abd1-8797a85bf062/002daebf-4de3-4d7c-abd1-8797a85bf062" target="_blank">002daebf</a></td><td class="id-col">W26</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane wide median; oversteer at start, slight wobble at end <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; 20th</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/5a161c27-026a-4a42-a6db-739db6b70478/5a161c27-026a-4a42-a6db-739db6b70478" target="_blank">5a161c27</a></td><td class="id-col">W27</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn good, 2-lane wide median; large wobble, overall acceptable <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; 16th</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/8524a574-4727-4fa1-8831-a391bda63b55/8524a574-4727-4fa1-8831-a391bda63b55" target="_blank">8524a574</a></td><td class="id-col">W28</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 2-lane wide median; understeer <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Mariposa</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7726b052-7ef0-49d1-adb6-33e299f981d0/7726b052-7ef0-49d1-adb6-33e299f981d0" target="_blank">7726b052</a></td><td class="id-col">W29</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 2+turning lane wide median; oversteer into median — APTO &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Mission Bay Blvd N</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/014f30fd-d269-44f5-a36d-50edd5bf239a/014f30fd-d269-44f5-a36d-50edd5bf239a" target="_blank">014f30fd</a></td><td class="id-col">W30</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 2-lane wide median; yielded to ped CW — good case <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; King</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a3ef666b-7fa0-4e7b-a0aa-bf8f602a0f58/a3ef666b-7fa0-4e7b-a0aa-bf8f602a0f58" target="_blank">a3ef666b</a></td><td class="id-col">W31</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2-lane wide median; could yield more to OOT bike, overall good <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">4th &amp; Channel</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/da952084-ffe7-489e-b7ca-9f4152c18cd6/da952084-ffe7-489e-b7ca-9f4152c18cd6" target="_blank">da952084</a></td><td class="id-col">W32</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn good, 2-lane wide median; oversteer too close to median <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">3rd &amp; Mission Bay South</td></tr>
+</tbody>
+</table>
+</div>
+
+</body>
+</html>
