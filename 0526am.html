@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 18px; font-size: 13px; }
+  h1 { font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 3px; }
+  .subtitle { font-size: 11px; color: #94a3b8; margin-bottom: 14px; }
+  .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+  .panel { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; margin-bottom: 14px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .three-col { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+
+  /* Summary buttons */
+  .summary-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .sum-btn { padding: 6px 14px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #2d3348; background: #1a1f2e; color: #94a3b8; }
+  .sum-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #3b82f6; }
+  .sum-panel { display: none; }
+  .sum-panel.active { display: block; }
+
+  /* Verdict */
+  .verdict-card { background: #1a1f2e; border: 2px solid #dc2626; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+  .verdict-grade { font-size: 48px; font-weight: 900; color: #f87171; line-height: 1; margin-bottom: 6px; }
+  .verdict-label { font-size: 12px; color: #94a3b8; margin-bottom: 10px; }
+  .verdict-headline { font-size: 13px; font-weight: 600; color: #f1f5f9; margin-bottom: 10px; }
+  .safety-events { display: flex; flex-direction: column; gap: 7px; }
+  .se-row { display: flex; gap: 10px; align-items: flex-start; padding: 7px 10px; border-radius: 6px; background: #2d0a0a; border-left: 3px solid #dc2626; }
+  .se-id { font-size: 11px; font-weight: 700; color: #fca5a5; white-space: nowrap; min-width: 28px; }
+  .se-text { font-size: 11px; color: #fecaca; line-height: 1.5; }
+
+  /* Issue frequency */
+  .freq-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .freq-table th { text-align: left; padding: 6px 10px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .freq-table td { padding: 6px 10px; border-bottom: 1px solid #1a1f2e; vertical-align: middle; }
+  .freq-table tr:last-child td { border-bottom: none; }
+  .freq-table tr:hover td { background: #1a1f2e; }
+  .freq-bar-wrap { width: 80px; height: 5px; background: #2d3348; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 5px; }
+  .freq-bar-fill { height: 100%; border-radius: 3px; }
+
+  /* Activity breakdown */
+  .act-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 12px; }
+  .act-card { background: #1a1f2e; border-radius: 7px; padding: 9px 11px; border: 1px solid #2d3348; }
+  .act-name { font-size: 10px; font-weight: 700; color: #f1f5f9; margin-bottom: 5px; border-bottom: 1px solid #2d3348; padding-bottom: 4px; }
+  .act-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 10px; }
+  .act-k { color: #64748b; }
+  .act-v { font-weight: 700; }
+
+  /* Fix suggestions */
+  .fix-list { display: flex; flex-direction: column; gap: 8px; }
+  .fix-row { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border-radius: 6px; background: #0f2040; border-left: 3px solid #3b82f6; }
+  .fix-priority { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; white-space: nowrap; min-width: 60px; text-align: center; }
+  .fix-p1 { background: #4c0519; color: #fca5a5; }
+  .fix-p2 { background: #431407; color: #fdba74; }
+  .fix-p3 { background: #422006; color: #fb923c; }
+  .fix-p4 { background: #1e3a5f; color: #93c5fd; }
+  .fix-text { font-size: 11px; color: #cbd5e1; line-height: 1.5; }
+  .fix-text strong { color: #f1f5f9; }
+
+  /* Stats grid */
+  .stat-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card { background: #1e2230; border-radius: 8px; padding: 10px 12px; border: 1px solid #2d3348; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-bottom: 3px; }
+  .stat-value { font-size: 22px; font-weight: 700; }
+  .stat-sub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+  .stat-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+  .stat-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #2d3348; color: #94a3b8; }
+  .pass-bar-wrap { height: 6px; background: #2d3348; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+  .pass-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #22c55e, #3b82f6); }
+
+  /* Trend rows */
+  .trend-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #1a1f2e; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-label { font-size: 11px; color: #94a3b8; flex: 1; }
+  .trend-bar-wrap { width: 90px; height: 5px; background: #2d3348; border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; }
+  .trend-count { font-size: 11px; font-weight: 700; min-width: 24px; text-align: right; }
+  .trend-sev { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+  .sev-xxl-tag{ background: #4c0519; color: #fca5a5; }
+  .sev-xl-tag { background: #431407; color: #fdba74; }
+  .sev-l-tag  { background: #422006; color: #fb923c; }
+  .sev-m-tag  { background: #1e3a5f; color: #93c5fd; }
+
+  /* Log */
+  .log-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .log-table th { text-align: left; padding: 6px 8px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .log-table td { padding: 5px 8px; border-bottom: 1px solid #1a1f2e; vertical-align: top; line-height: 1.5; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: #1a1f2e; }
+  .id-col { font-weight: 700; color: #64748b; white-space: nowrap; }
+  .event-link { font-size: 10px; color: #3b82f6; text-decoration: none; font-family: monospace; display: block; line-height: 1.8; }
+  .event-link:hover { color: #60a5fa; text-decoration: underline; }
+  .cat-pill { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 600; margin-right: 3px; background: #1e2535; color: #60a5fa; }
+
+  .sev-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .sev-xxl { background: #4c0519; color: #fca5a5; }
+  .sev-xl  { background: #431407; color: #fdba74; }
+  .sev-l   { background: #422006; color: #fb923c; }
+  .sev-m   { background: #1e3a5f; color: #93c5fd; }
+  .sev-s   { background: #14532d; color: #86efac; }
+
+  .info-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; background: #0f2040; font-size: 11px; color: #93c5fd; line-height: 1.6; }
+  .red{color:#f87171;} .orange{color:#fb923c;} .blue{color:#60a5fa;} .green{color:#4ade80;} .yellow{color:#facc15;}
+</style>
+</head>
+<body>
+
+<h1>LMR PMB — San Mateo / Redwood City</h1>
+<div class="subtitle">
+  2026-05-26 &nbsp;&middot;&nbsp; Build: <a href="https://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45639328&vid=2" target="_blank" style="color:#3b82f6;text-decoration:none;">45639328.2</a> &nbsp;&middot;&nbsp;
+  Model: sft-4640 &nbsp;&middot;&nbsp;
+  Session: <a href="https://maglev.nvda.ai/av/drivescrubber/drives/672100" target="_blank" style="color:#3b82f6;text-decoration:none;">e21e58b3</a> &nbsp;&middot;&nbsp;
+  Tester: E &nbsp;&middot;&nbsp; Veh: 174-16800
+</div>
+
+<!-- Stat cards -->
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-label">XXL</div>
+    <div class="stat-value red">2</div>
+    <div class="stat-tags"><span class="stat-tag">FN yield ped</span><span class="stat-tag">dangerous SILC</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">XL</div>
+    <div class="stat-value orange">2</div>
+    <div class="stat-tags"><span class="stat-tag">hesitant RoR</span><span class="stat-tag">lane drift oncoming</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">L</div>
+    <div class="stat-value orange">23</div>
+    <div class="stat-tags"><span class="stat-tag">hesitant</span><span class="stat-tag">hard brake</span><span class="stat-tag">ghost brake</span><span class="stat-tag">SILC issues</span><span class="stat-tag">drift</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">M</div>
+    <div class="stat-value blue">14</div>
+    <div class="stat-tags"><span class="stat-tag">lane drift</span><span class="stat-tag">wobble</span><span class="stat-tag">hard brake</span><span class="stat-tag">lane hugging</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">S</div>
+    <div class="stat-value green">9</div>
+    <div class="stat-tags"><span class="stat-tag">good UPL</span><span class="stat-tag">good yield</span><span class="stat-tag">TN U-turn</span><span class="stat-tag">notes</span></div>
+  </div>
+</div>
+
+<!-- Summary buttons -->
+<div class="summary-tabs">
+  <button class="sum-btn active" onclick="showSum('verdict')">&#x1F3AF; Verdict &amp; Safety</button>
+  <button class="sum-btn" onclick="showSum('freq')">&#x1F4CA; Issue Frequency</button>
+  <button class="sum-btn" onclick="showSum('fix')">&#x1F527; What to Fix</button>
+</div>
+
+<!-- Verdict panel -->
+<div id="sum-verdict" class="sum-panel active">
+  <div class="verdict-card">
+    <div class="verdict-grade">C&minus;</div>
+    <div class="verdict-label">Barely passing &nbsp;&middot;&nbsp; San Mateo / Redwood City &nbsp;&middot;&nbsp; 2026-05-26</div>
+    <div class="verdict-headline">Overall smooth ride with acceptable comfort, but 4 safety-critical events prevent a higher grade. Lane drift, hesitancy, and braking issues are pervasive throughout the session.</div>
+    <div class="safety-events">
+      <div class="se-row">
+        <div class="se-id">E14 XXL</div>
+        <div class="se-text">Hesitant late route SILC with a fast-approaching contender in the target lane. Driver took over to complete the lane change and accelerate with urgency. Critical safety intervention required.</div>
+      </div>
+      <div class="se-row">
+        <div class="se-id">E11 XXL</div>
+        <div class="se-text">Failed to yield to pedestrian entering crosswalk. Ego did not detect or respond to ped presence — direct safety violation.</div>
+      </div>
+      <div class="se-row">
+        <div class="se-id">E45 XL</div>
+        <div class="se-text">Severe lane drift into oncoming traffic on a curve. No intervention from system — driver correction required.</div>
+      </div>
+      <div class="se-row">
+        <div class="se-id">E6 XL</div>
+        <div class="se-text">Hesitant RoR with fast-approaching cross traffic. System failed to commit to the right-of-way window, creating an unsafe delay in the intersection.</div>
+      </div>
+    </div>
+  </div>
+  <div class="two-col" style="margin-top:12px;">
+    <div class="panel">
+      <div class="section-title">Positive Observations</div>
+      <div class="trend-row"><span class="trend-label">E21: Good UPL — yielded to cross traffic right</span><span class="trend-count green">S</span></div>
+      <div class="trend-row"><span class="trend-label">E30: Good UPL — yielded to cross traffic</span><span class="trend-count green">S</span></div>
+      <div class="trend-row"><span class="trend-label">E42: Good yield to arrow street</span><span class="trend-count green">S</span></div>
+      <div class="trend-row"><span class="trend-label">E49: Good yield to oncoming with occlusion</span><span class="trend-count green">S</span></div>
+      <div class="trend-row"><span class="trend-label">E24: Correct TN — no U-turn sign</span><span class="trend-count green">S</span></div>
+      <div class="trend-row"><span class="trend-label">E7: SILC through intersection (noted as L — not ideal)</span><span class="trend-count orange">L</span></div>
+    </div>
+    <div class="panel">
+      <div class="section-title">Non-Covered U-Turn Notes</div>
+      <div class="trend-row"><span class="trend-label">E24: TN U-turn — no sign (correct)</span><span class="trend-count green">S</span></div>
+      <div class="trend-row"><span class="trend-label">E25: Unprotected missed, aborted</span><span class="trend-count orange">L</span></div>
+      <div class="trend-row"><span class="trend-label">E26: U-turn missed</span><span class="trend-count orange">L</span></div>
+      <div class="info-box" style="margin-top:8px;">&#x2139;&#xFE0F; E25 and E26 are non-covered U-turns (outside ODD) — L rating logged for awareness but not counted as regression against build.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Frequency panel -->
+<div id="sum-freq" class="sum-panel">
+  <div class="two-col">
+    <div class="panel">
+      <div class="section-title">Most Common Activity / Modifier Combos</div>
+      <table class="freq-table">
+        <thead><tr><th>Activity / Modifier</th><th>Count</th><th>%</th><th>Worst</th><th>Distribution</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="cat-pill">Positioning</span>Lane Drift</td>
+            <td style="font-weight:700;">7</td>
+            <td style="color:#94a3b8;">14%</td>
+            <td><span class="sev-pill sev-xl">XL</span></td>
+            <td><div class="freq-bar-wrap"><div class="freq-bar-fill" style="width:100%;background:#3b82f6;"></div></div></td>
+          </tr>
+          <tr>
+            <td><span class="cat-pill">Braking</span>Hard Braking</td>
+            <td style="font-weight:700;">5</td>
+            <td style="color:#94a3b8;">10%</td>
+            <td><span class="sev-pill sev-l">L</span></td>
+            <td><div class="freq-bar-wrap"><div class="freq-bar-fill" style="width:71%;background:#fb923c;"></div></div></td>
+          </tr>
+          <tr>
+            <td><span class="cat-pill">Acceleration</span>Hesitant</td>
+            <td style="font-weight:700;">5</td>
+            <td style="color:#94a3b8;">10%</td>
+            <td><span class="sev-pill sev-xl">XL</span></td>
+            <td><div class="freq-bar-wrap"><div class="freq-bar-fill" style="width:71%;background:#ef4444;"></div></div></td>
+          </tr>
+          <tr>
+            <td><span class="cat-pill">Braking</span>Ghost Braking</td>
+            <td style="font-weight:700;">3</td>
+            <td style="color:#94a3b8;">6%</td>
+            <td><span class="sev-pill sev-l">L</span></td>
+            <td><div class="freq-bar-wrap"><div class="freq-bar-fill" style="width:43%;background:#fb923c;"></div></div></td>
+          </tr>
+          <tr>
+            <td><span class="cat-pill">Turns</span>Missed</td>
+            <td style="font-weight:700;">3</td>
+            <td style="color:#94a3b8;">6%</td>
+            <td><span class="sev-pill sev-l">L</span></td>
+            <td><div class="freq-bar-wrap"><div class="freq-bar-fill" style="width:43%;background:#fb923c;"></div></div></td>
+          </tr>
+          <tr>
+            <td><span class="cat-pill">Positioning</span>Lane Hugging</td>
+            <td style="font-weight:700;">2</td>
+            <td style="color:#94a3b8;">4%</td>
+            <td><span class="sev-pill sev-m">M</span></td>
+            <td><div class="freq-bar-wrap"><div class="freq-bar-fill" style="width:29%;background:#3b82f6;"></div></div></td>
+          </tr>
+          <tr>
+            <td><span class="cat-pill">Steering</span>Vehicle Wobble</td>
+            <td style="font-weight:700;">2</td>
+            <td style="color:#94a3b8;">4%</td>
+            <td><span class="sev-pill sev-l">L</span></td>
+            <td><div class="freq-bar-wrap"><div class="freq-bar-fill" style="width:29%;background:#fb923c;"></div></div></td>
+          </tr>
+          <tr>
+            <td><span class="cat-pill">Lane Change</span>SILC Issues (all)</td>
+            <td style="font-weight:700;">4</td>
+            <td style="color:#94a3b8;">8%</td>
+            <td><span class="sev-pill sev-xxl">XXL</span></td>
+            <td><div class="freq-bar-wrap"><div class="freq-bar-fill" style="width:57%;background:#dc2626;"></div></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <div class="section-title">Activity Category Severity Breakdown</div>
+      <div class="act-grid">
+        <div class="act-card" style="border-color:#431407;">
+          <div class="act-name" style="color:#fdba74;">Lane Change <span style="float:right;font-size:10px;color:#f87171;">6 events</span></div>
+          <div class="act-row"><span class="act-k">XXL</span><span class="act-v red">1</span></div>
+          <div class="act-row"><span class="act-k">L</span><span class="act-v orange">4</span></div>
+          <div class="act-row"><span class="act-k">M</span><span class="act-v blue">1</span></div>
+          <div class="act-row"><span class="act-k">Bad rate</span><span class="act-v red">83%</span></div>
+        </div>
+        <div class="act-card" style="border-color:#431407;">
+          <div class="act-name" style="color:#fdba74;">Acceleration <span style="float:right;font-size:10px;color:#f87171;">8 events</span></div>
+          <div class="act-row"><span class="act-k">XL</span><span class="act-v orange">1</span></div>
+          <div class="act-row"><span class="act-k">L</span><span class="act-v orange">6</span></div>
+          <div class="act-row"><span class="act-k">S</span><span class="act-v green">1</span></div>
+          <div class="act-row"><span class="act-k">Bad rate</span><span class="act-v red">88%</span></div>
+        </div>
+        <div class="act-card" style="border-color:#422006;">
+          <div class="act-name" style="color:#fb923c;">Braking <span style="float:right;font-size:10px;color:#94a3b8;">8 events</span></div>
+          <div class="act-row"><span class="act-k">L</span><span class="act-v orange">5</span></div>
+          <div class="act-row"><span class="act-k">M</span><span class="act-v blue">3</span></div>
+          <div class="act-row"><span class="act-k">Bad rate</span><span class="act-v orange">63%</span></div>
+        </div>
+        <div class="act-card" style="border-color:#422006;">
+          <div class="act-name" style="color:#fb923c;">Positioning <span style="float:right;font-size:10px;color:#94a3b8;">10 events</span></div>
+          <div class="act-row"><span class="act-k">XL</span><span class="act-v orange">1</span></div>
+          <div class="act-row"><span class="act-k">L</span><span class="act-v orange">2</span></div>
+          <div class="act-row"><span class="act-k">M</span><span class="act-v blue">7</span></div>
+          <div class="act-row"><span class="act-k">Bad rate</span><span class="act-v orange">30%</span></div>
+        </div>
+        <div class="act-card">
+          <div class="act-name" style="color:#e2e8f0;">Turns <span style="float:right;font-size:10px;color:#94a3b8;">9 events</span></div>
+          <div class="act-row"><span class="act-k">L</span><span class="act-v orange">2</span></div>
+          <div class="act-row"><span class="act-k">M</span><span class="act-v blue">2</span></div>
+          <div class="act-row"><span class="act-k">S</span><span class="act-v green">5</span></div>
+          <div class="act-row"><span class="act-k">Bad rate</span><span class="act-v blue">22%</span></div>
+        </div>
+        <div class="act-card">
+          <div class="act-name" style="color:#e2e8f0;">Steering <span style="float:right;font-size:10px;color:#94a3b8;">3 events</span></div>
+          <div class="act-row"><span class="act-k">L</span><span class="act-v orange">2</span></div>
+          <div class="act-row"><span class="act-k">M</span><span class="act-v blue">1</span></div>
+          <div class="act-row"><span class="act-k">Bad rate</span><span class="act-v orange">67%</span></div>
+        </div>
+        <div class="act-card" style="border-color:#4c0519;">
+          <div class="act-name" style="color:#fca5a5;">VRUs <span style="float:right;font-size:10px;color:#f87171;">1 event</span></div>
+          <div class="act-row"><span class="act-k">XXL</span><span class="act-v red">1</span></div>
+          <div class="act-row"><span class="act-k">Bad rate</span><span class="act-v red">100%</span></div>
+        </div>
+        <div class="act-card">
+          <div class="act-name" style="color:#e2e8f0;">U-Turn <span style="float:right;font-size:10px;color:#94a3b8;">3 events</span></div>
+          <div class="act-row"><span class="act-k">L</span><span class="act-v orange">2</span></div>
+          <div class="act-row"><span class="act-k">S</span><span class="act-v green">1</span></div>
+          <div class="act-row"><span class="act-k">Non-covered</span><span class="act-v" style="color:#64748b;">OOD</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fix panel -->
+<div id="sum-fix" class="sum-panel">
+  <div class="section-title">Suggested Fixes — Prioritized by Severity &amp; Frequency</div>
+  <div class="fix-list">
+    <div class="fix-row">
+      <div class="fix-priority fix-p1">P1 — CRITICAL</div>
+      <div class="fix-text"><strong>Lane Change safety (E14 XXL):</strong> Dangerous late SILC with fast contender in target lane requiring driver takeover. Root cause: hesitant / delayed lane change initiation on route-planned SILCs. Review SILC timing and contender-speed awareness in route planning. Highest priority fix.</div>
+    </div>
+    <div class="fix-row">
+      <div class="fix-priority fix-p1">P1 — CRITICAL</div>
+      <div class="fix-text"><strong>VRU yield (E11 XXL):</strong> Failed to yield to pedestrian entering crosswalk. Ped was not detected or was not treated as a yield-required scenario. Requires VRU detection review for crosswalk scenarios with entering peds.</div>
+    </div>
+    <div class="fix-row">
+      <div class="fix-priority fix-p2">P2 — HIGH</div>
+      <div class="fix-text"><strong>Lane drift on curves (E45 XL + 5× M/L):</strong> Most frequent issue — 7 events (14%). Drifting right on left curves and into oncoming on curvature. E45 drifted into oncoming lane. Lateral control on curves is the single biggest comfort and safety gap this session.</div>
+    </div>
+    <div class="fix-row">
+      <div class="fix-priority fix-p2">P2 — HIGH</div>
+      <div class="fix-text"><strong>Hesitancy at intersections (E6 XL + 4× L):</strong> 5 events across RoR, SS turns, and unprotected turns. E6 was XL-level hesitation with fast cross traffic. System repeatedly fails to commit to available gaps — throttle response at intersections needs improvement.</div>
+    </div>
+    <div class="fix-row">
+      <div class="fix-priority fix-p3">P3 — MEDIUM</div>
+      <div class="fix-text"><strong>Hard braking frequency (5× L/M):</strong> Hard braking for stop signs (E1, E38), lead contenders (E32), and no apparent reason (E20, E29). None were safety-critical but degrade ride comfort significantly. Review deceleration profiles for SS approach and lead-vehicle tracking.</div>
+    </div>
+    <div class="fix-row">
+      <div class="fix-priority fix-p3">P3 — MEDIUM</div>
+      <div class="fix-text"><strong>Ghost braking (3× L/M):</strong> FP speedbump (E2), FP near MD crosswalk (E33), ghost brake with creeping contender (E31). All distinct root causes — speed bump map data, crosswalk prediction, and contender behavior model each need targeted review.</div>
+    </div>
+    <div class="fix-row">
+      <div class="fix-priority fix-p4">P4 — LOW</div>
+      <div class="fix-text"><strong>SILC quality (4× L/M):</strong> Ping pong (E8, E50), unnecessary SILC (E12), SILC through intersection (E7), uncomfortable late SILC (E41). None were safety-critical outside E14 but collectively indicate unstable lane selection logic. FP SILC filter and intersection-avoidance for lane changes should be reviewed.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Detailed log -->
+<div class="section-title" style="margin-top:14px;">Detailed Event Log</div>
+<div class="panel" style="padding:0;overflow:hidden;">
+<table class="log-table">
+<thead>
+  <tr>
+    <th style="width:80px;">Event</th>
+    <th style="width:40px;">#</th>
+    <th style="width:36px;">Sev</th>
+    <th style="width:100px;">Category</th>
+    <th style="width:130px;">Modifier</th>
+    <th>Description</th>
+  </tr>
+</thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9a7fc5a7-f718-4bae-94a3-cbcb67f60fa8/9a7fc5a7-f718-4bae-94a3-cbcb67f60fa8" target="_blank">9a7fc5a7</a></td><td class="id-col">E1</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Braking</span></td><td style="font-size:10px;color:#94a3b8;">Hard Braking</td><td>Hard braking for stop sign</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e9811050-d1fd-4601-8659-b6c49cd67c9b/e9811050-d1fd-4601-8659-b6c49cd67c9b" target="_blank">e9811050</a></td><td class="id-col">E2</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Braking</span></td><td style="font-size:10px;color:#94a3b8;">Ghost Braking</td><td>FP speedbump</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/fad62384-e752-4930-bf44-5bc7735aee8f/fad62384-e752-4930-bf44-5bc7735aee8f" target="_blank">fad62384</a></td><td class="id-col">E3</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Positioning</span></td><td style="font-size:10px;color:#94a3b8;">Lane Drift</td><td>Lane drift right</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/54541bbe-bf90-4486-8a33-609539f5f47d/54541bbe-bf90-4486-8a33-609539f5f47d" target="_blank">54541bbe</a></td><td class="id-col">E4</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Acceleration</span></td><td style="font-size:10px;color:#94a3b8;">Hesitant</td><td>Hesitant turning left at stop sign</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/72e7bcae-acc4-4e76-a825-0e9b644392e8/72e7bcae-acc4-4e76-a825-0e9b644392e8" target="_blank">72e7bcae</a></td><td class="id-col">E5</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Acceleration</span></td><td style="font-size:10px;color:#94a3b8;">Hesitant</td><td>Hesitant turning right at stop sign</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/b6a55c8a-b1c6-467e-b6b4-fb26051e5f10/b6a55c8a-b1c6-467e-b6b4-fb26051e5f10" target="_blank">b6a55c8a</a></td><td class="id-col">E6</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="cat-pill">Acceleration</span></td><td style="font-size:10px;color:#94a3b8;">Hesitant</td><td>Hesitant RoR with fast cross traffic approaching &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/243fb9be-9448-4be6-aefa-7c72bbd26844/243fb9be-9448-4be6-aefa-7c72bbd26844" target="_blank">243fb9be</a></td><td class="id-col">E7</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Lane Change</span></td><td style="font-size:10px;color:#94a3b8;">SILC Through Intersection</td><td>SILC executed through intersection — not ideal</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e001a58e-5470-44bf-aaf4-a74e1bdeff24/e001a58e-5470-44bf-aaf4-a74e1bdeff24" target="_blank">e001a58e</a></td><td class="id-col">E8</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Lane Change</span></td><td style="font-size:10px;color:#94a3b8;">SILC FP — Ping Pong</td><td>Unnecessary SILC — ping pong behavior</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/163d3bf7-592a-4cba-a450-a2c77309717c/163d3bf7-592a-4cba-a450-a2c77309717c" target="_blank">163d3bf7</a></td><td class="id-col">E9</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Lane Change</span></td><td style="font-size:10px;color:#94a3b8;">Missed / Hesitant</td><td>Should have aborted turn after ping pong SILC</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a0533e82-f73b-49f5-9241-baeacbd9f63b/a0533e82-f73b-49f5-9241-baeacbd9f63b" target="_blank">a0533e82</a></td><td class="id-col">E10</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Turns</span></td><td style="font-size:10px;color:#94a3b8;">Understeer</td><td>Slight understeer turning left at stop sign</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/95201b47-df12-4a50-8f0e-c8515a4f464b/95201b47-df12-4a50-8f0e-c8515a4f464b" target="_blank">95201b47</a></td><td class="id-col">E11</td><td><span class="sev-pill sev-xxl">XXL</span></td><td><span class="cat-pill">VRUs</span></td><td style="font-size:10px;color:#94a3b8;">FN Yield Pedestrian</td><td>Failed to yield to pedestrian entering crosswalk &#x26A0;&#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/b9aa1e92-0088-4edd-b921-25588741ace1/b9aa1e92-0088-4edd-b921-25588741ace1" target="_blank">b9aa1e92</a></td><td class="id-col">E12</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Lane Change</span></td><td style="font-size:10px;color:#94a3b8;">SILC FP</td><td>FP SILC right — no reason</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d45b872e-f8ca-4b08-b276-f79e4577dee6/d45b872e-f8ca-4b08-b276-f79e4577dee6" target="_blank">d45b872e</a></td><td class="id-col">E13</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Positioning</span></td><td style="font-size:10px;color:#94a3b8;">Too Close (Long)</td><td>Too close to contender ahead</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f8f73331-e3d9-4ae1-ac38-8ceb254af624/f8f73331-e3d9-4ae1-ac38-8ceb254af624" target="_blank">f8f73331</a></td><td class="id-col">E14</td><td><span class="sev-pill sev-xxl">XXL</span></td><td><span class="cat-pill">Lane Change</span></td><td style="font-size:10px;color:#94a3b8;">Dangerous SILC</td><td>Hesitant late route SILC — fast contender in target lane; driver took over with urgency &#x26A0;&#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d95cedb2-0454-4491-947f-49c20b29c12d/d95cedb2-0454-4491-947f-49c20b29c12d" target="_blank">d95cedb2</a></td><td class="id-col">E15</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Positioning</span></td><td style="font-size:10px;color:#94a3b8;">Lane Hugging</td><td>Lane hugging left approaching stop sign</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2723f1d6-987d-4c33-8003-0b94a7a8f649/2723f1d6-987d-4c33-8003-0b94a7a8f649" target="_blank">2723f1d6</a></td><td class="id-col">E16</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Positioning</span></td><td style="font-size:10px;color:#94a3b8;">Lane Drift</td><td>Slight drift on left curve</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e4765b71-0fa5-4dbb-85a3-ffd9555169ba/e4765b71-0fa5-4dbb-85a3-ffd9555169ba" target="_blank">e4765b71</a></td><td class="id-col">E17</td><td><span class="sev-pill sev-s">S</span></td><td><span class="cat-pill">Other</span></td><td style="font-size:10px;color:#94a3b8;">Note</td><td>Road dip — noted for map data</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d8bd3cdd-f2ca-40c6-8eaa-07441569a4bf/d8bd3cdd-f2ca-40c6-8eaa-07441569a4bf" target="_blank">d8bd3cdd</a></td><td class="id-col">E18</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Steering</span></td><td style="font-size:10px;color:#94a3b8;">Vehicle Wobble</td><td>Wobble at lane split</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f336a41c-4417-423d-bcf6-85bd85e8f1b6/f336a41c-4417-423d-bcf6-85bd85e8f1b6" target="_blank">f336a41c</a></td><td class="id-col">E19</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Steering</span></td><td style="font-size:10px;color:#94a3b8;">Vehicle Wobble</td><td>Wobble turning left residential + speed up</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/bdb370b6-247f-47fb-a29c-40b0dc1c166c/bdb370b6-247f-47fb-a29c-40b0dc1c166c" target="_blank">bdb370b6</a></td><td class="id-col">E20</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Braking</span></td><td style="font-size:10px;color:#94a3b8;">Hard Braking</td><td>Hard braking</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/3356bc5f-d5e6-4f6d-954d-a3cc9c2e5432/3356bc5f-d5e6-4f6d-954d-a3cc9c2e5432" target="_blank">3356bc5f</a></td><td class="id-col">E21</td><td><span class="sev-pill sev-s">S</span></td><td><span class="cat-pill">Turns</span></td><td style="font-size:10px;color:#94a3b8;">Good UPL Yield</td><td>Good UPL — yielded to cross traffic right &#x2605;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/dfd287ef-05e5-45f3-9b14-906f7f9f732b/dfd287ef-05e5-45f3-9b14-906f7f9f732b" target="_blank">dfd287ef</a></td><td class="id-col">E22</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Turns</span></td><td style="font-size:10px;color:#94a3b8;">Jerky / Wobble</td><td>Jerky right turn at stop sign</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/395d020f-6108-4554-9d64-abb3220cbaec/395d020f-6108-4554-9d64-abb3220cbaec" target="_blank">395d020f</a></td><td class="id-col">E23</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Positioning</span></td><td style="font-size:10px;color:#94a3b8;">Lane Drift</td><td>Lane drift right on left curve</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e55862d0-8903-4005-8c22-82f394b0e00a/e55862d0-8903-4005-8c22-82f394b0e00a" target="_blank">e55862d0</a></td><td class="id-col">E24</td><td><span class="sev-pill sev-s">S</span></td><td><span class="cat-pill">U-Turn</span></td><td style="font-size:10px;color:#94a3b8;">TN No Sign</td><td>TN U-turn — no U-turn sign (non-covered, correct skip) &#x2605;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/32a98329-e518-45fb-8022-7d3f3da0e5f4/32a98329-e518-45fb-8022-7d3f3da0e5f4" target="_blank">32a98329</a></td><td class="id-col">E25</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">U-Turn</span></td><td style="font-size:10px;color:#94a3b8;">Missed (Non-Covered)</td><td>Unprotected U-turn missed, aborted — non-covered OOD</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/59b2d349-b2a9-4262-82ba-6f795d398f90/59b2d349-b2a9-4262-82ba-6f795d398f90" target="_blank">59b2d349</a></td><td class="id-col">E26</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">U-Turn</span></td><td style="font-size:10px;color:#94a3b8;">Missed (Non-Covered)</td><td>U-turn missed — non-covered OOD</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e9395076-45bf-4c16-ba4f-13edbc949555/e9395076-45bf-4c16-ba4f-13edbc949555" target="_blank">e9395076</a></td><td class="id-col">E27</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Turns</span></td><td style="font-size:10px;color:#94a3b8;">Missed</td><td>Completely missed turn right</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1a196545-c99e-4100-97f5-44b6e4b9dc68/1a196545-c99e-4100-97f5-44b6e4b9dc68" target="_blank">1a196545</a></td><td class="id-col">E28</td><td><span class="sev-pill sev-s">S</span></td><td><span class="cat-pill">Acceleration</span></td><td style="font-size:10px;color:#94a3b8;">Slow Creep</td><td>Slow creep</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/da04c04e-b8d0-48be-bcff-798433968fcc/da04c04e-b8d0-48be-bcff-798433968fcc" target="_blank">da04c04e</a></td><td class="id-col">E29</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Braking</span></td><td style="font-size:10px;color:#94a3b8;">Hard Braking</td><td>Hard braking</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/cee8023a-c389-4f57-9188-26a203a9d895/cee8023a-c389-4f57-9188-26a203a9d895" target="_blank">cee8023a</a></td><td class="id-col">E30</td><td><span class="sev-pill sev-s">S</span></td><td><span class="cat-pill">Turns</span></td><td style="font-size:10px;color:#94a3b8;">Good UPL Yield</td><td>Good UPL — yielded to cross traffic &#x2605;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/141f3db4-4208-4dbd-9d78-ccc0d220d9e7/141f3db4-4208-4dbd-9d78-ccc0d220d9e7" target="_blank">141f3db4</a></td><td class="id-col">E31</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Braking</span></td><td style="font-size:10px;color:#94a3b8;">Ghost Braking</td><td>Ghost brake with contender creeping on right</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/523a31e2-29ed-466d-9fe5-a7a034a61c4d/523a31e2-29ed-466d-9fe5-a7a034a61c4d" target="_blank">523a31e2</a></td><td class="id-col">E32</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Braking</span></td><td style="font-size:10px;color:#94a3b8;">Hard Braking</td><td>Hard braking for lead contender parking on right</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9f5b2617-8835-4eeb-a4b8-78e96ed4418d/9f5b2617-8835-4eeb-a4b8-78e96ed4418d" target="_blank">9f5b2617</a></td><td class="id-col">E33</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Braking</span></td><td style="font-size:10px;color:#94a3b8;">Ghost Braking</td><td>Ghost braking near MD crosswalk</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2a5013e9-01f6-4f67-8213-406e51fae1a4/2a5013e9-01f6-4f67-8213-406e51fae1a4" target="_blank">2a5013e9</a></td><td class="id-col">E34</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Acceleration</span></td><td style="font-size:10px;color:#94a3b8;">Hesitant</td><td>Hesitant turning right</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c6ae6b16-b309-44ab-a012-8f5e0cc1c711/c6ae6b16-b309-44ab-a012-8f5e0cc1c711" target="_blank">c6ae6b16</a></td><td class="id-col">E35</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Positioning</span></td><td style="font-size:10px;color:#94a3b8;">Lane Drift</td><td>Slight lane drift on right curve</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9e865f1a-0c45-4326-b12c-50b5f9c4841d/9e865f1a-0c45-4326-b12c-50b5f9c4841d" target="_blank">9e865f1a</a></td><td class="id-col">E36</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Positioning</span></td><td style="font-size:10px;color:#94a3b8;">Lane Hugging</td><td>Lane hugging left on curved road</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4eaba885-c85b-4017-b28f-95ed16986895/4eaba885-c85b-4017-b28f-95ed16986895" target="_blank">4eaba885</a></td><td class="id-col">E37</td><td><span class="sev-pill sev-s">S</span></td><td><span class="cat-pill">Other</span></td><td style="font-size:10px;color:#94a3b8;">Note</td><td>Off ramp — noted</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/68adba39-0dc8-492e-86b2-b8332ee81b44/68adba39-0dc8-492e-86b2-b8332ee81b44" target="_blank">68adba39</a></td><td class="id-col">E38</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Braking</span></td><td style="font-size:10px;color:#94a3b8;">Hard Braking</td><td>Hard braking approaching stop sign</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/37b69c09-dd42-4ec0-bab8-4efdefe52392/37b69c09-dd42-4ec0-bab8-4efdefe52392" target="_blank">37b69c09</a></td><td class="id-col">E39</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Acceleration</span></td><td style="font-size:10px;color:#94a3b8;">Wrong Speed Display</td><td>Display speed shows 15 mph</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a63f4b6a-19ed-4a77-acef-91e967053c10/a63f4b6a-19ed-4a77-acef-91e967053c10" target="_blank">a63f4b6a</a></td><td class="id-col">E40</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Turns</span></td><td style="font-size:10px;color:#94a3b8;">Missed</td><td>Completely missed turn</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/74f20d80-cbed-4db1-b508-0ecb46661fb8/74f20d80-cbed-4db1-b508-0ecb46661fb8" target="_blank">74f20d80</a></td><td class="id-col">E41</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Lane Change</span></td><td style="font-size:10px;color:#94a3b8;">Uncomfortable Late SILC</td><td>Uncomfortable late SILC</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4a222dd2-7fd1-4ab9-b75d-e1f5e38ef682/4a222dd2-7fd1-4ab9-b75d-e1f5e38ef682" target="_blank">4a222dd2</a></td><td class="id-col">E42</td><td><span class="sev-pill sev-s">S</span></td><td><span class="cat-pill">Turns</span></td><td style="font-size:10px;color:#94a3b8;">Good Yield</td><td>Good yielding to arrow street &#x2605;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/71d4f414-b9f0-43fe-852f-043b2dbeb28f/71d4f414-b9f0-43fe-852f-043b2dbeb28f" target="_blank">71d4f414</a></td><td class="id-col">E43</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Acceleration</span></td><td style="font-size:10px;color:#94a3b8;">Too Slow (Roundabout)</td><td>Very slow at roundabout — APTO</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4ee83852-a19f-4266-b500-11ebd2a95c9a/4ee83852-a19f-4266-b500-11ebd2a95c9a" target="_blank">4ee83852</a></td><td class="id-col">E44</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Positioning</span></td><td style="font-size:10px;color:#94a3b8;">Lane Drift</td><td>Lane drift on curve</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/57134375-0fab-484e-a2e1-b151f70194c6/57134375-0fab-484e-a2e1-b151f70194c6" target="_blank">57134375</a></td><td class="id-col">E45</td><td><span class="sev-pill sev-xl">XL</span></td><td><span class="cat-pill">Positioning</span></td><td style="font-size:10px;color:#94a3b8;">Lane Drift</td><td>Severe lane drift into oncoming lane on curvature &#x26A0;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/cb4077a6-03d1-4413-8a73-c1ebd1b04db0/cb4077a6-03d1-4413-8a73-c1ebd1b04db0" target="_blank">cb4077a6</a></td><td class="id-col">E46</td><td><span class="sev-pill sev-m">M</span></td><td><span class="cat-pill">Positioning</span></td><td style="font-size:10px;color:#94a3b8;">Lane Drift</td><td>Slight lane drift on unmarked road</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/44179ee8-1047-4dc6-b49c-faf0bc940591/44179ee8-1047-4dc6-b49c-faf0bc940591" target="_blank">44179ee8</a></td><td class="id-col">E47</td><td><span class="sev-pill sev-s">S</span></td><td><span class="cat-pill">Turns</span></td><td style="font-size:10px;color:#94a3b8;">Missed</td><td>Missed left turn — S (acceptable miss)</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c267d9d4-be36-4785-8765-c1d26c897f14/c267d9d4-be36-4785-8765-c1d26c897f14" target="_blank">c267d9d4</a></td><td class="id-col">E48</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Acceleration</span></td><td style="font-size:10px;color:#94a3b8;">Hesitant</td><td>Hesitant making left turn at stop sign</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/40674fdd-389d-4445-8650-f9da67c41f9e/40674fdd-389d-4445-8650-f9da67c41f9e" target="_blank">40674fdd</a></td><td class="id-col">E49</td><td><span class="sev-pill sev-s">S</span></td><td><span class="cat-pill">Turns</span></td><td style="font-size:10px;color:#94a3b8;">Good Yield</td><td>Good yield to oncoming with occlusion &#x2605;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/619502e3-14d2-46f7-a714-420ab4513e68/619502e3-14d2-46f7-a714-420ab4513e68" target="_blank">619502e3</a></td><td class="id-col">E50</td><td><span class="sev-pill sev-l">L</span></td><td><span class="cat-pill">Steering</span></td><td style="font-size:10px;color:#94a3b8;">Ping Pong</td><td>Ping pong steering behavior</td></tr>
+</tbody>
+</table>
+</div>
+
+<script>
+function showSum(id) {
+  ['verdict','freq','fix'].forEach(function(s) {
+    document.getElementById('sum-' + s).classList.remove('active');
+  });
+  document.getElementById('sum-' + id).classList.add('active');
+  document.querySelectorAll('.sum-btn').forEach(function(btn, i) {
+    btn.classList.toggle('active', ['verdict','freq','fix'][i] === id);
+  });
+}
+</script>
+</body>
+</html>
