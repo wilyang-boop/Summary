@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 18px; font-size: 13px; }
+  h1 { font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 3px; }
+  .subtitle { font-size: 11px; color: #94a3b8; margin-bottom: 14px; }
+  .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+  .panel { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; margin-bottom: 14px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+  .key-summary { background: #1a1f2e; border: 1px solid #2d3348; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+  .ks-item { display: flex; align-items: flex-start; gap: 8px; }
+  .ks-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .ks-label { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .ks-desc { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card { background: #1e2230; border-radius: 8px; padding: 10px 12px; border: 1px solid #2d3348; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-bottom: 3px; }
+  .stat-value { font-size: 22px; font-weight: 700; }
+  .stat-sub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+  .stat-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+  .stat-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #2d3348; color: #94a3b8; }
+  .pass-bar-wrap { height: 6px; background: #2d3348; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+  .pass-bar-fill { height: 100%; border-radius: 4px; }
+
+  /* Session comparison */
+  .session-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+  .build-card { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; }
+  .build-name { font-size: 11px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .build-meta { font-size: 10px; color: #64748b; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #2d3348; line-height: 1.6; }
+  .build-meta a { color: #3b82f6; text-decoration: none; }
+  .build-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 11px; }
+  .bk { color: #94a3b8; } .bv { font-weight: 700; }
+  .severity-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; margin-top: 8px; gap: 1px; }
+  .bar-xxl { background: #dc2626; } .bar-xl { background: #ef4444; } .bar-l { background: #fb923c; } .bar-m { background: #3b82f6; } .bar-s { background: #22c55e; }
+
+  /* Lane table */
+  .lane-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .lane-table th { text-align: left; padding: 6px 10px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .lane-table td { padding: 6px 10px; border-bottom: 1px solid #1a1f2e; vertical-align: middle; }
+  .lane-table tr:last-child td { border-bottom: none; }
+  .lane-label { font-weight: 600; color: #e2e8f0; }
+  .mini-bar-wrap { width: 100px; height: 6px; background: #2d3348; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 6px; }
+  .mini-bar-fill { height: 100%; border-radius: 3px; }
+  .pct { font-weight: 700; font-size: 11px; }
+
+  /* Trends */
+  .trend-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #1a1f2e; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-label { font-size: 11px; color: #94a3b8; flex: 1; }
+  .trend-bar-wrap { width: 90px; height: 5px; background: #2d3348; border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; }
+  .trend-count { font-size: 11px; font-weight: 700; min-width: 24px; text-align: right; }
+  .trend-sev { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+  .sev-xxl-tag{ background: #4c0519; color: #fca5a5; }
+  .sev-xl-tag { background: #431407; color: #fdba74; }
+  .sev-l-tag  { background: #422006; color: #fb923c; }
+  .sev-m-tag  { background: #1e3a5f; color: #93c5fd; }
+
+  /* Log */
+  .tab-buttons { display: flex; gap: 4px; margin-bottom: 8px; }
+  .tab-btn { padding: 4px 12px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #2d3348; background: #1a1f2e; color: #94a3b8; }
+  .tab-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #3b82f6; }
+  .hidden { display: none; }
+  .log-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .log-table th { text-align: left; padding: 6px 8px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .log-table td { padding: 5px 8px; border-bottom: 1px solid #1a1f2e; vertical-align: top; line-height: 1.5; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: #1a1f2e; }
+  .id-col { font-weight: 700; color: #64748b; white-space: nowrap; }
+  .event-link { font-size: 10px; color: #3b82f6; text-decoration: none; font-family: monospace; display: block; line-height: 1.8; }
+  .event-link:hover { color: #60a5fa; text-decoration: underline; }
+
+  .sev-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .sev-xxl { background: #4c0519; color: #fca5a5; }
+  .sev-xl  { background: #431407; color: #fdba74; }
+  .sev-l   { background: #422006; color: #fb923c; }
+  .sev-m   { background: #1e3a5f; color: #93c5fd; }
+  .sev-s   { background: #14532d; color: #86efac; }
+  .map-pill { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 600; margin-left: 3px; }
+  .map-yes { background: #14532d; color: #86efac; }
+  .map-no  { background: #1e2535; color: #64748b; }
+  .asym-pill { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 600; margin-left: 3px; background: #2d1f00; color: #fde68a; }
+  .reg-pill { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 700; margin-left: 3px; background: #4c0519; color: #fca5a5; }
+
+  .alert-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #f97316; background: #2d1800; margin-top: 8px; font-size: 11px; color: #fdba74; line-height: 1.6; }
+  .warn-box  { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #dc2626; background: #2d0a0a; margin-top: 8px; font-size: 11px; color: #fca5a5; line-height: 1.6; }
+  .info-box  { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; background: #0f2040; margin-top: 8px; font-size: 11px; color: #93c5fd; line-height: 1.6; }
+
+  .red{color:#f87171;} .orange{color:#fb923c;} .blue{color:#60a5fa;} .green{color:#4ade80;}
+</style>
+</head>
+<body>
+
+<h1>U-Turn Stress Test</h1>
+<div class="subtitle">
+  2026-05-26 &nbsp;&middot;&nbsp; San Tomas / Stevens Creek / Bowers / Scott Corridor &nbsp;&middot;&nbsp;
+  Build: <a href="http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45649850&vid=2" target="_blank" style="color:#3b82f6;text-decoration:none;">45649850.2</a> &nbsp;&middot;&nbsp;
+  Model: sft-5386 &nbsp;&middot;&nbsp;
+  Tester: W &nbsp;&middot;&nbsp; Veh: 174-323
+</div>
+
+<!-- Key findings -->
+<div class="key-summary" style="grid-template-columns:1fr;">
+  <div class="ks-item" style="border-bottom:1px solid #2d3348; padding-bottom:10px; margin-bottom:2px;">
+    <div class="ks-icon">🗺️</div>
+    <div>
+      <div class="ks-label" style="color:#fbbf24;">Testing Limitation — Navigation Refusing U-Turns</div>
+      <div class="ks-desc" style="color:#cbd5e1;">Vehicle navigation consistently refused to route U-turns independently. Only route-forced U-turns were executed, preventing a full and diverse sweep across regions. This resulted in repeated attempts at the same locations and fewer total U-turn opportunities than usual. Results may not be fully representative of build performance across all intersection types.</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:2px;">
+    <div class="ks-item">
+      <div class="ks-icon">✅</div>
+      <div>
+        <div class="ks-label">4-Lane Remains Strong</div>
+        <div class="ks-desc">All 6 four-lane turns completed successfully (100%) across sessions 1 and 3. San Tomas corridor consistent. Slight wobble and fishhook noted but all S or M rated.</div>
+      </div>
+    </div>
+    <div class="ks-item">
+      <div class="ks-icon">⚠️</div>
+      <div>
+        <div class="ks-label">Road Graph Issues — Possible Regression</div>
+        <div class="ks-desc">Multiple XL events linked to poor or missing road graph: W6 S1 (proceeds into curb, CPTO), W7 S1 (no rail), W10 S3 (missing rail — previously present, potential regression), W13 S3 (road graph not formed at speed), W16 S3 (noodle flicker).</div>
+      </div>
+    </div>
+    <div class="ks-item">
+      <div class="ks-icon">🚨</div>
+      <div>
+        <div class="ks-label">Safety Critical Events</div>
+        <div class="ks-desc">S1 W9 XXL: FN yield to oncoming during unprotected U-turn. S1 W6 XL: Proceeded straight into curb (CPTO) — poor road graph / missing noodle. S3 W1 XL: Oversteer into curb (APTO). 2-lane + bike lane: 20% pass rate across all sessions.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stat cards -->
+<div class="stat-grid" style="grid-template-columns:repeat(6,1fr);">
+  <div class="stat-card">
+    <div class="stat-label">XXL</div>
+    <div class="stat-value red">1</div>
+    <div class="stat-tags"><span class="stat-tag">FN yield oncoming</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">XL</div>
+    <div class="stat-value orange">13</div>
+    <div class="stat-tags"><span class="stat-tag">road graph / no rail</span><span class="stat-tag">asymmetric missed</span><span class="stat-tag">2-lane missed</span><span class="stat-tag">oversteer curb</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">L</div>
+    <div class="stat-value orange">1</div>
+    <div class="stat-tags"><span class="stat-tag">ghost brake</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">M</div>
+    <div class="stat-value blue">6</div>
+    <div class="stat-tags"><span class="stat-tag">wobble</span><span class="stat-tag">fishhook</span><span class="stat-tag">into bike lane</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">S</div>
+    <div class="stat-value green">12</div>
+    <div class="stat-tags"><span class="stat-tag">good turn</span><span class="stat-tag">unprotected yield</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">U-Turn Pass Rate</div>
+    <div class="stat-value orange">58%</div>
+    <div class="stat-sub">19 of 33 events</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:58%;background:linear-gradient(90deg,#f97316,#f59e0b);"></div></div>
+    <div style="font-size:9px;color:#64748b;margin-top:3px;">3+4 lane: 74% (17/23)</div>
+  </div>
+</div>
+
+<!-- Session comparison -->
+<div class="section-title">Session Comparison</div>
+<div class="session-grid">
+  <div class="build-card" style="border-color:#431407;">
+    <div class="build-name">Session 1</div>
+    <div class="build-meta">
+      <a href="https://maglev.nvda.ai/av/drivescrubber/drives/672328" target="_blank">6bbefb5a</a><br>
+      San Tomas / Stevens Creek / Saratoga
+    </div>
+    <div class="build-row"><span class="bk">XXL</span><span class="bv red">1</span></div>
+    <div class="build-row"><span class="bk">XL</span><span class="bv red">3</span></div>
+    <div class="build-row"><span class="bk">M</span><span class="bv blue">3</span></div>
+    <div class="build-row"><span class="bk">S</span><span class="bv green">2</span></div>
+    <div class="build-row"><span class="bk">Total</span><span class="bv">9</span></div>
+    <div class="build-row"><span class="bk">U-Turn pass rate</span><span class="bv red">56%</span></div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:56%;background:linear-gradient(90deg,#ef4444,#f97316);"></div></div>
+    <div class="severity-bar">
+      <div class="bar-xxl" style="width:11%"></div>
+      <div class="bar-xl" style="width:33%"></div>
+      <div class="bar-m" style="width:33%"></div>
+      <div class="bar-s" style="width:23%"></div>
+    </div>
+  </div>
+  <div class="build-card" style="border-color:#14532d;">
+    <div class="build-name">Session 2</div>
+    <div class="build-meta">
+      <a href="https://maglev.nvda.ai/av/drivescrubber/drives/672496" target="_blank">a8cfbd54</a><br>
+      Bowers / Scott corridor
+    </div>
+    <div class="build-row"><span class="bk">L</span><span class="bv orange">1</span></div>
+    <div class="build-row"><span class="bk">S</span><span class="bv green">1</span></div>
+    <div class="build-row"><span class="bk">Total</span><span class="bv">2</span></div>
+    <div class="build-row"><span class="bk">U-Turn pass rate</span><span class="bv green">100%</span></div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:100%;background:#22c55e;"></div></div>
+    <div style="font-size:9px;color:#64748b;margin-top:5px;">Limited data — 2 events only</div>
+    <div class="severity-bar" style="margin-top:10px;">
+      <div class="bar-l" style="width:50%"></div>
+      <div class="bar-s" style="width:50%"></div>
+    </div>
+  </div>
+  <div class="build-card" style="border-color:#431407;">
+    <div class="build-name">Session 3</div>
+    <div class="build-meta">
+      <a href="https://maglev.nvda.ai/av/drivescrubber/drives/672516" target="_blank">8be659bb</a><br>
+      Scott / Bowers / Oakmead / San Tomas
+    </div>
+    <div class="build-row"><span class="bk">XL</span><span class="bv red">10</span></div>
+    <div class="build-row"><span class="bk">M</span><span class="bv blue">3</span></div>
+    <div class="build-row"><span class="bk">S</span><span class="bv green">9</span></div>
+    <div class="build-row"><span class="bk">Total</span><span class="bv">22</span></div>
+    <div class="build-row"><span class="bk">U-Turn pass rate</span><span class="bv red">55%</span></div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:55%;background:linear-gradient(90deg,#ef4444,#f97316);"></div></div>
+    <div class="severity-bar" style="margin-top:8px;">
+      <div class="bar-xl" style="width:46%"></div>
+      <div class="bar-m" style="width:14%"></div>
+      <div class="bar-s" style="width:40%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Lane breakdown -->
+<div class="section-title">Lane Configuration Pass Rate (Combined)</div>
+<div class="panel" style="padding:0;overflow:hidden;margin-bottom:14px;">
+<table class="lane-table">
+<thead>
+  <tr><th>Config</th><th>Pass Rate</th><th>Count</th><th>Notes</th></tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="lane-label">4-Lane</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:100%;background:#22c55e;"></div></div><span class="pct green">100%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">6/6</td>
+    <td style="font-size:10px;color:#475569;">S1 W1–W3, S3 W20–W22; minor wobble/fishhook only</td>
+  </tr>
+  <tr>
+    <td class="lane-label">3-Lane (incl. +bike)</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:65%;background:#22c55e;"></div></div><span class="pct green">65%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">11/17</td>
+    <td style="font-size:10px;color:#475569;">Road graph / asymmetric misses dominate failures; Bowers &amp; Central recurring XL</td>
+  </tr>
+  <tr>
+    <td class="lane-label">3+4 Lane Combined</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:74%;background:#22c55e;"></div></div><span class="pct green">74%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">17/23</td>
+    <td style="font-size:10px;color:#475569;">R18 scope</td>
+  </tr>
+  <tr>
+    <td class="lane-label">Asymmetric Intersection</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:25%;background:#ef4444;"></div></div><span class="pct red">25%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">1/4</td>
+    <td style="font-size:10px;color:#475569;">W7 S3 pass; W7 S1, W13 S3, W16 S3 XL — Bowers &amp; Central asymmetric consistent failure</td>
+  </tr>
+  <tr>
+    <td class="lane-label">2-Lane + Bike / Merging</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:20%;background:#ef4444;"></div></div><span class="pct red">20%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">2/10</td>
+    <td style="font-size:10px;color:#475569;">S3 W14 S (Oakmead yield), S3 W3 M (jerky); 8 XL misses/bad across Scott / Oakmead / Saratoga</td>
+  </tr>
+  <tr>
+    <td class="lane-label" style="color:#4ade80;">With HD Map</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:100%;background:#22c55e;"></div></div><span class="pct green">100%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">3/3</td>
+    <td style="font-size:10px;color:#475569;">S1 W1, S3 W20, S3 W22 — all 4-lane, all S</td>
+  </tr>
+  <tr>
+    <td class="lane-label" style="color:#fb923c;">No HD Map</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:53%;background:#f97316;"></div></div><span class="pct orange">53%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">16/30</td>
+    <td style="font-size:10px;color:#475569;">All XL/XXL events on no-HD-map turns</td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!-- Trends -->
+<div class="two-col">
+  <div class="panel">
+    <div class="section-title">Failure Trends (Combined)</div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">2-lane + bike missed / bad (Scott / Saratoga)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#ef4444;"></div></div>
+      <span class="trend-count red">8</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Road graph / missing rail (no attempt or CPTO)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:63%;background:#ef4444;"></div></div>
+      <span class="trend-count red">5</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xl-tag">XL</span>
+      <span class="trend-label">Asymmetric 3-lane missed (Bowers &amp; Central)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:38%;background:#ef4444;"></div></div>
+      <span class="trend-count red">3</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-xxl-tag">XXL</span>
+      <span class="trend-label">FN yield to oncoming (unprotected)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:13%;background:#dc2626;"></div></div>
+      <span class="trend-count red">1</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-m-tag">M</span>
+      <span class="trend-label">Wobble / fishhook (completed)</span>
+      <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:75%;background:#3b82f6;"></div></div>
+      <span class="trend-count blue">6</span>
+    </div>
+    <div class="warn-box">&#x1F6A8; S1 W9 XXL: FN yield to oncoming during unprotected U-turn at Saratoga 3+bike lane.<br>&#x26A0;&#xFE0F; S1 W6 XL: Poor road graph + missing noodle — system proceeded straight into curb (CPTO).<br>&#x26A0;&#xFE0F; S3 W10 XL: Rail missing at Oakmead median — previously present in prior builds. Potential road graph regression.</div>
+    <div class="alert-box" style="margin-top:8px;">&#x1F4CC; Possible regression (S3 W10): Rail at Oakmead median unprotected turn was present in prior sessions but missing in this build. Bowers &amp; Central asymmetric (W13, W16) also flagged — road graph not properly formed when approaching at higher speed.</div>
+  </div>
+  <div class="panel">
+    <div class="section-title">Recurring Locations</div>
+    <div class="trend-row"><span class="trend-label">Bowers &amp; Central (asymmetric)</span><span class="trend-count red">XL ×3 (W7 S1, W13, W16 S3)</span></div>
+    <div class="trend-row"><span class="trend-label">Scott &amp; Olcott / Coronado (2+bike)</span><span class="trend-count red">XL ×3 (W2, W4, W5 / W19 S3)</span></div>
+    <div class="trend-row"><span class="trend-label">Stevens Creek median (road graph)</span><span class="trend-count red">XXL + XL (W6, W7, W9 S1)</span></div>
+    <div class="trend-row"><span class="trend-label">Oakmead median (unprotected)</span><span class="trend-count" style="color:#94a3b8;">XL W10 (missing rail) · S W14 (good yield)</span></div>
+    <div class="trend-row"><span class="trend-label">Bowers &amp; Walsh / Scott (3+bike)</span><span class="trend-count green">S ×5 (W9, W11, W15 S3 + S2)</span></div>
+    <div class="trend-row"><span class="trend-label">San Tomas 4-lane</span><span class="trend-count green">S/M ×6 — consistent</span></div>
+    <div class="info-box" style="margin-top:8px;">&#x2139;&#xFE0F; Bowers corridor (Walsh / Scott) performed well consistently — S-rated across multiple sessions. Main failure cluster concentrated on Scott narrow lanes, Stevens Creek median, and asymmetric Bowers &amp; Central. 4-lane San Tomas remains the most reliable configuration.</div>
+  </div>
+</div>
+
+<!-- Detailed log -->
+<div class="section-title">Detailed Event Log</div>
+<div class="tab-buttons">
+  <button class="tab-btn active" onclick="showTab('s1')">Session 1</button>
+  <button class="tab-btn" onclick="showTab('s2')">Session 2</button>
+  <button class="tab-btn" onclick="showTab('s3')">Session 3</button>
+</div>
+
+<div class="panel" style="padding:0;overflow:hidden;">
+
+<!-- Session 1 -->
+<div id="tab-s1">
+<table class="log-table">
+<thead><tr><th style="width:80px;">Event</th><th style="width:40px;">#</th><th style="width:36px;">Sev</th><th>Description</th><th style="width:180px;">Location</th></tr></thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/856cebf4-f5d9-4e65-b407-1d595aafa11d/856cebf4-f5d9-4e65-b407-1d595aafa11d" target="_blank">856cebf4</a></td><td class="id-col">W1</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 4-lane <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Walsh</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/086eae7c-952a-4e54-bab2-3ee18ec1d353/086eae7c-952a-4e54-bab2-3ee18ec1d353" target="_blank">086eae7c</a></td><td class="id-col">W2</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 4-lane; wobble at end <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; El Camino Real</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f050e510-7e66-4d44-aaa8-5dbeb5461d82/f050e510-7e66-4d44-aaa8-5dbeb5461d82" target="_blank">f050e510</a></td><td class="id-col">W3</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 4-lane; slight wobble at end (3rd into 4th lane) <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Cabrillo</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/fc226c45-8515-46a1-922f-67b5faffd31e/fc226c45-8515-46a1-922f-67b5faffd31e" target="_blank">fc226c45</a></td><td class="id-col">W4</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3-lane <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">El Camino Real</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/63c65a0a-e0e2-4826-b040-8b3b7e7f3625/63c65a0a-e0e2-4826-b040-8b3b7e7f3625" target="_blank">63c65a0a</a></td><td class="id-col">W5</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 3+bike lane; into bike lane <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Stevens Creek &amp; Cabot</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/3535b42e-4aad-413e-b397-842620f85234/3535b42e-4aad-413e-b397-842620f85234" target="_blank">3535b42e</a></td><td class="id-col">W6</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 3+bike lane; poor road graph, missing noodle — proceeded straight into curb — CPTO &#x26A0;&#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Stevens Creek median</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/1151a04a-0059-4ccc-80b3-7af5e9bf0462/1151a04a-0059-4ccc-80b3-7af5e9bf0462" target="_blank">1151a04a</a></td><td class="id-col">W7</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, 3+bike lane; no rail — attempted LT instead — unprotected &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Stevens Creek median</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7ca090e2-4cbe-4f02-a468-295d6ca239a6/7ca090e2-4cbe-4f02-a468-295d6ca239a6" target="_blank">7ca090e2</a></td><td class="id-col">W8</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, 2+bike lane; possibly infeasible &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Saratoga &amp; Doyle</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/f8174c3b-9b1a-4818-910e-f76e2c92bc57/f8174c3b-9b1a-4818-910e-f76e2c92bc57" target="_blank">f8174c3b</a></td><td class="id-col">W9</td><td><span class="sev-pill sev-xxl">XXL</span></td><td>U-turn bad, 3+bike lane; FN yield to oncoming during unprotected U-turn &#x26A0;&#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Saratoga</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- Session 2 -->
+<div id="tab-s2" class="hidden">
+<table class="log-table">
+<thead><tr><th style="width:80px;">Event</th><th style="width:40px;">#</th><th style="width:36px;">Sev</th><th>Description</th><th style="width:180px;">Location</th></tr></thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9e2da681-6cb2-4eb6-a79b-10ebc3352242/9e2da681-6cb2-4eb6-a79b-10ebc3352242" target="_blank">9e2da681</a></td><td class="id-col">W1</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn bad, 3-lane; ghost brake at start [Alfred]</td><td style="font-size:10px;color:#475569;font-style:italic;">Central &amp; Bowers</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/4e18413a-87c4-4ed6-a604-2c73e35bb85c/4e18413a-87c4-4ed6-a604-2c73e35bb85c" target="_blank">4e18413a</a></td><td class="id-col">W2</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3+bike lane [Alfred]</td><td style="font-size:10px;color:#475569;font-style:italic;">Scott &amp; Bowers</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- Session 3 -->
+<div id="tab-s3" class="hidden">
+<table class="log-table">
+<thead><tr><th style="width:80px;">Event</th><th style="width:40px;">#</th><th style="width:36px;">Sev</th><th>Description</th><th style="width:180px;">Location</th></tr></thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9d594a08-4176-4d5f-9d4a-b9b4b053fc99/9d594a08-4176-4d5f-9d4a-b9b4b053fc99" target="_blank">9d594a08</a></td><td class="id-col">W1</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 2+bike lane; oversteer into curb — APTO; slow start, jerky &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Scott &amp; Octavius</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d0d32289-8ba2-4e35-bffa-be1bf7a02c0a/d0d32289-8ba2-4e35-bffa-be1bf7a02c0a" target="_blank">d0d32289</a></td><td class="id-col">W2</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, 2+bike lane; LT instead &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Scott &amp; Olcott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/38c16dec-05e6-41e9-afa1-2e2e044a9193/38c16dec-05e6-41e9-afa1-2e2e044a9193" target="_blank">38c16dec</a></td><td class="id-col">W3</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 2+bike lane; jerky <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Scott &amp; Octavius</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/16c6f982-a6b8-4045-8afb-50c2926ffdc5/16c6f982-a6b8-4045-8afb-50c2926ffdc5" target="_blank">16c6f982</a></td><td class="id-col">W4</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, 2+bike lane; possibly infeasible &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Scott &amp; Olcott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ff56f6b6-a4e8-4fd4-a3ad-55e59fd5dcc9/ff56f6b6-a4e8-4fd4-a3ad-55e59fd5dcc9" target="_blank">ff56f6b6</a></td><td class="id-col">W5</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, 2+bike lane; possibly infeasible &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Scott &amp; Coronado</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ef0c0865-7b0c-48c4-b1fc-85f5f333b112/ef0c0865-7b0c-48c4-b1fc-85f5f333b112" target="_blank">ef0c0865</a></td><td class="id-col">W6</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3+bike lane <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Scott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a7f19e0c-05ea-4823-8469-13099abe5231/a7f19e0c-05ea-4823-8469-13099abe5231" target="_blank">a7f19e0c</a></td><td class="id-col">W7</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, 3+bike lane &#x26A0; <span class="map-pill map-no">No HD</span><span class="asym-pill">Asymmetric</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Central</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ef1111c4-ff31-458b-b456-05c9e20cf25a/ef1111c4-ff31-458b-b456-05c9e20cf25a" target="_blank">ef1111c4</a></td><td class="id-col">W8</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3+bike lane <span class="map-pill map-no">No HD</span><span class="asym-pill">Asymmetric</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Central</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/28620c95-f0d0-410f-9ffd-1d6b7f5859cd/28620c95-f0d0-410f-9ffd-1d6b7f5859cd" target="_blank">28620c95</a></td><td class="id-col">W9</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3+bike lane <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Walsh</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d7e4772b-a551-4be7-af72-7fe440041386/d7e4772b-a551-4be7-af72-7fe440041386" target="_blank">d7e4772b</a></td><td class="id-col">W10</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, 2+merging lane; missing rail — previously present &#x26A0; <span class="map-pill map-no">No HD</span><span class="reg-pill">Regression?</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Oakmead median</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/81d8c02b-c2ff-4e92-ba4f-e4fa997ea6a8/81d8c02b-c2ff-4e92-ba4f-e4fa997ea6a8" target="_blank">81d8c02b</a></td><td class="id-col">W11</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3+bike lane <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Scott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/5013b5ae-4e70-47b2-bbfa-f00231b75978/5013b5ae-4e70-47b2-bbfa-f00231b75978" target="_blank">5013b5ae</a></td><td class="id-col">W12</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 3+bike lane; slight wobble at end <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Walsh</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/14f4e1d1-ba61-4304-9a20-b31ff1d27b71/14f4e1d1-ba61-4304-9a20-b31ff1d27b71" target="_blank">14f4e1d1</a></td><td class="id-col">W13</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, 3+bike lane; road graph not properly formed at higher approach speed &#x26A0; <span class="map-pill map-no">No HD</span><span class="asym-pill">Asymmetric</span><span class="reg-pill">Road Graph</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Central</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/ab145e4a-1805-4efd-8325-921c6b55f7d4/ab145e4a-1805-4efd-8325-921c6b55f7d4" target="_blank">ab145e4a</a></td><td class="id-col">W14</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 2+merging lane; unprotected — yielded &#x2605; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Oakmead median</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/877f878e-950e-4704-a90c-230fbbfdaa05/877f878e-950e-4704-a90c-230fbbfdaa05" target="_blank">877f878e</a></td><td class="id-col">W15</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3+bike lane <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Scott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/5a038811-1433-4ce7-b1b4-300a28298651/5a038811-1433-4ce7-b1b4-300a28298651" target="_blank">5a038811</a></td><td class="id-col">W16</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, 3+bike lane; road graph issue + noodle flicker &#x26A0; <span class="map-pill map-no">No HD</span><span class="asym-pill">Asymmetric</span><span class="reg-pill">Road Graph</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Central</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/66fc7847-3340-4302-8828-769f13a2cd35/66fc7847-3340-4302-8828-769f13a2cd35" target="_blank">66fc7847</a></td><td class="id-col">W17</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 3-lane; fishhook and wobble at end <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Central &amp; Scott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e3c15f4d-f85c-4fd7-9921-39adbced7d70/e3c15f4d-f85c-4fd7-9921-39adbced7d70" target="_blank">e3c15f4d</a></td><td class="id-col">W18</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, 2+bike lane; possibly infeasible &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Jay &amp; Scott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/dcc78d03-9b57-4b10-9866-436a3481cb9b/dcc78d03-9b57-4b10-9866-436a3481cb9b" target="_blank">dcc78d03</a></td><td class="id-col">W19</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn missed, 2+bike lane; possibly infeasible &#x26A0; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Scott &amp; Olcott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/df706efc-2c5c-41bd-8028-bf4ed658ddd0/df706efc-2c5c-41bd-8028-bf4ed658ddd0" target="_blank">df706efc</a></td><td class="id-col">W20</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 4-lane; slight correction at end <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Walsh</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/177b2262-d515-4297-ba31-0aaef91a7818/177b2262-d515-4297-ba31-0aaef91a7818" target="_blank">177b2262</a></td><td class="id-col">W21</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 4-lane; fishhook at end <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Monroe</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/291d8410-6cec-4f39-abaa-2b87a345be05/291d8410-6cec-4f39-abaa-2b87a345be05" target="_blank">291d8410</a></td><td class="id-col">W22</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 4-lane; slight fishhook correction <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Walsh</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+function showTab(id) {
+  ['s1','s2','s3'].forEach(function(s) {
+    document.getElementById('tab-' + s).classList.add('hidden');
+  });
+  document.getElementById('tab-' + id).classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+    btn.classList.toggle('active', ['s1','s2','s3'][i] === id);
+  });
+}
+</script>
+</body>
+</html>
