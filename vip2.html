@@ -1,0 +1,290 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--nv:#76b900;--dark:#0f1117;--card:#1a1f2e;--card2:#212840;--border:#2e3a52;--text:#e8eaf0;--muted:#8a93a8;--accent:#00c8ff;--accent2:#f7941d}
+body{background:transparent;color:var(--text);font-family:'Inter',sans-serif;font-size:13px}
+.wrap{background:var(--dark);border-radius:16px;padding:28px 24px 32px;border:1px solid var(--border);max-width:680px;position:relative;overflow:visible}
+.wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--nv),var(--accent),#5a8a00);opacity:.9;border-radius:16px 16px 0 0}
+.header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.nv-badge{background:var(--nv);color:#000;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11px;letter-spacing:.12em;padding:3px 8px;border-radius:4px}
+.ttl{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:22px;color:#fff;letter-spacing:.03em}
+.sub{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.tagline{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--nv);border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:22px;font-size:13px;color:var(--muted);line-height:1.5}
+.tagline strong{color:var(--nv)}
+.sec{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.hint{font-size:10px;color:var(--muted);margin-bottom:10px}
+.lb{border-radius:7px;padding:10px 14px;border:1px solid;position:relative;cursor:default;transition:filter .12s}
+.lb:hover{filter:brightness(1.13)}
+.ndas{background:rgba(0,200,255,.10);border-color:rgba(0,200,255,.30);border-left:3px solid var(--accent);border-radius:7px 7px 0 0;border-bottom:none}
+.aa{background:rgba(0,200,255,.14);border-color:rgba(0,200,255,.35);border-left:3px solid var(--accent);border-radius:0;border-top:none;border-bottom:none}
+.avos{background:rgba(0,200,255,.18);border-color:rgba(0,200,255,.40);border-left:3px solid var(--accent);border-radius:0;border-top:none;border-bottom:none}
+.fsi{background:rgba(0,200,255,.18);border-color:rgba(0,200,255,.40);border-left:3px solid var(--accent);border-radius:0 0 7px 7px;border-top:none}
+.fw-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:2px}
+.fw-box{background:rgba(247,148,29,.08);border:1px solid rgba(247,148,29,.28);border-left:3px solid var(--accent2);border-radius:7px;padding:8px 12px;position:relative;cursor:default;transition:filter .12s}
+.fw-box:hover{filter:brightness(1.13)}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cb{border-radius:7px;padding:8px 12px;border:1px solid;position:relative;cursor:default;transition:filter .12s}
+.cb:hover{filter:brightness(1.13)}
+.cbc{background:rgba(247,148,29,.07);border-color:rgba(247,148,29,.35);border-left:3px solid rgba(247,148,29,.6)}
+.cbp{background:rgba(180,100,255,.07);border-color:rgba(180,100,255,.35);border-left:3px solid #b464ff}
+.lname{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:#fff;margin-bottom:2px}
+.ldesc{font-size:11px;color:var(--muted);line-height:1.4}
+.pill{font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid;font-weight:500;cursor:default;position:relative;white-space:nowrap;display:inline-block}
+.pac{background:rgba(0,200,255,.12);border-color:rgba(0,200,255,.3);color:#7de2ff}
+.por{background:rgba(247,148,29,.12);border-color:rgba(247,148,29,.3);color:#fbb85e}
+.pill[data-tip]{text-decoration:underline dotted;text-underline-offset:2px;cursor:help}
+.pill[data-tip]:hover{opacity:.8}
+.tip{display:none;position:absolute;z-index:9999;background:#1e2535;border:1px solid #3a4a6a;border-radius:9px;padding:12px 14px;width:280px;font-size:11.5px;color:#c8d0e0;line-height:1.6;pointer-events:none;top:calc(100% + 9px);left:0}
+.tip.r{left:auto;right:0}
+.tip::before{content:'';position:absolute;bottom:100%;left:20px;border:5px solid transparent;border-bottom-color:#3a4a6a}
+.tip.r::before{left:auto;right:20px}
+.tip::after{content:'';position:absolute;bottom:100%;left:20px;border:4px solid transparent;border-bottom-color:#1e2535;margin-top:1px}
+.tip.r::after{left:auto;right:20px}
+.pill[data-tip]:hover .tip{display:block}
+.tn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:#fff;margin-bottom:6px}
+.tl{list-style:none;margin-top:6px;padding-top:6px;border-top:1px solid #2e3a52}
+.tl li{padding:2px 0;color:#a8b8cc}
+.tl li::before{content:'· ';color:var(--nv)}
+.ts{font-size:10.5px;color:#7a8aa0;margin-top:5px;padding-top:5px;border-top:1px solid #2e3a52;font-style:italic}
+.dr{display:flex;align-items:center;gap:8px;padding:0 14px;height:20px;background:rgba(0,200,255,.04);border-left:3px solid var(--accent);border-right:1px solid rgba(0,200,255,.25)}
+.flow{display:flex;align-items:center;margin-bottom:22px}
+.fs{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-align:center;flex:1;min-width:76px}
+.fs .n{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--nv);line-height:1}
+.fs .nm{font-size:10px;color:#fff;font-weight:500;margin-top:3px;line-height:1.3}
+.fs .sb{font-size:9px;color:var(--muted);margin-top:2px;line-height:1.3}
+.fa{color:var(--nv);font-size:16px;padding:0 3px;flex-shrink:0;opacity:.7}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+.ib{border-radius:10px;padding:14px;border:1px solid}
+.ic{background:rgba(247,148,29,.07);border-color:rgba(247,148,29,.35)}
+.ip{background:rgba(180,100,255,.07);border-color:rgba(180,100,255,.35)}
+.it{display:inline-block;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:16px;padding:2px 10px;border-radius:5px;margin-bottom:8px}
+.ic .it{background:rgba(247,148,29,.25);color:#fbb85e}
+.ip .it{background:rgba(180,100,255,.25);color:#d098ff}
+.ih{font-weight:500;font-size:13px;color:#fff;margin-bottom:6px}
+.il{list-style:none;font-size:11.5px;color:var(--muted);line-height:1.7}
+.il li::before{content:'→ ';color:var(--muted)}
+.why{display:flex;gap:8px;margin-bottom:22px}
+.wc{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;border-top:2px solid}
+.wc:nth-child(1){border-top-color:var(--nv)}
+.wc:nth-child(2){border-top-color:var(--accent)}
+.wc:nth-child(3){border-top-color:var(--accent2)}
+.wh{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:#fff;margin-bottom:4px}
+.wb{font-size:11px;color:var(--muted);line-height:1.5}
+.cl{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:22px}
+.cn{background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-size:12px;color:var(--text);font-weight:500}
+.ca{color:var(--nv);opacity:.6;font-size:13px}
+.cn.hi{border-color:var(--nv);color:var(--nv)}
+.ng{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.nc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.nh{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;color:#fff;margin-bottom:4px}
+.nb{font-size:11.5px;color:var(--muted);line-height:1.5}
+.nb em{color:var(--text);font-style:normal;font-weight:500}
+</style>
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">NVIDIA DRIVE VIP Vehicle Integration Package system overview infographic</h2>
+<div class="wrap">
+
+  <div class="header">
+    <div class="nv-badge">NVIDIA DRIVE</div>
+    <div>
+      <div class="ttl">VIP System Overview</div>
+      <div class="sub">Vehicle Integration Package · Release Baseline Architecture</div>
+    </div>
+  </div>
+
+  <div class="tagline"><strong>VIP (Vehicle Integration Package)</strong> is the validated release baseline for a vehicle program — a compatibility contract binding software, firmware, coding, and configuration into a single fleet-usable package.</div>
+
+  <div class="sec">Software &amp; firmware stack</div>
+  <div class="hint">Layers ordered by dependency — each sits on top of the one below. Hover underlined terms for definitions.</div>
+
+  <div style="display:flex;gap:0;margin-bottom:22px">
+    <div style="width:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+      <div style="writing-mode:vertical-lr;transform:rotate(180deg);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;opacity:.6;white-space:nowrap">depends on ↓</div>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;gap:0">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#a8d840;opacity:.8;margin-bottom:4px;padding-left:2px">VIP baseline envelope</div>
+
+      <div class="lb ndas">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="lname"><span class="pill pac" data-tip style="font-size:12px;padding:1px 8px">NDAS<span class="tip">
+              <div class="tn">NDAS — driving/application stack</div>
+              The main driving and application stack. Sits at the top of the software hierarchy — it calls AA's platform services to do its work. NDAS-only bundles may fail the pipeline, so it always moves as part of a full VIP/DDU update.
+              <div class="ts">Top layer: depends on AA services below it</div>
+            </span></span></div>
+            <div class="ldesc" style="margin-top:3px">Driving &amp; application logic</div>
+          </div>
+          <div style="font-size:10px;color:rgba(0,200,255,.45);font-family:'Rajdhani',sans-serif;letter-spacing:.05em">TOP</div>
+        </div>
+      </div>
+
+      <div class="dr">
+        <svg width="12" height="14" style="flex-shrink:0"><line x1="6" y1="0" x2="6" y2="10" stroke="rgba(0,200,255,.4)" stroke-width="1"/><polygon points="2,10 10,10 6,14" fill="rgba(0,200,255,.4)"/></svg>
+        <span style="font-size:10px;color:rgba(0,200,255,.5)">uses services from</span>
+      </div>
+
+      <div class="lb aa">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="lname"><span class="pill pac" data-tip style="font-size:12px;padding:1px 8px">AA — Adaptive AUTOSAR<span class="tip">
+              <div class="tn">AA — Adaptive AUTOSAR stack</div>
+              Middleware/platform services layer. Runs QNX user-space (X6*) processes. Sits between AVOS and NDAS and:
+              <ul class="tl"><li>Talks to radars, subscribes to sensor data</li><li>Manages SC7 suspend/resume power state</li><li>Coordinates with LCM, FSI, MCU/Aurix</li><li>Exposes platform services NDAS depends on</li></ul>
+              <div class="ts">If X6* processes are missing, AA is down — flash an LKG DDU. AA persistence must match its DDU version.</div>
+            </span></span></div>
+            <div class="ldesc" style="margin-top:3px">Adaptive middleware &amp; platform services</div>
+          </div>
+          <div style="font-size:10px;color:rgba(0,200,255,.45);font-family:'Rajdhani',sans-serif;letter-spacing:.05em">MID</div>
+        </div>
+      </div>
+
+      <div class="dr">
+        <svg width="12" height="14" style="flex-shrink:0"><line x1="6" y1="0" x2="6" y2="10" stroke="rgba(0,200,255,.4)" stroke-width="1"/><polygon points="2,10 10,10 6,14" fill="rgba(0,200,255,.4)"/></svg>
+        <span style="font-size:10px;color:rgba(0,200,255,.5)">runs on top of</span>
+      </div>
+
+      <div class="lb avos">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="lname"><span class="pill pac" data-tip style="font-size:12px;padding:1px 8px">AVOS / QNX<span class="tip r">
+              <div class="tn">AVOS / QNX — base OS</div>
+              The operating system and base services layer on the IDC/Orin. All higher layers (AA, NDAS) depend on this runtime foundation being compatible with the rest of the VIP baseline.
+              <div class="ts">Foundation layer: everything above depends on this</div>
+            </span></span></div>
+            <div class="ldesc" style="margin-top:3px">Operating system &amp; base runtime</div>
+          </div>
+          <div style="font-size:10px;color:rgba(0,200,255,.45);font-family:'Rajdhani',sans-serif;letter-spacing:.05em">BASE</div>
+        </div>
+      </div>
+
+      <div class="dr">
+        <svg width="12" height="14" style="flex-shrink:0"><line x1="6" y1="0" x2="6" y2="10" stroke="rgba(0,200,255,.4)" stroke-width="1"/><polygon points="2,10 10,10 6,14" fill="rgba(0,200,255,.4)"/></svg>
+        <span style="font-size:10px;color:rgba(0,200,255,.5)">also packaged in DDU alongside</span>
+      </div>
+
+      <div class="lb fsi">
+        <div class="lname"><span class="pill pac" data-tip style="font-size:12px;padding:1px 8px">FSI<span class="tip r">
+          <div class="tn">FSI — versioned SW component</div>
+          Another versioned software component shipped in the same DDU baseline, managed as part of compatibility control alongside AVOS, AA, and NDAS.
+        </span></span></div>
+        <div class="ldesc" style="margin-top:3px">Low-level component, co-packaged in DDU</div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;margin:6px 0 2px;padding-left:6px">
+        <div style="height:1px;flex:1;background:rgba(0,200,255,.2)"></div>
+        <span class="pill pac" data-tip style="font-size:10px;padding:1px 7px">DDU<span class="tip">
+          <div class="tn">DDU — Direct Drive Update</div>
+          The flashable tarball put on the IDC/Orin during the SW update step.
+          <ul class="tl"><li>QNX / AVOS platform image</li><li>AA adaptive binaries</li><li>NDAS build</li><li>FSI and low-level components</li><li>DDU_build_info.txt (crypto-type detection)</li></ul>
+          <div class="ts">DDU = the main software image bundle for the IDC</div>
+        </span></span>
+        <span style="font-size:10px;color:rgba(0,200,255,.5)">bundles NDAS + AA + AVOS/QNX + FSI as one flashable image</span>
+        <div style="height:1px;flex:1;background:rgba(0,200,255,.2)"></div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 14px;margin-top:4px">
+        <svg width="12" height="14" style="flex-shrink:0"><line x1="6" y1="0" x2="6" y2="10" stroke="rgba(247,148,29,.45)" stroke-width="1"/><polygon points="2,10 10,10 6,14" fill="rgba(247,148,29,.45)"/></svg>
+        <span style="font-size:10px;color:rgba(247,148,29,.55)">IDC SW depends on compatible firmware below</span>
+      </div>
+
+      <div class="fw-grid">
+        <div class="fw-box">
+          <div class="lname" style="font-size:12px"><span class="pill por" data-tip style="font-size:11px;padding:1px 7px">Aurix MCU<span class="tip">
+            <div class="tn">Aurix — MCU firmware</div>
+            Separate MCU/control-side firmware domain. Even with a correct DDU, a mismatched Aurix version can break provisioning, boot, or vehicle integration — hence its own explicit flashing step in every VIP.
+            <div class="ts">Bad Aurix releases can break clear-persistency or SW update entirely.</div>
+          </span></span></div>
+          <div class="ldesc" style="margin-top:3px">MCU firmware · separate domain</div>
+        </div>
+        <div class="fw-box">
+          <div class="lname" style="font-size:12px;display:flex;flex-wrap:wrap;gap:4px;align-items:center">
+            <span class="pill por" data-tip style="font-size:11px;padding:1px 7px">Switch<span class="tip r">
+              <div class="tn">Switch — network switch firmware</div>
+              In-vehicle network switch firmware. Tracked separately from the DDU and flashed alongside Aurix as its own VIP step.
+            </span></span>
+            <span class="pill por" data-tip style="font-size:11px;padding:1px 7px">Radar<span class="tip r">
+              <div class="tn">Radar — sensor firmware</div>
+              Sensor firmware outside the DDU. AA subscribes to radar data — mismatches break that integration even when the IDC software is correct.
+            </span></span>
+            <span class="pill por" data-tip style="font-size:11px;padding:1px 7px">Gateway<span class="tip r">
+              <div class="tn">Gateway — vehicle network firmware</div>
+              Vehicle-network / communication firmware. Mismatches can break provisioning or inter-ECU communication even when the IDC baseline is correct.
+            </span></span>
+          </div>
+          <div class="ldesc" style="margin-top:3px">Vehicle network &amp; sensor firmware</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 14px;margin-top:2px">
+        <svg width="12" height="14" style="flex-shrink:0"><line x1="6" y1="0" x2="6" y2="10" stroke="rgba(180,100,255,.4)" stroke-width="1"/><polygon points="2,10 10,10 6,14" fill="rgba(180,100,255,.4)"/></svg>
+        <span style="font-size:10px;color:rgba(180,100,255,.55)">firmware must be coded to match the VIP</span>
+      </div>
+
+      <div class="cg">
+        <div class="cb cbc">
+          <div class="lname" style="font-size:12px;color:#fbb85e">IDC-C</div>
+          <div class="ldesc" style="margin-top:2px">Aurix-side coding &amp; config</div>
+        </div>
+        <div class="cb cbp">
+          <div class="lname" style="font-size:12px;color:#d098ff">IDC-P</div>
+          <div class="ldesc" style="margin-top:2px">Variant coding &amp; key provisioning</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:100px;flex-shrink:0;padding-left:12px;padding-top:28px;display:flex;flex-direction:column;gap:12px">
+      <div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px">IDC software</div><div style="width:3px;height:36px;background:var(--accent);border-radius:2px;opacity:.5"></div></div>
+      <div style="margin-top:8px"><div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px">Firmware</div><div style="width:3px;height:18px;background:var(--accent2);border-radius:2px;opacity:.5"></div></div>
+      <div style="margin-top:8px"><div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px">Coding</div><div style="width:3px;height:18px;background:#b464ff;border-radius:2px;opacity:.5"></div></div>
+    </div>
+  </div>
+
+  <div class="sec">Provisioning flow (end-to-end)</div>
+  <div class="flow">
+    <div class="fs"><div class="n">1</div><div class="nm">Clear Persistency</div><div class="sb">Reset state</div></div>
+    <div class="fa">›</div>
+    <div class="fs"><div class="n">2</div><div class="nm">SW Update</div><div class="sb">Full DDU only</div></div>
+    <div class="fa">›</div>
+    <div class="fs"><div class="n">3</div><div class="nm">Aurix / Switch</div><div class="sb">MCU flashing</div></div>
+    <div class="fa">›</div>
+    <div class="fs"><div class="n">4</div><div class="nm">IDC-C</div><div class="sb">Aurix coding</div></div>
+    <div class="fa">›</div>
+    <div class="fs"><div class="n">5</div><div class="nm">IDC-P</div><div class="sb">Variant + keys</div></div>
+    <div class="fa">›</div>
+    <div class="fs" style="border-color:rgba(118,185,0,.4)"><div class="n" style="color:#a8d840">✓</div><div class="nm">Acceptance</div><div class="sb">Fleet rollout</div></div>
+  </div>
+
+  <div class="compare">
+    <div class="ib ic"><span class="it">IDC-C</span><div class="ih">Aurix-side coding</div><ul class="il"><li>Aurix MCU configuration</li><li>Stored separately in NGC</li><li>Applied after Aurix flash</li><li>"What Aurix coding is active?"</li></ul></div>
+    <div class="ib ip"><span class="it">IDC-P</span><div class="ih">Variant &amp; function coding</div><ul class="il"><li>Feature switches &amp; carline variants</li><li>NV SEH strings, MB SEM settings</li><li>Key provisioning behavior</li><li>"What features are enabled?"</li></ul></div>
+  </div>
+
+  <div class="why">
+    <div class="wc"><div class="wh">Compatibility</div><div class="wb">Software, coding, firmware, and carline settings verified to work together as one set</div></div>
+    <div class="wc"><div class="wh">Repeatability</div><div class="wb">Fleet ops, test teams, and MTTF provision identically from one named baseline</div></div>
+    <div class="wc"><div class="wh">Release control</div><div class="wb">Shadow-mode acceptance before any fleet rollout — known issues documented</div></div>
+  </div>
+
+  <div class="cl">Component relationship chain</div>
+  <div class="chain">
+    <div class="cn hi">VIP</div>
+    <div class="ca">→</div>
+    <div class="cn">DDU (AVOS/QNX + AA + NDAS + FSI)</div>
+    <div class="ca">→</div>
+    <div class="cn">Aurix + Switch</div>
+    <div class="ca">→</div>
+    <div class="cn">IDC-C</div>
+    <div class="ca">→</div>
+    <div class="cn">IDC-P</div>
+    <div class="ca">→</div>
+    <div class="cn hi">Accepted Fleet Release</div>
+  </div>
+
+  <div class="ng">
+    <div class="nc"><div class="nh">Why Aurix churns</div><div class="nb">Aurix is a <em>separate compatibility axis</em> — bad releases break clear-persistency or flashing, forcing a full package refresh even when the feature story hasn't changed.</div></div>
+    <div class="nc"><div class="nh">NDAS needs VIP upgrade</div><div class="nb">NDAS-only bundles may fail the pipeline. NDAS sits above AA inside the DDU — moving it safely means moving the whole validated Vehicle Integration Package.</div></div>
+  </div>
+
+</div>
