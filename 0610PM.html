@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 18px; font-size: 13px; }
+  h1 { font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 3px; }
+  .subtitle { font-size: 11px; color: #94a3b8; margin-bottom: 14px; }
+  .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+  .panel { background: #1e2230; border-radius: 8px; padding: 12px; border: 1px solid #2d3348; margin-bottom: 14px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+  .key-summary { background: #1a1f2e; border: 1px solid #2d3348; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+  .ks-item { display: flex; align-items: flex-start; gap: 8px; }
+  .ks-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .ks-label { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .ks-desc { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card { background: #1e2230; border-radius: 8px; padding: 10px 12px; border: 1px solid #2d3348; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-bottom: 3px; }
+  .stat-value { font-size: 22px; font-weight: 700; }
+  .stat-sub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+  .stat-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+  .stat-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #2d3348; color: #94a3b8; }
+  .pass-bar-wrap { height: 6px; background: #2d3348; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+  .pass-bar-fill { height: 100%; border-radius: 4px; }
+
+  .lane-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .lane-table th { text-align: left; padding: 6px 10px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .lane-table td { padding: 6px 10px; border-bottom: 1px solid #1a1f2e; vertical-align: middle; }
+  .lane-table tr:last-child td { border-bottom: none; }
+  .lane-label { font-weight: 600; color: #e2e8f0; }
+  .mini-bar-wrap { width: 100px; height: 6px; background: #2d3348; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 6px; }
+  .mini-bar-fill { height: 100%; border-radius: 3px; }
+  .pct { font-weight: 700; font-size: 11px; }
+
+  .trend-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #1a1f2e; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-label { font-size: 11px; color: #94a3b8; flex: 1; }
+  .trend-bar-wrap { width: 90px; height: 5px; background: #2d3348; border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill { height: 100%; border-radius: 3px; }
+  .trend-count { font-size: 11px; font-weight: 700; min-width: 24px; text-align: right; }
+  .trend-sev { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+  .sev-xl-tag { background: #431407; color: #fdba74; }
+  .sev-l-tag  { background: #422006; color: #fb923c; }
+  .sev-m-tag  { background: #1e3a5f; color: #93c5fd; }
+
+  /* Summary buttons */
+  .sum-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .sum-btn { padding: 6px 14px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #2d3348; background: #1a1f2e; color: #94a3b8; }
+  .sum-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #3b82f6; }
+  .sum-panel { display: none; }
+  .sum-panel.active { display: block; }
+
+  .log-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .log-table th { text-align: left; padding: 6px 8px; color: #64748b; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3348; background: #181d2a; }
+  .log-table td { padding: 5px 8px; border-bottom: 1px solid #1a1f2e; vertical-align: top; line-height: 1.5; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: #1a1f2e; }
+  .id-col { font-weight: 700; color: #64748b; white-space: nowrap; }
+  .event-link { font-size: 10px; color: #3b82f6; text-decoration: none; font-family: monospace; display: block; line-height: 1.8; }
+  .event-link:hover { color: #60a5fa; text-decoration: underline; }
+
+  .sev-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .sev-xl { background: #431407; color: #fdba74; }
+  .sev-l  { background: #422006; color: #fb923c; }
+  .sev-m  { background: #1e3a5f; color: #93c5fd; }
+  .sev-s  { background: #14532d; color: #86efac; }
+  .map-pill { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 600; margin-left: 3px; }
+  .map-yes { background: #14532d; color: #86efac; }
+  .map-no  { background: #1e2535; color: #64748b; }
+  .asym-pill { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 600; margin-left: 3px; background: #2d1f00; color: #fde68a; }
+  .cl-pill { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 600; margin-left: 3px; background: #1e1a35; color: #a78bfa; }
+  .non-ut-row td { background: #181d2a; color: #64748b; }
+  .non-ut-row:hover td { background: #1a1f2e !important; }
+
+  .alert-box { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #f97316; background: #2d1800; margin-top: 8px; font-size: 11px; color: #fdba74; line-height: 1.6; }
+  .info-box  { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; background: #0f2040; margin-top: 8px; font-size: 11px; color: #93c5fd; line-height: 1.6; }
+  .note-box  { padding: 7px 10px; border-radius: 6px; border-left: 3px solid #8b5cf6; background: #1a0f2e; margin-top: 8px; font-size: 11px; color: #c4b5fd; line-height: 1.6; }
+
+  .red{color:#f87171;} .orange{color:#fb923c;} .blue{color:#60a5fa;} .green{color:#4ade80;}
+</style>
+</head>
+<body>
+
+<h1>U-Turn Test — SC Route 0 L2PP</h1>
+<div class="subtitle">
+  2026-06-10 PM &nbsp;&middot;&nbsp; San Tomas / Bowers / Saratoga / Oakmead Corridor &nbsp;&middot;&nbsp;
+  Build: <a href="http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45915737&vid=1" target="_blank" style="color:#3b82f6;text-decoration:none;">45915737.1</a> &nbsp;&middot;&nbsp;
+  Model: sft-5748 &nbsp;&middot;&nbsp;
+  Session: <a href="https://maglev.nvda.ai/av/drivescrubber/drives/687456" target="_blank" style="color:#3b82f6;text-decoration:none;">126c51f9</a> &nbsp;&middot;&nbsp;
+  Tester: W &nbsp;&middot;&nbsp; Veh: 174-393
+</div>
+
+<!-- Key findings -->
+<div class="key-summary">
+  <div class="ks-item">
+    <div class="ks-icon">✅</div>
+    <div>
+      <div class="ks-label">Best Session Yet — 95% Overall</div>
+      <div class="ks-desc">95% U-turn pass rate (19/20) with 4-lane at 100% (9/9) and 3-lane at 91% (10/11). Understeer and minor wobble present throughout but all self-corrected. Channelized and unprotected turns completed cleanly. sft-5748 shows strong trajectory quality improvement.</div>
+    </div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">⚠️</div>
+    <div>
+      <div class="ks-label">Bowers &amp; Central Asymmetric Persists</div>
+      <div class="ks-desc">W21 XL: noodle flicker/jump at Bowers &amp; Central asymmetric — same recurring failure location across multiple builds. W24 L: completed with wobble but missing node/lane graph. Road graph issue at this intersection remains unresolved.</div>
+    </div>
+  </div>
+  <div class="ks-item">
+    <div class="ks-icon">📋</div>
+    <div>
+      <div class="ks-label">Non-U-Turn Quality Issues</div>
+      <div class="ks-desc">7 non-U-turn events logged: W6 L (large drift near roundabout), W22 L (jerky RT), W25 L (hesitant RoR — classical), W11 L (SILC/BBL behind parked vehicle), W19 L (ghost brake DRT), W23 L (missing lane/node), W26 M (slow PLT). Jerkiness pattern extends beyond U-turns.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Stat cards -->
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-label">XL</div>
+    <div class="stat-value orange">1</div>
+    <div class="stat-tags"><span class="stat-tag">asymmetric noodle flicker</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">L</div>
+    <div class="stat-value orange">1</div>
+    <div class="stat-tags"><span class="stat-tag">asymmetric wobble + missing node</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">M</div>
+    <div class="stat-value blue">7</div>
+    <div class="stat-tags"><span class="stat-tag">understeer</span><span class="stat-tag">wobble</span><span class="stat-tag">fishhook</span><span class="stat-tag">jerky</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">S</div>
+    <div class="stat-value green">11</div>
+    <div class="stat-tags"><span class="stat-tag">clean turn</span><span class="stat-tag">channelized</span><span class="stat-tag">unprotected yield</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">U-Turn Pass Rate</div>
+    <div class="stat-value green">95%</div>
+    <div class="stat-sub">19 of 20 events</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:95%;background:linear-gradient(90deg,#22c55e,#3b82f6);"></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">3+4 Lane Pass Rate</div>
+    <div class="stat-value green">95%</div>
+    <div class="stat-sub">19 of 20 events</div>
+    <div class="pass-bar-wrap"><div class="pass-bar-fill" style="width:95%;background:linear-gradient(90deg,#22c55e,#3b82f6);"></div></div>
+  </div>
+</div>
+
+<!-- Lane breakdown -->
+<div class="section-title">Lane Configuration Pass Rate</div>
+<div class="panel" style="padding:0;overflow:hidden;margin-bottom:14px;">
+<table class="lane-table">
+<thead>
+  <tr><th>Config</th><th>Pass Rate</th><th>Count</th><th>Notes</th></tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="lane-label">4-Lane</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:100%;background:#22c55e;"></div></div><span class="pct green">100%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">9/9</td>
+    <td style="font-size:10px;color:#475569;">W1–W10 (excl. W6); all completed — understeer into adj lane and fishhook present but all S or M</td>
+  </tr>
+  <tr>
+    <td class="lane-label">3-Lane (incl. +bike, channelized)</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:91%;background:#22c55e;"></div></div><span class="pct green">91%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">10/11</td>
+    <td style="font-size:10px;color:#475569;">W21 XL Bowers &amp; Central (asymmetric, noodle flicker); W24 L same location (missing node); W18 S channelized Stevens Creek</td>
+  </tr>
+  <tr>
+    <td class="lane-label">3+4 Lane Combined</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:95%;background:#22c55e;"></div></div><span class="pct green">95%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">19/20</td>
+    <td style="font-size:10px;color:#475569;">R18 scope</td>
+  </tr>
+  <tr>
+    <td class="lane-label">Asymmetric Intersection</td>
+    <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:67%;background:#f97316;"></div></div><span class="pct orange">67%</span></td>
+    <td style="font-size:11px;color:#94a3b8;">2/3</td>
+    <td style="font-size:10px;color:#475569;">W17 S (Saratoga &amp; Stevens Creek — good); W21 XL + W24 L (Bowers &amp; Central — recurring road graph issue)</td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<!-- Summary buttons + trends -->
+<div class="sum-tabs">
+  <button class="sum-btn active" onclick="showSum('uturn')">&#x1F504; U-Turn Trends</button>
+  <button class="sum-btn" onclick="showSum('other')">&#x1F4CB; Non-U-Turn Events</button>
+</div>
+
+<div id="sum-uturn" class="sum-panel active">
+  <div class="two-col">
+    <div class="panel">
+      <div class="section-title">U-Turn Failure Trends</div>
+      <div class="trend-row">
+        <span class="trend-sev sev-xl-tag">XL</span>
+        <span class="trend-label">Asymmetric missed — noodle flicker/jump (Bowers &amp; Central)</span>
+        <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#ef4444;"></div></div>
+        <span class="trend-count red">1</span>
+      </div>
+      <div class="trend-row">
+        <span class="trend-sev sev-l-tag">L</span>
+        <span class="trend-label">Asymmetric completed with wobble — missing node/lane graph</span>
+        <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#fb923c;"></div></div>
+        <span class="trend-count orange">1</span>
+      </div>
+      <div class="trend-row">
+        <span class="trend-sev sev-m-tag">M</span>
+        <span class="trend-label">Understeer into adjacent lane (no contenders)</span>
+        <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:100%;background:#3b82f6;"></div></div>
+        <span class="trend-count blue">5</span>
+      </div>
+      <div class="trend-row">
+        <span class="trend-sev sev-m-tag">M</span>
+        <span class="trend-label">Wobble / fishhook / jerky at end</span>
+        <div class="trend-bar-wrap"><div class="trend-bar-fill" style="width:40%;background:#3b82f6;"></div></div>
+        <span class="trend-count blue">2</span>
+      </div>
+      <div class="alert-box">&#x26A0;&#xFE0F; W21 + W24: Bowers &amp; Central asymmetric intersection has been a recurring failure across multiple builds and sessions. Missing node/lane graph appears to be a persistent road graph issue at this location. Requires road graph investigation.</div>
+    </div>
+    <div class="panel">
+      <div class="section-title">Recurring Locations</div>
+      <div class="trend-row"><span class="trend-label">Bowers &amp; Central (asymmetric)</span><span class="trend-count red">XL + L (W21, W24)</span></div>
+      <div class="trend-row"><span class="trend-label">San Tomas &amp; Scott (4-lane)</span><span class="trend-count blue">M + S ×3 (W2, W3, W5)</span></div>
+      <div class="trend-row"><span class="trend-label">San Tomas &amp; Walsh (4-lane)</span><span class="trend-count blue">M + S ×2 (W1, W4)</span></div>
+      <div class="trend-row"><span class="trend-label">San Tomas &amp; Forbes (3-lane)</span><span class="trend-count green">S + M ×2 (W13, W15)</span></div>
+      <div class="trend-row"><span class="trend-label">Stevens Creek channelized</span><span class="trend-count green">S (W18 — good)</span></div>
+      <div class="trend-row"><span class="trend-label">Oakmead median (unprotected)</span><span class="trend-count green">S (W27 — classical, good)</span></div>
+      <div class="trend-row"><span class="trend-label">Saratoga &amp; Stevens Creek (asym)</span><span class="trend-count green">S (W17 — good)</span></div>
+      <div class="info-box" style="margin-top:8px;">&#x2139;&#xFE0F; W17 S (Saratoga &amp; Stevens Creek asymmetric) and W18 S (channelized Stevens Creek median) are both notable clean completions — locations that have caused failures in prior builds. W27 S (Oakmead unprotected, classical mode) also completed cleanly.</div>
+    </div>
+  </div>
+</div>
+
+<div id="sum-other" class="sum-panel">
+  <div class="panel">
+    <div class="section-title">Non-U-Turn Events (excluded from U-turn pass rate)</div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">W6: Large drift during split near roundabout</span>
+      <span class="trend-count orange">L</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">W11: SILC or BBL behind parked vehicle — behavior unclear</span>
+      <span class="trend-count orange">L</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">W19: Ghost brake during DRT</span>
+      <span class="trend-count orange">L</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">W22: Jerky right turn</span>
+      <span class="trend-count orange">L</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">W23: Missing lane/node — routing issue</span>
+      <span class="trend-count orange">L</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-l-tag">L</span>
+      <span class="trend-label">W25: Hesitant RoR — classical mode</span>
+      <span class="trend-count orange">L</span>
+    </div>
+    <div class="trend-row">
+      <span class="trend-sev sev-m-tag">M</span>
+      <span class="trend-label">W26: Slow PLT</span>
+      <span class="trend-count blue">M</span>
+    </div>
+    <div class="note-box" style="margin-top:8px;">&#x1F4CC; The jerkiness pattern observed in U-turns (W1, W8, W15) also appears in regular turns — W22 (jerky RT) and W25 (hesitant RoR). This suggests a broader trajectory smoothness issue in sft-5748 beyond U-turn maneuvers. W23 (missing lane/node) may be related to the same road graph issues seen at Bowers &amp; Central.</div>
+  </div>
+</div>
+
+<!-- Detailed log -->
+<div class="section-title" style="margin-top:14px;">Detailed Event Log</div>
+<div class="panel" style="padding:0;overflow:hidden;">
+<table class="log-table">
+<thead>
+  <tr>
+    <th style="width:80px;">Event</th>
+    <th style="width:40px;">#</th>
+    <th style="width:36px;">Sev</th>
+    <th>Description</th>
+    <th style="width:190px;">Location</th>
+  </tr>
+</thead>
+<tbody>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a3365b92-81f4-4a7c-b569-59d3557ac9dc/a3365b92-81f4-4a7c-b569-59d3557ac9dc" target="_blank">a3365b92</a></td><td class="id-col">W1</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 4-lane; slightly jerky <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Walsh</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c2e87d15-5c14-4447-abf7-77a1f1800db6/c2e87d15-5c14-4447-abf7-77a1f1800db6" target="_blank">c2e87d15</a></td><td class="id-col">W2</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 4-lane; slight fishhook at start <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Scott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/363e8e74-bc1a-45d2-8829-0229e10a8892/363e8e74-bc1a-45d2-8829-0229e10a8892" target="_blank">363e8e74</a></td><td class="id-col">W3</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 4-lane; slight wobble at end <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Scott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/79505cb1-bcf8-48d7-a982-8b34cfd8b7ff/79505cb1-bcf8-48d7-a982-8b34cfd8b7ff" target="_blank">79505cb1</a></td><td class="id-col">W4</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 4-lane; tap-to-go, jerky at end <span class="map-pill map-yes">HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Walsh</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2e8bf684-1410-488e-8059-479c131c541b/2e8bf684-1410-488e-8059-479c131c541b" target="_blank">2e8bf684</a></td><td class="id-col">W5</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 4-lane; understeer, slight wobble during correction <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Scott</td></tr>
+<tr class="non-ut-row"><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/113fabce-08dc-4225-a1fa-dba2455fa39f/113fabce-08dc-4225-a1fa-dba2455fa39f" target="_blank">113fabce</a></td><td class="id-col">W6</td><td><span class="sev-pill sev-l">L</span></td><td>⬚ Non-U-turn: Large drift during split near roundabout</td><td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d540c86f-22ad-406e-a98c-50589158f726/d540c86f-22ad-406e-a98c-50589158f726" target="_blank">d540c86f</a></td><td class="id-col">W7</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 4-lane; understeer, corrected into adj lane left <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; El Camino Real</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/3f8fd190-3219-41b2-b849-f7b9dd8cbda2/3f8fd190-3219-41b2-b849-f7b9dd8cbda2" target="_blank">3f8fd190</a></td><td class="id-col">W8</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 4-lane; slightly jerky at end <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Cabrillo</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/48caa18f-23e8-462c-8b6d-a2f6fb971590/48caa18f-23e8-462c-8b6d-a2f6fb971590" target="_blank">48caa18f</a></td><td class="id-col">W9</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 4-lane; slight fishhook at end <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; El Camino Real</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/e46f3f0d-630e-431e-bbde-211323d128c2/e46f3f0d-630e-431e-bbde-211323d128c2" target="_blank">e46f3f0d</a></td><td class="id-col">W10</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 4-lane <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Cabrillo</td></tr>
+<tr class="non-ut-row"><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2f7be3e0-1bf7-4630-9d09-435ca40e407f/2f7be3e0-1bf7-4630-9d09-435ca40e407f" target="_blank">2f7be3e0</a></td><td class="id-col">W11</td><td><span class="sev-pill sev-l">L</span></td><td>⬚ Non-U-turn: SILC or BBL behind parked vehicle</td><td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/95e2a561-07ab-4bb6-9b80-ef6a0fdb33bf/95e2a561-07ab-4bb6-9b80-ef6a0fdb33bf" target="_blank">95e2a561</a></td><td class="id-col">W12</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 3-lane; slight wobble <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Pruneridge</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/43250f60-320e-46f3-94b3-ce64eeff77c5/43250f60-320e-46f3-94b3-ce64eeff77c5" target="_blank">43250f60</a></td><td class="id-col">W13</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3-lane <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Forbes</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/a5ed9937-1eaa-46ae-a53e-d075267099ad/a5ed9937-1eaa-46ae-a53e-d075267099ad" target="_blank">a5ed9937</a></td><td class="id-col">W14</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3-lane <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Pruneridge</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/6c4f8559-89f2-4f1f-bbd8-ec7add130b27/6c4f8559-89f2-4f1f-bbd8-ec7add130b27" target="_blank">6c4f8559</a></td><td class="id-col">W15</td><td><span class="sev-pill sev-m">M</span></td><td>U-turn good, 3-lane; slight jerk at end <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">San Tomas &amp; Forbes</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/7451bf95-56b5-4acb-a87b-261655d41d8b/7451bf95-56b5-4acb-a87b-261655d41d8b" target="_blank">7451bf95</a></td><td class="id-col">W16</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3-lane <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Winchester &amp; Dorich</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/b1b48195-e9c2-4cc9-a685-5a53111aaf11/b1b48195-e9c2-4cc9-a685-5a53111aaf11" target="_blank">b1b48195</a></td><td class="id-col">W17</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3-lane &#x2605; <span class="map-pill map-no">No HD</span><span class="asym-pill">Asymmetric</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Saratoga &amp; Stevens Creek</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/9c817ea9-be65-4f5a-addd-defd75900343/9c817ea9-be65-4f5a-addd-defd75900343" target="_blank">9c817ea9</a></td><td class="id-col">W18</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3-lane channelized median &#x2605; <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Stevens Creek median</td></tr>
+<tr class="non-ut-row"><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/badc0c49-4141-4d47-b6cd-8e179eea026d/badc0c49-4141-4d47-b6cd-8e179eea026d" target="_blank">badc0c49</a></td><td class="id-col">W19</td><td><span class="sev-pill sev-l">L</span></td><td>⬚ Non-U-turn: Ghost brake during DRT</td><td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/2b5cd863-5806-4fcd-a0d1-c08c890962af/2b5cd863-5806-4fcd-a0d1-c08c890962af" target="_blank">2b5cd863</a></td><td class="id-col">W20</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3+bike lane <span class="map-pill map-no">No HD</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Scott</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d4231446-3f57-4e4d-8a3d-8b6fa0240ef9/d4231446-3f57-4e4d-8a3d-8b6fa0240ef9" target="_blank">d4231446</a></td><td class="id-col">W21</td><td><span class="sev-pill sev-xl">XL</span></td><td>U-turn bad, 3-lane; noodle flicker/jump — asymmetric &#x26A0; <span class="map-pill map-no">No HD</span><span class="asym-pill">Asymmetric</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Central</td></tr>
+<tr class="non-ut-row"><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/78cb98de-87ea-4673-8dc5-c5bba03cc7e7/78cb98de-87ea-4673-8dc5-c5bba03cc7e7" target="_blank">78cb98de</a></td><td class="id-col">W22</td><td><span class="sev-pill sev-l">L</span></td><td>⬚ Non-U-turn: Jerky RT</td><td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td></tr>
+<tr class="non-ut-row"><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/c28d1096-36de-4400-9e97-d9c8ca3de70e/c28d1096-36de-4400-9e97-d9c8ca3de70e" target="_blank">c28d1096</a></td><td class="id-col">W23</td><td><span class="sev-pill sev-l">L</span></td><td>⬚ Non-U-turn: Missing lane/node</td><td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/0d503d50-a361-4f17-a566-848126b5e489/0d503d50-a361-4f17-a566-848126b5e489" target="_blank">0d503d50</a></td><td class="id-col">W24</td><td><span class="sev-pill sev-l">L</span></td><td>U-turn bad, 3-lane; wobble at end, missing node/lane graph &#x26A0; <span class="map-pill map-no">No HD</span><span class="asym-pill">Asymmetric</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Bowers &amp; Central</td></tr>
+<tr class="non-ut-row"><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/81d50e07-52a3-45de-ae41-f1ce4d149b9b/81d50e07-52a3-45de-ae41-f1ce4d149b9b" target="_blank">81d50e07</a></td><td class="id-col">W25</td><td><span class="sev-pill sev-l">L</span></td><td>⬚ Non-U-turn: Hesitant RoR <span class="cl-pill">Classical</span></td><td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td></tr>
+<tr class="non-ut-row"><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/3f655c91-3b64-4929-9bff-5a37aa4db3a5/3f655c91-3b64-4929-9bff-5a37aa4db3a5" target="_blank">3f655c91</a></td><td class="id-col">W26</td><td><span class="sev-pill sev-m">M</span></td><td>⬚ Non-U-turn: Slow PLT</td><td style="font-size:10px;color:#475569;font-style:italic;">&mdash;</td></tr>
+<tr><td><a class="event-link" href="https://maglev.nvda.ai/av/drivescrubber/events/d3915cf7-ebe3-414c-89d3-fcf81a0e1633/d3915cf7-ebe3-414c-89d3-fcf81a0e1633" target="_blank">d3915cf7</a></td><td class="id-col">W27</td><td><span class="sev-pill sev-s">S</span></td><td>U-turn good, 3-lane channelized Oakmead median; unprotected &#x2605; <span class="map-pill map-no">No HD</span><span class="cl-pill">Classical</span></td><td style="font-size:10px;color:#475569;font-style:italic;">Oakmead median</td></tr>
+</tbody>
+</table>
+</div>
+
+<script>
+function showSum(id) {
+  ['uturn','other'].forEach(function(s) {
+    document.getElementById('sum-' + s).classList.remove('active');
+  });
+  document.getElementById('sum-' + id).classList.add('active');
+  document.querySelectorAll('.sum-btn').forEach(function(btn, i) {
+    btn.classList.toggle('active', ['uturn','other'][i] === id);
+  });
+}
+</script>
+</body>
+</html>
