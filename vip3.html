@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIP — the vehicle release baseline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ground */
+    --ink:#0C0D11;
+    --ink-2:#101218;
+    --panel:#14161D;
+    --panel-2:#1A1D26;
+    --line:#262A34;
+    --line-bright:#363B47;
+
+    /* text */
+    --text:#E9E7E1;
+    --text-dim:#9B9A93;
+    --text-faint:#6A6963;
+
+    /* signal */
+    --amber:#FF9E2C;
+    --amber-d:#C9781A;
+    --steel:#74A6C6;
+
+    /* category encodings (muted) */
+    --c-baseline:#FF9E2C;
+    --c-software:#83A9D2;
+    --c-firmware:#CBA46C;
+    --c-coding:#B89AD6;
+    --c-application:#62B9A9;
+    --c-hardware:#888D98;
+
+    --radius:10px;
+    --maxw:1080px;
+    --rail:208px;
+    --row-h:62px;
+
+    --ff-display:"Chakra Petch", system-ui, sans-serif;
+    --ff-body:"Inter", system-ui, sans-serif;
+    --ff-mono:"JetBrains Mono", ui-monospace, monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--text);
+    font-family:var(--ff-body);
+    font-weight:450;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+  /* faint engineering grid behind everything */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:.10;
+    pointer-events:none;
+    z-index:0;
+    -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%, #000 35%, transparent 100%);
+            mask-image:radial-gradient(ellipse 90% 70% at 50% 0%, #000 35%, transparent 100%);
+  }
+
+  a{color:var(--steel);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    height:52px;
+    display:flex; align-items:center; gap:14px;
+    padding:0 20px;
+    background:rgba(12,13,17,.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar .wm{
+    font-family:var(--ff-display);
+    font-weight:700; letter-spacing:.14em;
+    font-size:15px; color:var(--text);
+  }
+  .topbar .wm b{color:var(--amber);}
+  .topbar .sub{
+    font-family:var(--ff-mono); font-size:11px;
+    color:var(--text-faint); letter-spacing:.02em;
+    border-left:1px solid var(--line); padding-left:14px;
+  }
+  .topbar .src{margin-left:auto; font-family:var(--ff-mono); font-size:10.5px; color:var(--text-faint); letter-spacing:.05em;}
+  @media(max-width:560px){ .topbar .sub{display:none;} .topbar .src{display:none;} }
+
+  /* ---------- left rail ---------- */
+  .rail{
+    position:fixed; top:52px; left:0; bottom:0; width:var(--rail);
+    padding:30px 0 30px 22px;
+    border-right:1px solid var(--line);
+    z-index:30;
+    display:flex; flex-direction:column; gap:2px;
+  }
+  .rail .lbl{
+    font-family:var(--ff-mono); font-size:10px; letter-spacing:.22em;
+    color:var(--text-faint); text-transform:uppercase; margin-bottom:14px;
+  }
+  .rail a{
+    display:flex; align-items:baseline; gap:10px;
+    color:var(--text-dim); font-size:13.5px; padding:7px 0;
+    border:none; letter-spacing:.01em;
+    transition:color .2s;
+  }
+  .rail a .n{font-family:var(--ff-mono); font-size:10.5px; color:var(--text-faint); transition:color .2s;}
+  .rail a:hover{color:var(--text); text-decoration:none;}
+  .rail a:hover .n{color:var(--amber);}
+  .rail a.active{color:var(--text);}
+  .rail a.active .n{color:var(--amber);}
+  .rail a.active::before{
+    content:""; position:absolute; left:0; width:2px; height:18px;
+    background:var(--amber); border-radius:2px; margin-top:2px;
+  }
+  .rail a{position:relative;}
+  @media(max-width:980px){ .rail{display:none;} }
+
+  /* ---------- layout ---------- */
+  .wrap{
+    position:relative; z-index:1;
+    margin-left:var(--rail);
+    padding:0 28px;
+  }
+  @media(max-width:980px){ .wrap{margin-left:0;} }
+  .inner{max-width:var(--maxw); margin:0 auto;}
+
+  section{padding:78px 0; border-top:1px solid var(--line);}
+  section:first-of-type{border-top:none;}
+
+  /* section heading */
+  .head{margin-bottom:38px;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:var(--ff-mono); font-size:11px; letter-spacing:.2em;
+    color:var(--amber); text-transform:uppercase; margin-bottom:16px;
+  }
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--amber); opacity:.7;}
+  h2{
+    font-family:var(--ff-display); font-weight:600;
+    font-size:clamp(26px,4vw,38px); line-height:1.12; margin:0 0 14px;
+    letter-spacing:-.01em;
+  }
+  .lede{font-size:16.5px; color:var(--text-dim); max-width:62ch; margin:0;}
+  .lede b{color:var(--text); font-weight:600;}
+
+  /* ---------- hero ---------- */
+  .hero{padding:clamp(54px,11vw,104px) 0 64px;}
+  .hero .eyebrow{margin-bottom:22px;}
+  .hero h1{
+    font-family:var(--ff-display); font-weight:700;
+    font-size:clamp(38px,7.2vw,76px); line-height:1.02;
+    margin:0 0 26px; letter-spacing:-.02em; max-width:18ch;
+  }
+  .hero h1 .hl{color:var(--amber);}
+  .hero p{font-size:clamp(16px,2.1vw,19.5px); color:var(--text-dim); max-width:64ch; margin:0 0 34px;}
+  .hero p b{color:var(--text); font-weight:600;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; max-width:680px;}
+  .chip{
+    font-family:var(--ff-mono); font-size:12px; letter-spacing:.02em;
+    color:var(--text-dim);
+    padding:6px 11px; border:1px solid var(--line-bright);
+    border-radius:6px; background:var(--panel);
+    opacity:0; transform:translateY(8px);
+    animation:rise .5s ease forwards;
+  }
+  .hero-meta{
+    margin-top:38px; display:flex; gap:30px; flex-wrap:wrap;
+    font-family:var(--ff-mono); font-size:11.5px; color:var(--text-faint);
+    letter-spacing:.03em;
+  }
+  .hero-meta span b{color:var(--steel); font-weight:600;}
+  @keyframes rise{to{opacity:1; transform:translateY(0);}}
+
+  /* ---------- stack module ---------- */
+  .stack-grid{
+    display:grid; grid-template-columns:1fr 360px; gap:34px; align-items:start;
+  }
+  @media(max-width:880px){ .stack-grid{grid-template-columns:1fr;} }
+
+  .stack-canvas{
+    background:
+      radial-gradient(120% 120% at 50% -10%, rgba(255,158,44,.05), transparent 55%),
+      var(--ink-2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px 22px 22px 18px;
+    position:relative;
+  }
+  .stack-canvas .canvas-tag{
+    position:absolute; top:12px; right:16px;
+    font-family:var(--ff-mono); font-size:10px; letter-spacing:.16em;
+    color:var(--text-faint); text-transform:uppercase;
+  }
+
+  /* bracketed bands */
+  .vip-band{position:relative; padding-left:38px; margin-top:8px;}
+  .ddu-band{position:relative; padding-left:34px;}
+  .band-label{
+    position:absolute; left:0; top:0; bottom:0;
+    width:24px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; background:none; border:none; padding:0;
+  }
+  .band-label .stem{
+    position:absolute; top:6px; bottom:6px; left:11px; width:2px;
+    border-radius:2px;
+  }
+  .band-label .stem::before,.band-label .stem::after{
+    content:""; position:absolute; left:0; width:9px; height:2px; border-radius:2px;
+  }
+  .band-label .stem::before{top:0;} .band-label .stem::after{bottom:0;}
+  .band-label .vtext{
+    writing-mode:vertical-rl; transform:rotate(180deg);
+    font-family:var(--ff-display); font-weight:600; letter-spacing:.18em;
+    font-size:11px; text-transform:uppercase; white-space:nowrap;
+    position:relative; z-index:2;
+  }
+  .vip-band > .band-label .stem{background:var(--amber); box-shadow:0 0 14px rgba(255,158,44,.35);}
+  .vip-band > .band-label .stem::before,.vip-band > .band-label .stem::after{background:var(--amber);}
+  .vip-band > .band-label .vtext{color:var(--amber);}
+  .ddu-band > .band-label .stem{background:var(--c-software);}
+  .ddu-band > .band-label .stem::before,.ddu-band > .band-label .stem::after{background:var(--c-software);}
+  .ddu-band > .band-label .vtext{color:var(--c-software);}
+  .band-label:hover .vtext{filter:brightness(1.15);}
+
+  .row{
+    display:flex; align-items:center; gap:13px; width:100%;
+    min-height:var(--row-h);
+    margin:7px 0; padding:0 15px;
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:9px; cursor:pointer; text-align:left;
+    color:var(--text); font-family:var(--ff-body);
+    transition:border-color .18s, background .18s, transform .18s;
+    position:relative;
+  }
+  .row:hover{border-color:var(--line-bright); background:var(--panel-2);}
+  .row .dot{width:9px; height:9px; border-radius:50%; flex:none;}
+  .row .rl{display:flex; flex-direction:column; gap:1px; min-width:0;}
+  .row .name{font-family:var(--ff-mono); font-weight:600; font-size:14px; letter-spacing:.01em; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .row .tag{font-size:13.5px; color:var(--text-dim);}
+  .row .mini{
+    font-family:var(--ff-mono); font-size:9.5px; letter-spacing:.08em;
+    padding:2px 6px; border-radius:4px; color:var(--text-faint);
+    border:1px solid var(--line-bright); text-transform:uppercase; font-weight:500;
+  }
+  .row .chev{margin-left:auto; color:var(--text-faint); font-size:18px; line-height:1; flex:none; transition:color .18s, transform .18s;}
+  .row:hover .chev{color:var(--text-dim); transform:translateX(2px);}
+
+  .row.is-active{border-color:var(--amber); background:var(--panel-2); box-shadow:0 0 0 1px var(--amber), 0 8px 30px -12px rgba(255,158,44,.4);}
+  .row.is-active .chev{color:var(--amber);}
+  .row.is-related{border-color:var(--steel);}
+  .row.is-related::after{content:""; position:absolute; left:-1px; top:8px; bottom:8px; width:2px; background:var(--steel); border-radius:2px;}
+
+  .substrate{margin-top:14px; padding-top:14px; border-top:1px dashed var(--line-bright);}
+  .substrate .row{background:transparent;}
+  .note-tag{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-left:auto; font-family:var(--ff-mono); font-size:10px;
+    color:var(--steel); letter-spacing:.02em; flex:none;
+  }
+  .note-tag::before{content:"↑"; font-size:11px;}
+  @media(max-width:480px){ .note-tag{display:none;} }
+
+  /* right column: coding inputs + detail */
+  .side{position:sticky; top:72px; display:flex; flex-direction:column; gap:18px;}
+  @media(max-width:880px){ .side{position:static; top:auto;} }
+
+  .inputs h4{
+    font-family:var(--ff-mono); font-size:10.5px; letter-spacing:.16em;
+    color:var(--text-faint); text-transform:uppercase; margin:0 0 10px;
+  }
+  .input-chips{display:flex; gap:10px;}
+  .icbtn{
+    flex:1; text-align:left; cursor:pointer;
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:9px; padding:12px 13px; color:var(--text);
+    transition:border-color .18s, background .18s;
+  }
+  .icbtn:hover{border-color:var(--c-coding); background:var(--panel-2);}
+  .icbtn.is-active{border-color:var(--c-coding); box-shadow:0 0 0 1px var(--c-coding);}
+  .icbtn .ic-n{display:flex; align-items:center; gap:8px; font-family:var(--ff-mono); font-weight:600; font-size:13px;}
+  .icbtn .ic-n .dot{width:8px; height:8px; border-radius:50%; background:var(--c-coding);}
+  .icbtn .ic-t{font-size:12px; color:var(--text-dim); margin-top:3px;}
+  .icbtn .ic-arrow{font-family:var(--ff-mono); font-size:10px; color:var(--text-faint); margin-top:7px; letter-spacing:.02em;}
+  .icbtn .ic-arrow b{color:var(--steel);}
+
+  .detail{
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:12px; padding:22px; min-height:240px;
+  }
+  .detail .d-cat{
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:var(--ff-mono); font-size:10px; letter-spacing:.14em;
+    text-transform:uppercase; padding:4px 9px; border-radius:5px;
+    border:1px solid var(--line-bright);
+  }
+  .detail .d-cat .dot{width:8px; height:8px; border-radius:50%;}
+  .detail .d-name{font-family:var(--ff-display); font-weight:700; font-size:23px; margin:14px 0 2px; letter-spacing:.01em;}
+  .detail .d-exp{font-family:var(--ff-mono); font-size:12px; color:var(--text-dim); margin-bottom:14px;}
+  .detail .d-exp .uc{color:var(--amber-d); font-style:normal;}
+  .detail .d-body{font-size:14.5px; color:var(--text-dim); margin:0;}
+  .detail .d-body b{color:var(--text); font-weight:600;}
+  .detail .d-mono{
+    margin-top:14px; font-family:var(--ff-mono); font-size:12px;
+    color:var(--steel); background:var(--ink-2);
+    border:1px solid var(--line); border-radius:7px; padding:9px 12px;
+    word-break:break-all;
+  }
+  .detail .d-mono span{color:var(--text-faint);}
+
+  /* ---------- pipeline ---------- */
+  .flow{display:grid; grid-template-columns:repeat(5,1fr); gap:0; position:relative; margin-bottom:24px;}
+  @media(max-width:760px){ .flow{grid-template-columns:1fr;} }
+  .step{
+    position:relative; cursor:pointer; text-align:left;
+    background:var(--panel); border:1px solid var(--line);
+    padding:18px 16px 20px; color:var(--text);
+    transition:border-color .18s, background .18s;
+  }
+  .step:first-child{border-radius:10px 0 0 10px;}
+  .step:last-child{border-radius:0 10px 10px 0;}
+  .step:not(:first-child){border-left:none;}
+  @media(max-width:760px){
+    .step{border-radius:10px!important; border-left:1px solid var(--line)!important; margin-bottom:8px;}
+  }
+  .step:hover{background:var(--panel-2); border-color:var(--line-bright); z-index:2;}
+  .step.is-active{border-color:var(--steel); background:var(--panel-2); z-index:3; box-shadow:0 0 0 1px var(--steel);}
+  .step .sn{
+    font-family:var(--ff-mono); font-size:11px; color:var(--steel);
+    letter-spacing:.05em; margin-bottom:10px; display:flex; align-items:center; gap:8px;
+  }
+  .step .sn .arr{color:var(--text-faint);}
+  .step.is-active .sn{color:var(--steel);}
+  .step .st{font-family:var(--ff-mono); font-weight:600; font-size:13px; line-height:1.35;}
+  .step .sm{
+    display:inline-block; margin-top:8px; font-family:var(--ff-mono);
+    font-size:9.5px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--amber); border:1px solid var(--amber-d); border-radius:4px; padding:2px 6px;
+  }
+  .flow-detail{
+    background:var(--ink-2); border:1px solid var(--line);
+    border-left:2px solid var(--steel);
+    border-radius:9px; padding:18px 20px; font-size:14.5px; color:var(--text-dim);
+  }
+  .flow-detail b{color:var(--text); font-weight:600;}
+  .flow-detail .ft{font-family:var(--ff-mono); font-size:13px; color:var(--steel); margin-bottom:8px; font-weight:600;}
+  .flow-note{
+    margin-top:16px; display:flex; gap:11px; align-items:flex-start;
+    font-size:13.5px; color:var(--text-dim); padding:14px 16px;
+    background:var(--panel); border:1px solid var(--line); border-radius:9px;
+  }
+  .flow-note .k{font-family:var(--ff-mono); color:var(--amber); flex:none; font-size:12px; letter-spacing:.02em; margin-top:1px;}
+  .flow-note code{font-family:var(--ff-mono); color:var(--steel); font-size:13px;}
+
+  /* ---------- lifecycle chain ---------- */
+  .chain{display:flex; flex-direction:column; gap:0;}
+  .clink{display:flex; gap:20px; padding:18px 0; border-bottom:1px solid var(--line);}
+  .clink:last-child{border-bottom:none;}
+  .clink .cn{
+    font-family:var(--ff-display); font-weight:700; font-size:22px;
+    color:var(--amber); flex:none; width:42px; line-height:1.1;
+  }
+  .clink .ctxt{font-size:15.5px; color:var(--text-dim); padding-top:2px;}
+  .clink .ctxt b{color:var(--text); font-weight:600;}
+  .clink.final{background:var(--ink-2); border-radius:10px; padding:18px 18px 20px; border-bottom:none; margin-top:6px; border:1px solid var(--line);}
+  .gates{display:flex; flex-wrap:wrap; gap:7px; margin-top:12px;}
+  .gate{
+    font-family:var(--ff-mono); font-size:11px; color:var(--text-dim);
+    border:1px solid var(--line-bright); border-radius:5px; padding:4px 9px; letter-spacing:.02em;
+  }
+  .gate.last{color:var(--amber); border-color:var(--amber-d);}
+
+  /* ---------- churn ---------- */
+  .acc{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:34px;}
+  @media(max-width:700px){ .acc{grid-template-columns:1fr;} }
+  .ait{background:var(--panel); border:1px solid var(--line); border-radius:9px; overflow:hidden;}
+  .ait > button{
+    width:100%; display:flex; align-items:center; gap:11px;
+    background:none; border:none; cursor:pointer; color:var(--text);
+    padding:14px 15px; text-align:left; font-family:var(--ff-mono);
+    font-size:13px; font-weight:600; letter-spacing:.01em;
+    transition:background .15s;
+  }
+  .ait > button:hover{background:var(--panel-2);}
+  .ait .adot{width:8px; height:8px; border-radius:50%; flex:none;}
+  .ait .aplus{margin-left:auto; color:var(--text-faint); font-size:17px; transition:transform .2s, color .2s; flex:none;}
+  .ait.open .aplus{transform:rotate(45deg); color:var(--amber);}
+  .ait .abody{
+    max-height:0; overflow:hidden; transition:max-height .26s ease;
+    font-size:13.5px; color:var(--text-dim);
+  }
+  .ait .abody div{padding:0 15px 15px 34px;}
+  .ait.open .abody{max-height:240px;}
+
+  .why-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(max-width:700px){ .why-grid{grid-template-columns:1fr;} }
+  .why{
+    background:
+      linear-gradient(180deg, rgba(255,158,44,.04), transparent 40%),
+      var(--panel);
+    border:1px solid var(--line); border-top:2px solid var(--amber);
+    border-radius:11px; padding:22px;
+  }
+  .why h4{font-family:var(--ff-display); font-weight:600; font-size:18px; margin:0 0 10px; letter-spacing:.005em;}
+  .why p{font-size:14.5px; color:var(--text-dim); margin:0;}
+  .why p b{color:var(--text); font-weight:600;}
+
+  /* ---------- glossary ---------- */
+  .filters{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px;}
+  .fbtn{
+    font-family:var(--ff-mono); font-size:12px; letter-spacing:.03em;
+    color:var(--text-dim); background:var(--panel); border:1px solid var(--line);
+    border-radius:20px; padding:7px 15px; cursor:pointer; transition:all .15s;
+    display:flex; align-items:center; gap:7px;
+  }
+  .fbtn .fdot{width:7px; height:7px; border-radius:50%;}
+  .fbtn:hover{border-color:var(--line-bright); color:var(--text);}
+  .fbtn.active{color:var(--ink); background:var(--text); border-color:var(--text); font-weight:600;}
+  .fbtn.active .fdot{outline:1px solid rgba(0,0,0,.25);}
+
+  .gloss{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+  @media(max-width:720px){ .gloss{grid-template-columns:1fr;} }
+  .gcard{
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:11px; padding:18px 19px;
+    border-left:3px solid var(--line-bright);
+    transition:border-color .18s, transform .18s; position:relative;
+  }
+  .gcard:hover{border-top-color:var(--line-bright); transform:translateY(-2px);}
+  .gcard .gtop{display:flex; align-items:center; gap:10px; margin-bottom:8px;}
+  .gcard .gname{font-family:var(--ff-mono); font-weight:600; font-size:15px; letter-spacing:.01em;}
+  .gcard .gcat{
+    margin-left:auto; font-family:var(--ff-mono); font-size:9.5px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--text-faint);
+    padding:3px 8px; border:1px solid var(--line-bright); border-radius:4px;
+  }
+  .gcard .gexp{font-family:var(--ff-mono); font-size:11.5px; color:var(--text-dim); margin-bottom:9px;}
+  .gcard .gexp .uc{color:var(--amber-d);}
+  .gcard .gbody{font-size:13.5px; color:var(--text-dim); margin:0;}
+  .gcard .gbody b{color:var(--text); font-weight:600;}
+  .gcard.hide{display:none;}
+
+  /* ---------- bottom ---------- */
+  .bottom{border-top:1px solid var(--line);}
+  .bigline{
+    font-family:var(--ff-display); font-weight:600;
+    font-size:clamp(22px,3.4vw,32px); line-height:1.28; letter-spacing:-.005em;
+    max-width:30ch; margin:0 0 34px;
+  }
+  .bigline .hl{color:var(--amber);}
+  .srcbox{
+    display:flex; flex-wrap:wrap; gap:10px 28px; padding-top:26px;
+    border-top:1px solid var(--line);
+    font-family:var(--ff-mono); font-size:12px; color:var(--text-faint); letter-spacing:.02em;
+  }
+  .srcbox .sl{color:var(--text-dim);}
+  .foot{padding:24px 0 60px; font-family:var(--ff-mono); font-size:11px; color:var(--text-faint); letter-spacing:.03em;}
+
+  /* focus visibility */
+  :focus-visible{outline:2px solid var(--amber); outline-offset:3px; border-radius:4px;}
+
+  @media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    *,*::before,*::after{animation-duration:.001ms!important; animation-iteration-count:1!important; transition-duration:.001ms!important;}
+    .chip{opacity:1; transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="wm"><b>VIP</b> · INTEGRATION REFERENCE</span>
+  <span class="sub">Vehicle release baseline</span>
+  <span class="src">IDC / Orin · AVOS · Adaptive AUTOSAR</span>
+</div>
+
+<nav class="rail" aria-label="Section navigation">
+  <div class="lbl">Contents</div>
+  <a href="#stack"><span class="n">01</span> The stack</a>
+  <a href="#flow"><span class="n">02</span> Provisioning</a>
+  <a href="#lifecycle"><span class="n">03</span> Candidate to fleet</a>
+  <a href="#churn"><span class="n">04</span> Why VIPs churn</a>
+  <a href="#glossary"><span class="n">05</span> Glossary</a>
+</nav>
+
+<div class="wrap">
+<div class="inner">
+
+  <!-- HERO -->
+  <header class="hero" id="top">
+    <span class="eyebrow">Vehicle Integration Package</span>
+    <h1>One baseline <span class="hl">binds</span> the whole stack.</h1>
+    <p>A VIP is the validated release configuration for a vehicle program — the <b>compatibility contract</b> that ties software, firmware, and coding into a single thing you can flash, test, sign off, and ship to fleet. Not a file. A proven combination.</p>
+    <div class="chips" id="heroChips"></div>
+    <div class="hero-meta">
+      <span><b>1</b> compatible version of every layer</span>
+      <span><b>5</b> provisioning steps, one NGC tag</span>
+      <span><b>7</b> hops from candidate to fleet</span>
+    </div>
+  </header>
+
+  <!-- STACK -->
+  <section id="stack">
+    <div class="head">
+      <span class="eyebrow">01 / The stack</span>
+      <h2>What a VIP pins, layer by layer</h2>
+      <p class="lede">Every named piece is one layer of a single vehicle-release baseline. The <b>VIP</b> bracket binds the firmware, software, and coding that get versioned together; the <b>DDU</b> bundle inside it carries the main software payload. Select any layer to see what it is and how it relates.</p>
+    </div>
+
+    <div class="stack-grid">
+      <div class="stack-canvas">
+        <span class="canvas-tag">on-car stack · top → bottom</span>
+
+        <div class="vip-band">
+          <button class="band-label" data-id="vip" aria-label="VIP — the binding baseline">
+            <span class="stem"></span><span class="vtext">VIP</span>
+          </button>
+
+          <button class="row" data-id="rr">
+            <span class="dot" style="background:var(--c-application)"></span>
+            <span class="rl"><span class="name">RR · RoadRunner <span class="mini">launches DAG</span></span><span class="tag">Runtime application layer</span></span>
+            <span class="chev">›</span>
+          </button>
+
+          <div class="ddu-band">
+            <button class="band-label" data-id="ddu" aria-label="DDU — the software bundle">
+              <span class="stem"></span><span class="vtext">DDU + FSI</span>
+            </button>
+            <button class="row" data-id="ndas">
+              <span class="dot" style="background:var(--c-software)"></span>
+              <span class="rl"><span class="name">NDAS</span><span class="tag">Driving / application stack</span></span>
+              <span class="chev">›</span>
+            </button>
+            <button class="row" data-id="aa">
+              <span class="dot" style="background:var(--c-software)"></span>
+              <span class="rl"><span class="name">AA</span><span class="tag">Adaptive AUTOSAR — middleware &amp; services</span></span>
+              <span class="chev">›</span>
+            </button>
+            <button class="row" data-id="avos">
+              <span class="dot" style="background:var(--c-software)"></span>
+              <span class="rl"><span class="name">AVOS / QNX</span><span class="tag">Base OS / platform</span></span>
+              <span class="chev">›</span>
+            </button>
+          </div>
+
+          <button class="row" data-id="idchw">
+            <span class="dot" style="background:var(--c-hardware)"></span>
+            <span class="rl"><span class="name">IDC hardware <span class="mini">Orin</span></span><span class="tag">Compute target</span></span>
+            <span class="chev">›</span>
+          </button>
+
+          <button class="row" data-id="aurix">
+            <span class="dot" style="background:var(--c-firmware)"></span>
+            <span class="rl"><span class="name">Aurix <span class="mini">+ Switch</span></span><span class="tag">MCU &amp; network firmware</span></span>
+            <span class="chev">›</span>
+          </button>
+        </div>
+
+        <div class="substrate">
+          <button class="row" data-id="vehiclehw">
+            <span class="dot" style="background:var(--c-hardware)"></span>
+            <span class="rl"><span class="name">Vehicle HW · sensors</span><span class="tag">Radar · gateway · physical substrate</span></span>
+            <span class="note-tag">radar / gateway FW pinned by VIP</span>
+          </button>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="inputs">
+          <h4>Coding inputs</h4>
+          <div class="input-chips">
+            <button class="icbtn" data-id="idcc">
+              <span class="ic-n"><span class="dot"></span>IDC-C</span>
+              <span class="ic-t">Aurix-side coding</span>
+              <span class="ic-arrow">→ applies to <b>Aurix</b></span>
+            </button>
+            <button class="icbtn" data-id="idcp">
+              <span class="ic-n"><span class="dot"></span>IDC-P</span>
+              <span class="ic-t">Variant &amp; function coding</span>
+              <span class="ic-arrow">→ selects LCM variant for <b>RR</b></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="detail" id="detail" aria-live="polite"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- PROVISIONING FLOW -->
+  <section id="flow">
+    <div class="head">
+      <span class="eyebrow">02 / Provisioning</span>
+      <h2>A VIP update is an end-to-end flash</h2>
+      <p class="lede">Not a single binary swap — five ordered steps that take a target clean, load the baseline, and code it for the carline. Select a step for detail.</p>
+    </div>
+
+    <div class="flow" id="flow-steps"></div>
+    <div class="flow-detail" id="flow-detail" aria-live="polite"></div>
+
+    <div class="flow-note">
+      <span class="k">tag</span>
+      <span>Every artifact — the <code>create_MB_DDU_Bundle</code> output, Aurix/Switch, IDC-C, IDC-P — is uploaded to NGC under the <b>same VIP tag</b>, so the pipeline resolves them as one release. Mismatch the versions and coding fails.</span>
+    </div>
+  </section>
+
+  <!-- LIFECYCLE -->
+  <section id="lifecycle">
+    <div class="head">
+      <span class="eyebrow">03 / Candidate to fleet</span>
+      <h2>How a baseline earns its release</h2>
+      <p class="lede">This is why a VIP is a release baseline and not a convenience bundle: it has to be proven, signed off, and shadow-approved before any car runs it.</p>
+    </div>
+    <div class="chain" id="chain"></div>
+  </section>
+
+  <!-- CHURN -->
+  <section id="churn">
+    <div class="head">
+      <span class="eyebrow">04 / Why VIPs churn</span>
+      <h2>A new VIP is rarely a rename</h2>
+      <p class="lede">A VIP is refreshed whenever any one of its coupled ingredients moves — each is an independent compatibility axis. Expand any axis to see what a change usually means in practice.</p>
+    </div>
+
+    <div class="acc" id="acc"></div>
+
+    <div class="why-grid">
+      <div class="why">
+        <h4>Why an NDAS upgrade drags in a VIP</h4>
+        <p>NDAS lives inside a broader validated baseline. Coding fails when the VIP and DDU versions don't match, and <b>NDAS-only bundles may fail</b> in the pipeline — the guidance is to use the full target SW bundle. Moving NDAS alone is sometimes technically possible but operationally unsupported, so teams move it as a VIP.</p>
+      </div>
+      <div class="why">
+        <h4>Why Aurix churns constantly</h4>
+        <p>Aurix is both a compatibility dependency and a source of release risk. A regressed release can break clear-persistency or flashing; <code style="font-family:var(--ff-mono);color:var(--steel);font-size:13px">aurixreset</code> is routine during coding; fleet history is full of <b>"New Aurix version"</b> and <b>"Point fix for Aurix stability."</b> It can force a new VIP even when the feature story hasn't changed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GLOSSARY -->
+  <section id="glossary">
+    <div class="head">
+      <span class="eyebrow">05 / Glossary</span>
+      <h2>The pieces, defined</h2>
+      <p class="lede">Where sources don't spell out an acronym's letter, the definition is functional — flagged below. Filter by what kind of thing each piece is.</p>
+    </div>
+    <div class="filters" id="filters"></div>
+    <div class="gloss" id="gloss"></div>
+  </section>
+
+  <!-- BOTTOM -->
+  <section class="bottom" id="bottom">
+    <p class="bigline">If you remember one thing: a VIP is the <span class="hl">validated release baseline</span> for a vehicle program — DDU carries the software, Aurix and Switch are separate firmware, IDC-C and IDC-P apply the coding, and acceptance proves they all work as one.</p>
+    <div class="srcbox">
+      <span class="sl">Sources</span>
+      <span>Vehicle Integration Package SOP</span>
+      <span>Managed Test Target Farm (MTTF) SC User Guide</span>
+      <span>Master Fleet VIP Config Tracker</span>
+    </div>
+    <div class="foot">Interactive reference · built from the indexed VIP documentation · "most likely" expansions reflect source hedging</div>
+  </section>
+
+</div>
+</div>
+
+<script>
+/* ---------- DATA ---------- */
+const CAT = {
+  baseline:{label:"Baseline", color:"var(--c-baseline)"},
+  software:{label:"Software", color:"var(--c-software)"},
+  firmware:{label:"Firmware", color:"var(--c-firmware)"},
+  coding:{label:"Coding", color:"var(--c-coding)"},
+  application:{label:"Application", color:"var(--c-application)"},
+  hardware:{label:"Hardware", color:"var(--c-hardware)"}
+};
+
+const COMPONENTS = {
+  vip:{ name:"VIP", exp:"Vehicle Integration Package", uc:true, cat:"baseline",
+    body:"Not a single file — the named release baseline for a carline and program. It pins one compatible version of every layer below, then verifies the whole combination boots and runs on a real target. Think of it as a <b>compatibility contract</b>: these exact pieces were assembled, flashed, and validated together.",
+    related:["ddu","avos","aa","ndas","fsi","rr","aurix","idcc","idcp"] },
+  ddu:{ name:"DDU / SW bundle", exp:"Flashable software payload", cat:"software",
+    body:"The full flashable package that moves the IDC to the VIP baseline, generated by a Jenkins pipeline and handed to Alfred/Valet for flashing. It bundles the main software layers — <b>AVOS, AA, NDAS, FSI</b> — as one matched set. The software heart of a VIP, but not the whole VIP: Aurix, Switch, IDC-C and IDC-P live outside the DDU payload.",
+    mono:"create_MB_DDU_Bundle", monoNote:"// Jenkins pipeline → .yml bundle",
+    related:["avos","aa","ndas","fsi"] },
+  avos:{ name:"AVOS / QNX", exp:"Base OS / platform", cat:"software",
+    body:"The base operating-system and platform layer on the IDC/Orin — the runtime foundation everything above depends on. A mismatched AVOS can make higher layers boot wrong or fail health checks. VIP notes call out moves like <b>AVOS 4.2 → 4.3 → 6.0.9.3</b>.",
+    related:["aa","ddu"] },
+  aa:{ name:"AA", exp:"Adaptive AUTOSAR stack", cat:"software",
+    body:"The Adaptive AUTOSAR stack on the IDC/Orin — middleware and services sitting above AVOS and below the driving apps. Usually packaged inside the DDU. It must be running <b>before RoadRunner launches</b>; if it isn't, the fix is to flash an LKG DDU that includes the adaptive stack. Versioned separately, e.g. R15 / R15.1.",
+    related:["avos","rr","ddu"] },
+  ndas:{ name:"NDAS", exp:"Driving / application stack", cat:"software",
+    body:"The main driving baseline tracked in the VIP and packaged in the DDU. It's expected to line up with the chosen DDU, coding and firmware — not move on its own. <b>NDAS-only bundles can fail</b> in the pipeline; use the full target SW bundle. Baselines are named, e.g. '0624 baseline.'",
+    related:["ddu","rr","idcp"] },
+  fsi:{ name:"FSI", exp:"Bundled software component", cat:"software",
+    body:"Another versioned software component carried inside the same DDU baseline, e.g. <b>FSI 1.11.06.00</b>. The trackers treat it as one more compatibility-controlled layer in the vehicle stack.",
+    related:["ddu"] },
+  rr:{ name:"RR · RoadRunner", exp:"Runtime application layer", cat:"application",
+    body:"The top executable layer. Once the platform below is healthy, RoadRunner launches the driving product — the <b>DAG</b> — on the IDC. It needs AVOS/QNX as a base and AA up first; NDAS launch behavior is realized through RR, and its launch config, DAG and amends decide which product flavor starts. On newer safety VIPs it auto-launches, from the DriveWorks / roadrunner config area.",
+    related:["avos","aa","ndas","idcp"] },
+  aurix:{ name:"Aurix", exp:"MCU / control-side firmware", cat:"firmware",
+    body:"A separate MCU firmware domain — <b>not AA</b>. It has its own console and commands and is flashed as its own provisioning step. It's an independent compatibility axis and a real source of release risk: a regressed Aurix can break clear-persistency or flashing, and teams sometimes revert to a known-good version to finish coding.",
+    mono:"aurixreset · version · versionoak", monoNote:"// Aurix console commands",
+    related:["switch","idcc"] },
+  switch:{ name:"Switch", exp:"Network switch firmware", cat:"firmware",
+    body:"The network/switch firmware in the vehicle platform, flashed in the same step as Aurix. <b>Some flashing options must be applied together</b> to succeed.",
+    related:["aurix"] },
+  idcc:{ name:"IDC-C", exp:"Aurix-side coding", uc:true, ucNote:"\u2014 letter not confirmed in sources", cat:"coding",
+    body:"The coding/configuration applied to the Aurix / C-side domain — <b>distinct from the Aurix firmware version</b> itself. The provisioning block is \u201cIDC_C Aurix Coding,\u201d with its own NGC artifacts the pipeline selects independently. Firmware is one thing; IDC-C is the coding applied to it.",
+    related:["aurix"] },
+  idcp:{ name:"IDC-P", exp:"Variant coding & key provisioning", uc:true, ucNote:"\u2014 letter not confirmed in sources", cat:"coding",
+    body:"The variant-coding and key-provisioning layer for the IDC-side functional config — the part of a VIP that most directly <b>changes feature behavior on the car</b>. One IDC-P file carries coding sets for Purple vs Yellow, SAE2 vs SAE2PP, carlines and feature variations, plus functional parameters, coding deviations, NV SEH strings and MB SEM settings. It selects the coded NV LCM variant — which determines the default DAG RoadRunner launches.",
+    related:["rr","ndas"] },
+  idchw:{ name:"IDC hardware (Orin)", exp:"Compute target", cat:"hardware",
+    body:"The NVIDIA Orin compute the software baseline runs on. The VIP targets this hardware; it isn't versioned by the VIP itself.",
+    related:[] },
+  vehiclehw:{ name:"Vehicle HW · sensors", exp:"Physical substrate", cat:"hardware",
+    body:"Sensors and vehicle-network hardware. <b>Radar and gateway firmware sit here and are pinned by the VIP</b> as carline dependencies — even a correct IDC stack can hit integration problems if radar or gateway firmware is mismatched, because the car is a multi-ECU system.",
+    related:[] }
+};
+
+const HERO_CHIPS = ["VIP","DDU","AVOS","AA","NDAS","FSI","Aurix","Switch","IDC-C","IDC-P","RoadRunner"];
+
+const PIPELINE = [
+  {n:1, name:"Clear Persistency", body:"Wipe persisted state so the target starts clean before the new baseline goes on. A regressed Aurix can break this step."},
+  {n:2, name:"SW Update", note:"Full DDU only", body:"Flash the full SW bundle from <code>create_MB_DDU_Bundle</code> — AVOS, AA, NDAS and FSI as one matched payload. NDAS-only bundles may fail; always use the full target bundle."},
+  {n:3, name:"Aurix / Switch Flashing", body:"Bring the MCU and network-switch firmware to the baseline version. Some flashing options have to be applied together or the flash won't succeed."},
+  {n:4, name:"IDC-C Aurix Coding", body:"Apply the Aurix-side coding and configuration for this baseline — a selectable block, separate from the Aurix firmware itself."},
+  {n:5, name:"IDC-P Variant Coding & Key Provisioning", body:"Apply the IDC-side variant and function coding — the feature behavior for this carline and release — and provision keys. This is where the LCM variant gets set."}
+];
+
+const CHAIN = [
+  "Product &amp; fleet teams pick the next candidate release baseline.",
+  "That baseline becomes a <b>VIP</b> — chosen DDU, AA, NDAS, FSI, Aurix, Switch, IDC-C, IDC-P and carline dependencies.",
+  "The <b>DDU / SW bundle</b> provides the software payload Alfred can flash.",
+  "<b>Aurix &amp; Switch</b> flashing bring MCU and network firmware to the expected version.",
+  "<b>IDC-C</b> applies the Aurix-side coding baseline.",
+  "<b>IDC-P</b> applies the variant/function coding and, when needed, key provisioning.",
+  "Acceptance verifies the whole set on bench and car — then shadow mode, then fleet rollout."
+];
+const GATES = ["in-car checks","CI / STS","DI / DQ","replay","perf","exceptions","shadow mode"];
+
+const CHURN = [
+  {id:"ddu", name:"DDU / base software", cat:"software", body:"The full flashable bundle from the DDU pipeline. A bump here can also carry patches or debug libraries — not just a version change."},
+  {id:"avos", name:"AVOS", cat:"software", body:"The base OS/platform. Higher layers run against it, so AVOS moves (4.2 → 4.3 → 6.0.9.3) ripple upward."},
+  {id:"aa", name:"AA", cat:"software", body:"Adaptive AUTOSAR, versioned separately (R15 / R15.1) even though it ships inside the DDU."},
+  {id:"ndas", name:"NDAS", cat:"software", body:"The driving baseline (e.g. '0624 baseline'). NDAS changes usually travel with a VIP refresh."},
+  {id:"fsi", name:"FSI", cat:"software", body:"A bundled software component versioned on its own (e.g. 1.11.06.00)."},
+  {id:"idcp", name:"IDC-P coding", cat:"coding", body:"Functional coding: NV SEH / MB SEM selections, NV LCM domain, and carline deviations like bumper or steering-wheel differences."},
+  {id:"idcc", name:"IDC-C coding", cat:"coding", body:"Aurix-side coding, updated alongside Aurix firmware; behavior can differ between NVIDIA IDC-C files and direct Codeman coding."},
+  {id:"aurixsw", name:"Aurix / Switch", cat:"firmware", body:"Lower-level MCU and network firmware, flashed as its own step. A regressed Aurix can break provisioning entirely."},
+  {id:"radar", name:"Radar / gateway firmware", cat:"firmware", body:"Sensor- and network-side firmware outside the IDC bundle. Mismatches cause integration and communication problems."},
+  {id:"fix", name:"Focused stability / feature fix", cat:"baseline", body:"A narrow respin — an Aurix stability point fix, an ALCA/IDC-P coding fix, a memory-carveout patch, or an instrumented debug library."}
+];
+
+const GLOSS_ORDER = ["vip","ddu","avos","aa","ndas","fsi","rr","aurix","switch","idcc","idcp"];
+const FILTERS = ["all","baseline","software","firmware","coding","application"];
+
+/* ---------- RENDER HELPERS ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+/* hero chips */
+(()=>{ const c=$("#heroChips"); HERO_CHIPS.forEach((t,i)=>{ const s=document.createElement("span"); s.className="chip"; s.textContent=t; s.style.animationDelay=(0.25+i*0.045)+"s"; c.appendChild(s); }); })();
+
+/* detail panel */
+function renderDetail(id){
+  const c = COMPONENTS[id]; if(!c) return;
+  const cat = CAT[c.cat];
+  const exp = c.uc
+    ? `${c.exp} <span class="uc">\u2248 most likely${c.ucNote?" "+c.ucNote:""}</span>`
+    : c.exp;
+  let html = `
+    <span class="d-cat"><span class="dot" style="background:${cat.color}"></span>${cat.label}</span>
+    <div class="d-name">${c.name}</div>
+    <div class="d-exp">${exp}</div>
+    <p class="d-body">${c.body}</p>`;
+  if(c.mono){ html += `<div class="d-mono">${c.mono}${c.monoNote?`<br><span>${c.monoNote}</span>`:""}</div>`; }
+  $("#detail").innerHTML = html;
+}
+
+/* selection + cross-highlight */
+let current = "vip";
+function select(id){
+  if(!COMPONENTS[id]) return;
+  current = id;
+  renderDetail(id);
+  const rel = COMPONENTS[id].related || [];
+  $$(".row, .icbtn").forEach(el=>{
+    const eid = el.dataset.id;
+    el.classList.toggle("is-active", eid===id);
+    el.classList.toggle("is-related", eid!==id && rel.includes(eid));
+  });
+}
+
+/* wire stack rows, band labels, coding chips */
+$$(".row, .band-label, .icbtn").forEach(el=>{
+  el.addEventListener("click", ()=> select(el.dataset.id));
+});
+
+/* pipeline */
+(()=>{
+  const wrap = $("#flow-steps");
+  PIPELINE.forEach((s,i)=>{
+    const b = document.createElement("button");
+    b.className = "step"; b.dataset.i = i;
+    b.innerHTML = `<div class="sn">STEP ${s.n}${i<PIPELINE.length-1?'<span class="arr">→</span>':''}</div>
+      <div class="st">${s.name}</div>${s.note?`<span class="sm">${s.note}</span>`:""}`;
+    b.addEventListener("click", ()=> selectStep(i));
+    wrap.appendChild(b);
+  });
+})();
+function selectStep(i){
+  const s = PIPELINE[i];
+  $$(".step").forEach(el=> el.classList.toggle("is-active", +el.dataset.i===i));
+  $("#flow-detail").innerHTML = `<div class="ft">Step ${s.n} — ${s.name}</div>${s.body}`;
+}
+
+/* chain */
+(()=>{
+  const wrap = $("#chain");
+  CHAIN.forEach((t,i)=>{
+    const final = i===CHAIN.length-1;
+    const d = document.createElement("div");
+    d.className = "clink" + (final?" final":"");
+    let inner = `<div class="cn">${String(i+1).padStart(2,"0")}</div><div class="ctxt">${t}`;
+    if(final){
+      inner += `<div class="gates">` + GATES.map((g,gi)=>`<span class="gate${gi===GATES.length-1?' last':''}">${g}</span>`).join("") + `</div>`;
+    }
+    inner += `</div>`;
+    d.innerHTML = inner;
+    wrap.appendChild(d);
+  });
+})();
+
+/* churn accordion */
+(()=>{
+  const wrap = $("#acc");
+  CHURN.forEach(a=>{
+    const item = document.createElement("div");
+    item.className = "ait";
+    item.innerHTML = `
+      <button aria-expanded="false">
+        <span class="adot" style="background:${CAT[a.cat].color}"></span>${a.name}
+        <span class="aplus">+</span>
+      </button>
+      <div class="abody"><div>${a.body}</div></div>`;
+    const btn = item.querySelector("button");
+    btn.addEventListener("click", ()=>{
+      const open = item.classList.toggle("open");
+      btn.setAttribute("aria-expanded", open);
+    });
+    wrap.appendChild(item);
+  });
+})();
+
+/* glossary */
+function renderGloss(filter){
+  const wrap = $("#gloss"); wrap.innerHTML="";
+  GLOSS_ORDER.forEach(id=>{
+    const c = COMPONENTS[id]; const cat = CAT[c.cat];
+    if(filter!=="all" && c.cat!==filter) return;
+    const exp = c.uc ? `${c.exp} <span class="uc">\u2248 unconfirmed</span>` : c.exp;
+    const card = document.createElement("div");
+    card.className="gcard"; card.style.borderLeftColor=cat.color;
+    card.innerHTML = `
+      <div class="gtop">
+        <span class="gname">${c.name}</span>
+        <span class="gcat">${cat.label}</span>
+      </div>
+      <div class="gexp">${exp}</div>
+      <p class="gbody">${c.body}</p>`;
+    wrap.appendChild(card);
+  });
+}
+(()=>{
+  const wrap = $("#filters");
+  FILTERS.forEach((f,i)=>{
+    const b=document.createElement("button");
+    b.className="fbtn"+(i===0?" active":"");
+    const c = f==="all" ? null : CAT[f];
+    b.innerHTML = c ? `<span class="fdot" style="background:${c.color}"></span>${c.label}` : "All";
+    b.addEventListener("click", ()=>{
+      $$(".fbtn").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+      renderGloss(f);
+    });
+    wrap.appendChild(b);
+  });
+})();
+
+/* scroll-spy */
+(()=>{
+  const links = $$(".rail a");
+  const map = {};
+  links.forEach(l=> map[l.getAttribute("href").slice(1)] = l);
+  const ids = Object.keys(map);
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove("active"));
+        if(map[e.target.id]) map[e.target.id].classList.add("active");
+      }
+    });
+  }, {rootMargin:"-45% 0px -50% 0px", threshold:0});
+  ids.forEach(id=>{ const el=document.getElementById(id); if(el) obs.observe(el); });
+})();
+
+/* init */
+select("vip");
+selectStep(0);
+renderGloss("all");
+</script>
+</body>
+</html>
