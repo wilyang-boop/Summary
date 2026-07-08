@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New-hire tooling map — Occhio · DDB · DriveScrubber · DDBX · MagLev · Kratos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0C0D11; --ink-2:#101218; --panel:#14161D; --panel-2:#1A1D26;
+    --line:#262A34; --line-bright:#363B47;
+    --text:#E9E7E1; --text-dim:#9B9A93; --text-faint:#6A6963;
+    --amber:#FF9E2C; --amber-d:#C9781A; --steel:#74A6C6;
+
+    /* role encodings (muted) */
+    --r-operate:#62B9A9;   /* teal   */
+    --r-analyze:#FF9E2C;   /* amber — the hub */
+    --r-browse:#83A9D2;    /* slate  */
+    --r-package:#B89AD6;   /* mauve  */
+    --r-platform:#CBA46C;  /* bronze */
+    --r-data:#9DBF7E;      /* sage   */
+
+    --maxw:1080px; --rail:208px;
+    --ff-display:"Chakra Petch", system-ui, sans-serif;
+    --ff-body:"Inter", system-ui, sans-serif;
+    --ff-mono:"JetBrains Mono", ui-monospace, monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--ink); color:var(--text); font-family:var(--ff-body); font-weight:450; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden;}
+  body::before{
+    content:""; position:fixed; inset:0;
+    background-image:linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px; opacity:.10; pointer-events:none; z-index:0;
+    -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%, #000 35%, transparent 100%);
+            mask-image:radial-gradient(ellipse 90% 70% at 50% 0%, #000 35%, transparent 100%);
+  }
+  a{color:var(--steel); text-decoration:none;} a:hover{text-decoration:underline;}
+  .amber{color:var(--amber); font-weight:600;} .steel{color:var(--steel); font-weight:600;}
+
+  /* top bar */
+  .topbar{position:sticky; top:0; z-index:40; height:52px; display:flex; align-items:center; gap:14px; padding:0 20px; background:rgba(12,13,17,.82); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+  .topbar .wm{font-family:var(--ff-display); font-weight:700; letter-spacing:.14em; font-size:15px;}
+  .topbar .wm b{color:var(--amber);}
+  .topbar .sub{font-family:var(--ff-mono); font-size:11px; color:var(--text-faint); letter-spacing:.02em; border-left:1px solid var(--line); padding-left:14px;}
+  .topbar .src{margin-left:auto; font-family:var(--ff-mono); font-size:10.5px; color:var(--text-faint); letter-spacing:.05em;}
+  @media(max-width:560px){ .topbar .sub,.topbar .src{display:none;} }
+
+  /* rail */
+  .rail{position:fixed; top:52px; left:0; bottom:0; width:var(--rail); padding:30px 0 30px 22px; border-right:1px solid var(--line); z-index:30; display:flex; flex-direction:column; gap:2px;}
+  .rail .lbl{font-family:var(--ff-mono); font-size:10px; letter-spacing:.22em; color:var(--text-faint); text-transform:uppercase; margin-bottom:14px;}
+  .rail a{position:relative; display:flex; align-items:baseline; gap:10px; color:var(--text-dim); font-size:13.5px; padding:7px 0; transition:color .2s;}
+  .rail a .n{font-family:var(--ff-mono); font-size:10.5px; color:var(--text-faint); transition:color .2s;}
+  .rail a:hover{color:var(--text);} .rail a:hover .n{color:var(--amber);}
+  .rail a.active{color:var(--text);} .rail a.active .n{color:var(--amber);}
+  .rail a.active::before{content:""; position:absolute; left:0; width:2px; height:18px; background:var(--amber); border-radius:2px; margin-top:2px;}
+  @media(max-width:980px){ .rail{display:none;} }
+
+  /* layout */
+  .wrap{position:relative; z-index:1; margin-left:var(--rail); padding:0 28px;}
+  @media(max-width:980px){ .wrap{margin-left:0;} }
+  .inner{max-width:var(--maxw); margin:0 auto;}
+  section{padding:74px 0; border-top:1px solid var(--line);}
+  section:first-of-type{border-top:none;}
+
+  .head{margin-bottom:36px;}
+  .eyebrow{display:inline-flex; align-items:center; gap:10px; font-family:var(--ff-mono); font-size:11px; letter-spacing:.2em; color:var(--amber); text-transform:uppercase; margin-bottom:16px;}
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--amber); opacity:.7;}
+  h2{font-family:var(--ff-display); font-weight:600; font-size:clamp(26px,4vw,38px); line-height:1.12; margin:0 0 14px; letter-spacing:-.01em;}
+  .lede{font-size:16.5px; color:var(--text-dim); max-width:64ch; margin:0;}
+  .lede b{color:var(--text); font-weight:600;}
+
+  /* hero */
+  .hero{padding:clamp(50px,10vw,92px) 0 58px;}
+  .hero h1{font-family:var(--ff-display); font-weight:700; font-size:clamp(36px,6.6vw,68px); line-height:1.04; margin:0 0 24px; letter-spacing:-.02em; max-width:17ch;}
+  .hero h1 .hl{color:var(--amber);}
+  .hero p{font-size:clamp(16px,2.1vw,19px); color:var(--text-dim); max-width:66ch; margin:0 0 40px;}
+  .hero p b{color:var(--text); font-weight:600;}
+
+  /* overview grid */
+  .ov-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  @media(max-width:820px){ .ov-grid{grid-template-columns:repeat(2,1fr);} }
+  @media(max-width:520px){ .ov-grid{grid-template-columns:1fr;} }
+  .ov-card{
+    text-align:left; cursor:pointer; background:var(--panel); border:1px solid var(--line);
+    border-top:2px solid var(--line-bright); border-radius:11px; padding:17px 17px 18px; color:var(--text);
+    transition:transform .18s, border-color .18s, background .18s;
+  }
+  .ov-card:hover{transform:translateY(-2px); background:var(--panel-2);}
+  .ov-card .ov-role{display:flex; align-items:center; gap:7px; font-family:var(--ff-mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); margin-bottom:9px;}
+  .ov-card .ov-role .dot{width:8px; height:8px; border-radius:50%;}
+  .ov-card .ov-name{font-family:var(--ff-display); font-weight:700; font-size:20px; margin-bottom:5px; letter-spacing:.01em;}
+  .ov-card .ov-line{font-size:14px; color:var(--text-dim);}
+  .ov-card.hub{border-top-color:var(--amber);}
+  .ov-card.hub .ov-name{color:var(--amber);}
+  .ov-card.active{border-color:var(--amber); box-shadow:0 0 0 1px var(--amber);}
+
+  /* ---- MAP (signature) ---- */
+  .map-grid{display:grid; grid-template-columns:1fr 340px; gap:30px; align-items:start;}
+  @media(max-width:900px){ .map-grid{grid-template-columns:1fr;} }
+  .map-canvas{
+    background:radial-gradient(120% 120% at 55% 40%, rgba(255,158,44,.045), transparent 60%), var(--ink-2);
+    border:1px solid var(--line); border-radius:14px; padding:14px; overflow-x:auto;
+  }
+  .mapsvg{width:100%; min-width:660px; height:auto; display:block;}
+  .map-hint{margin-top:12px; font-size:12.5px; color:var(--text-dim); line-height:1.7;}
+  .map-hint span{display:block; color:var(--text-faint); font-family:var(--ff-mono); font-size:11px; margin-top:4px;}
+
+  /* svg node + edge styling */
+  #env{fill:rgba(203,164,108,.035); stroke:var(--line-bright); stroke-width:1.4; stroke-dasharray:2 7; transition:stroke .18s;}
+  #env.sel{stroke:var(--amber); stroke-dasharray:2 7; stroke-width:1.8;}
+  #env.rel{stroke:var(--steel);}
+  .env-label{font-family:var(--ff-mono); font-size:12px; letter-spacing:.06em; fill:var(--r-platform); cursor:pointer; font-weight:600;}
+  .env-label:hover{fill:#e0c08a;}
+
+  .mapsvg #ah path{fill:var(--line-bright);}
+  .edge{stroke:var(--line-bright); stroke-width:1.7; fill:none; transition:stroke .15s, stroke-width .15s;}
+  .edge.dashed{stroke-dasharray:5 5;}
+  .edge.hot{stroke:var(--amber); stroke-width:2.6;}
+  .edge-label{font-family:var(--ff-mono); font-size:11px; fill:var(--text-faint); transition:fill .15s; paint-order:stroke; stroke:var(--ink-2); stroke-width:3px; stroke-linejoin:round;}
+  .edge-label.hot{fill:var(--amber);}
+
+  .node{cursor:pointer;}
+  .node-box{fill:var(--panel); stroke:var(--line); stroke-width:1.4; transition:stroke .15s, fill .15s;}
+  .node:hover .node-box{stroke:var(--line-bright); fill:var(--panel-2);}
+  .node-box.hub{fill:#1a1a20;}
+  .node.sel .node-box{stroke:var(--amber); stroke-width:2.4;}
+  .node.rel .node-box{stroke:var(--steel); stroke-width:2;}
+  .node-name{font-family:var(--ff-mono); font-weight:600; font-size:16px; fill:var(--text); text-anchor:middle; pointer-events:none;}
+  .node-name.hub{font-size:20px;}
+  .node-sub{font-family:var(--ff-mono); font-size:10.5px; text-anchor:middle; pointer-events:none; letter-spacing:.05em;}
+  .rdot{pointer-events:none;}
+
+  /* detail panel (shared) */
+  .side{position:sticky; top:70px;}
+  @media(max-width:900px){ .side{position:static;} }
+  .detail{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:22px; min-height:240px;}
+  .detail .d-cat{display:inline-flex; align-items:center; gap:7px; font-family:var(--ff-mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; padding:4px 9px; border-radius:5px; border:1px solid var(--line-bright);}
+  .detail .d-cat .dot{width:8px; height:8px; border-radius:50%;}
+  .detail .d-name{font-family:var(--ff-display); font-weight:700; font-size:23px; margin:14px 0 2px; letter-spacing:.01em;}
+  .detail .d-exp{font-family:var(--ff-mono); font-size:12px; color:var(--text-dim); margin-bottom:14px;}
+  .detail .d-body{font-size:14.5px; color:var(--text-dim); margin:0;}
+  .detail .d-body b{color:var(--text); font-weight:600;}
+  .detail .d-links{margin-top:15px; padding-top:14px; border-top:1px solid var(--line); font-family:var(--ff-mono); font-size:11.5px; color:var(--text-faint);}
+  .detail .d-links b{color:var(--steel); font-weight:500;}
+
+  /* ---- workflow (sequence) ---- */
+  .flow{display:grid; grid-template-columns:repeat(5,1fr); gap:0; margin-bottom:22px;}
+  @media(max-width:820px){ .flow{grid-template-columns:1fr;} }
+  .step{position:relative; cursor:pointer; text-align:left; background:var(--panel); border:1px solid var(--line); border-top-width:3px; padding:16px 15px 18px; color:var(--text); transition:background .18s, border-color .18s;}
+  .step:first-child{border-radius:10px 0 0 10px;}
+  .step:last-child{border-radius:0 10px 10px 0;}
+  .step:not(:first-child){border-left:none;}
+  @media(max-width:820px){ .step{border-radius:10px!important; border-left:1px solid var(--line)!important; border-top-width:3px!important; margin-bottom:8px;} }
+  .step:hover{background:var(--panel-2); z-index:2;}
+  .step.is-active{background:var(--panel-2); z-index:3; box-shadow:0 0 0 1px var(--amber); border-color:var(--amber);}
+  .step .sn{font-family:var(--ff-mono); font-size:11px; letter-spacing:.05em; margin-bottom:9px; display:flex; align-items:center; gap:8px;}
+  .step .sn .arr{color:var(--text-faint);}
+  .step .st{font-family:var(--ff-mono); font-weight:600; font-size:13.5px; line-height:1.35;}
+  .step .stool{display:block; margin-top:8px; font-family:var(--ff-mono); font-size:10px; letter-spacing:.04em; color:var(--text-faint);}
+  .flow-detail{background:var(--ink-2); border:1px solid var(--line); border-left:2px solid var(--amber); border-radius:9px; padding:18px 20px; font-size:14.5px; color:var(--text-dim);}
+  .flow-detail b{color:var(--text); font-weight:600;}
+  .flow-detail .ft{font-family:var(--ff-mono); font-size:13px; color:var(--amber); margin-bottom:8px; font-weight:600;}
+
+  /* ---- DDB panels ---- */
+  .sub-h{font-family:var(--ff-mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--r-analyze); margin:34px 0 16px; display:flex; align-items:center; gap:10px;}
+  .sub-h::before{content:""; width:7px; height:7px; border-radius:50%; background:var(--r-analyze);}
+  .sub-h:first-of-type{margin-top:6px;}
+
+  .dm{display:flex; align-items:stretch; gap:0; flex-wrap:wrap;}
+  .dm-node{flex:1; min-width:190px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:15px 16px;}
+  .dm-node .dk{font-family:var(--ff-mono); font-weight:600; font-size:14px; color:var(--text); margin-bottom:5px;}
+  .dm-node .dd{font-size:13px; color:var(--text-dim);}
+  .dm-arrow{display:flex; align-items:center; justify-content:center; padding:0 12px; color:var(--text-faint); font-size:20px; flex:none;}
+  @media(max-width:640px){ .dm{flex-direction:column;} .dm-arrow{transform:rotate(90deg); padding:8px 0;} }
+  .dm-note{margin-top:12px; font-size:13px; color:var(--text-faint); font-family:var(--ff-mono); letter-spacing:.01em;}
+
+  .ptypes{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+  @media(max-width:820px){ .ptypes{grid-template-columns:repeat(2,1fr);} }
+  @media(max-width:460px){ .ptypes{grid-template-columns:1fr;} }
+  .pt{background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:13px 14px; transition:border-color .15s, transform .15s;}
+  .pt:hover{border-color:var(--line-bright); transform:translateY(-2px);}
+  .pt .ptn{font-family:var(--ff-mono); font-weight:600; font-size:13px; display:flex; align-items:center; gap:7px; margin-bottom:5px;}
+  .pt .ptn .core{width:6px; height:6px; border-radius:50%; background:var(--amber); flex:none;}
+  .pt .ptd{font-size:12.5px; color:var(--text-dim);}
+
+  .paths{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  @media(max-width:800px){ .paths{grid-template-columns:1fr;} }
+  .path{background:var(--panel); border:1px solid var(--line); border-top:3px solid var(--line-bright); border-radius:11px; padding:18px;}
+  .path .ph{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
+  .path .pname{font-family:var(--ff-display); font-weight:600; font-size:17px;}
+  .path .effort{font-family:var(--ff-mono); font-size:11px; letter-spacing:.1em;}
+  .path .pwhen{font-size:13.5px; color:var(--text-dim); margin-bottom:12px;}
+  .path ol{margin:0; padding-left:0; list-style:none; counter-reset:s;}
+  .path ol li{counter-increment:s; position:relative; padding:5px 0 5px 26px; font-size:13px; color:var(--text-dim); border-top:1px solid var(--line);}
+  .path ol li:first-child{border-top:none;}
+  .path ol li::before{content:counter(s); position:absolute; left:0; top:5px; font-family:var(--ff-mono); font-size:11px; color:var(--text-faint); width:16px; text-align:center;}
+  .share-note{margin-top:16px; display:flex; gap:11px; align-items:flex-start; font-size:13.5px; color:var(--text-dim); padding:15px 17px; background:var(--ink-2); border:1px solid var(--line); border-left:2px solid var(--r-package); border-radius:9px;}
+  .share-note .k{font-family:var(--ff-mono); color:var(--r-package); flex:none; font-size:12px; letter-spacing:.04em; margin-top:1px;}
+  .share-note code{font-family:var(--ff-mono); color:var(--steel); font-size:13px;}
+
+  /* ---- learning order ---- */
+  .chain{display:flex; flex-direction:column;}
+  .clink{display:flex; gap:20px; padding:17px 0; border-bottom:1px solid var(--line); align-items:baseline;}
+  .clink:last-child{border-bottom:none;}
+  .clink .cn{font-family:var(--ff-display); font-weight:700; font-size:24px; flex:none; width:42px; line-height:1;}
+  .clink .ctool{font-family:var(--ff-mono); font-size:11px; letter-spacing:.06em; color:var(--text-faint); text-transform:uppercase; width:118px; flex:none; padding-top:3px;}
+  .clink .ctxt{font-size:15px; color:var(--text-dim); padding-top:1px;}
+  .clink .ctxt b{color:var(--text); font-weight:600;}
+  @media(max-width:640px){ .clink{flex-wrap:wrap; gap:6px 16px;} .clink .ctool{width:auto;} .clink .ctxt{flex-basis:100%;} }
+
+  /* bottom */
+  .bigline{font-family:var(--ff-display); font-weight:600; font-size:clamp(21px,3.3vw,30px); line-height:1.3; letter-spacing:-.005em; max-width:32ch; margin:0 0 32px;}
+  .bigline .hl{color:var(--amber);}
+  .srcbox{display:flex; flex-wrap:wrap; gap:10px 26px; padding-top:24px; border-top:1px solid var(--line); font-family:var(--ff-mono); font-size:12px; color:var(--text-faint); letter-spacing:.02em;}
+  .srcbox .sl{color:var(--text-dim);}
+  .foot{padding:22px 0 60px; font-family:var(--ff-mono); font-size:11px; color:var(--text-faint); letter-spacing:.03em;}
+
+  :focus-visible{outline:2px solid var(--amber); outline-offset:3px; border-radius:4px;}
+  @media(prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} *,*::before,*::after{animation-duration:.001ms!important; transition-duration:.001ms!important;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="wm"><b>◆</b> TOOLING MAP</span>
+  <span class="sub">New-hire primer</span>
+  <span class="src">ATG-B · MagLev · AV</span>
+</div>
+
+<nav class="rail" aria-label="Section navigation">
+  <div class="lbl">Contents</div>
+  <a href="#map"><span class="n">01</span> The map</a>
+  <a href="#workflow"><span class="n">02</span> The workflow</a>
+  <a href="#panels"><span class="n">03</span> Inside DDB</a>
+  <a href="#learn"><span class="n">04</span> Learning order</a>
+</nav>
+
+<div class="wrap">
+<div class="inner">
+
+  <!-- HERO -->
+  <header class="hero" id="top">
+    <span class="eyebrow">New-hire tooling primer</span>
+    <h1>Six tools, one workflow — and <span class="hl">DDB</span> at the center.</h1>
+    <p>You operate the car, record data, visualize it, browse it, and share what you build. <b>DDB is the hub</b> every other tool connects to; <b>MagLev</b> is the platform they live on. Start with the one-liners, then open the map to see how they wire together.</p>
+    <div class="ov-grid" id="overview"></div>
+  </header>
+
+  <!-- MAP -->
+  <section id="map">
+    <div class="head">
+      <span class="eyebrow">01 / The map</span>
+      <h2>How the tools connect</h2>
+      <p class="lede"><b>DDB</b> sits at the center — Occhio launches it, DriveScrubber links into it, DDBX packages workflows for it. <b>MagLev</b> is the platform that hosts them, and <b>Kratos</b> is the data platform on its edge. Select any tool to trace its connections.</p>
+    </div>
+
+    <div class="map-grid">
+      <div>
+        <div class="map-canvas" id="map-canvas"></div>
+        <p class="map-hint">Tap a tool — it turns <b class="amber">amber</b>, and everything it connects to turns <b class="steel">blue</b>.
+          <span>Notice Kratos connects only to MagLev — it replaces old data workflows and does <b style="color:var(--text-dim)">not</b> touch Occhio, DDB, or DriveScrubber.</span>
+        </p>
+      </div>
+      <aside class="side">
+        <div class="detail" id="detail" aria-live="polite"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- WORKFLOW -->
+  <section id="workflow">
+    <div class="head">
+      <span class="eyebrow">02 / The workflow</span>
+      <h2>A drive, end to end</h2>
+      <p class="lede">The everyday path through the tools. Each step's colored edge shows which tool you're in. Select a step for detail.</p>
+    </div>
+    <div class="flow" id="flow-steps"></div>
+    <div class="flow-detail" id="flow-detail" aria-live="polite"></div>
+  </section>
+
+  <!-- INSIDE DDB -->
+  <section id="panels">
+    <div class="head">
+      <span class="eyebrow">03 / Inside DDB</span>
+      <h2>Panels, layouts, and how to build your own</h2>
+      <p class="lede">DDB is the hub, so it's worth knowing its parts. Panels render data; layouts arrange panels; and there are three ways to extend it — from a quick rearrange to a bespoke component.</p>
+    </div>
+
+    <div class="sub-h">The data model</div>
+    <div class="dm" id="dm"></div>
+    <p class="dm-note">// The Data Source UI browses topics and routes them into panels.</p>
+
+    <div class="sub-h">Built-in panel types <span style="font-family:var(--ff-body); text-transform:none; letter-spacing:0; color:var(--text-faint); font-size:12px; font-weight:400;">— <span style="color:var(--amber)">●</span> marks the ones you'll reach for most</span></div>
+    <div class="ptypes" id="ptypes"></div>
+
+    <div class="sub-h">Which path: layout, script, or custom panel?</div>
+    <div class="paths" id="paths"></div>
+    <div class="share-note">
+      <span class="k">share</span>
+      <span>All three package into a <b>DDB extension</b> (that's DDBX). Publish to the marketplace when you have cloud access, or export a <code>.ddbx</code> file and drag it into a DDB window for offline, workstation, or in-car install.</span>
+    </div>
+  </section>
+
+  <!-- LEARNING ORDER -->
+  <section id="learn">
+    <div class="head">
+      <span class="eyebrow">04 / Learning order</span>
+      <h2>What to learn, in order</h2>
+      <p class="lede">Follow the workflow itself: operate first, then analyze, then everything around it.</p>
+    </div>
+    <div class="chain" id="chain"></div>
+  </section>
+
+  <!-- BOTTOM -->
+  <section class="bottom" id="bottom">
+    <p class="bigline">Operate in <span class="hl">Occhio</span>, inspect in <span class="hl">DDB</span>, find your drive in DriveScrubber, and share it with DDBX — with MagLev as the platform and Kratos as the data layer underneath.</p>
+    <div class="srcbox">
+      <span class="sl">Sources</span>
+      <span>ATG-B Test Operator Handbook v2</span>
+      <span>DDB Engineer Handbook</span>
+      <span>DriveScrubber</span>
+      <span>DDB Self-Serve Capabilities</span>
+      <span>MagLev Onboarding</span>
+      <span>Kratos Primer</span>
+      <span>DDB Panel Features List</span>
+    </div>
+    <div class="foot">Interactive new-hire reference · built from the indexed tooling docs</div>
+  </section>
+
+</div>
+</div>
+
+<script>
+/* ---------- ROLES ---------- */
+const ROLES = {
+  operate:{label:"Operate", color:"var(--r-operate)"},
+  analyze:{label:"Analyze", color:"var(--r-analyze)"},
+  browse:{label:"Browse", color:"var(--r-browse)"},
+  package:{label:"Package", color:"var(--r-package)"},
+  platform:{label:"Platform", color:"var(--r-platform)"},
+  data:{label:"Data", color:"var(--r-data)"}
+};
+
+/* ---------- TOOLS (detail) ---------- */
+const TOOLS = {
+  occhio:{ role:"operate", name:"Occhio", tagline:"In-car operator UI", hub:false,
+    body:"The operator-facing desktop UI for vehicle bring-up, build verification, health checks, recording, map updates, and event annotation \u2014 the <b>front door for operators</b>. It's where live DDB gets started: Occhio reads the available live streams and connects to them automatically. A new hire logs in, verifies GCID/build, checks sensors and health, starts recording, opens the DDB tab when deeper visualization is needed, and submits annotations.",
+    links:"Launches <b>DDB</b> · feeds <b>DriveScrubber</b> after the drive", related:["ddb","drivescrubber"] },
+  ddb:{ role:"analyze", name:"DDB", tagline:"DriveDebugger \u2014 the visualization & debugging engine", hub:true,
+    body:"NVIDIA's unified visualization platform for MagLev and AV, built to visualize <b>synchronized time-series drive data</b>: RC logs, sensor recordings, and RoV streams. It's the analysis engine between in-car operation and post-drive debugging. Occhio launches or embeds it live, DriveScrubber links you into it for event analysis, and DDBX packages the reusable customizations teams build on top. A new hire opens a layout, replays or live-streams, picks the right panels, and imports an extension when a team workflow already exists.",
+    links:"Started by <b>Occhio</b> · entered from <b>DriveScrubber</b> · extended by <b>DDBX</b> · hosted on <b>MagLev</b>", related:["occhio","drivescrubber","ddbx","maglev"] },
+  drivescrubber:{ role:"browse", name:"DriveScrubber", tagline:"Drive & event browser", hub:false,
+    body:"The entry point for browsing drives and clipped events <b>after data is recorded</b> \u2014 the bridge from an event into deeper DDB analysis. Used after data exists (Occhio is used during setup and driving). A new hire finds the session or event of interest, confirms annotations or clips, then launches DDB for detailed, time-synchronized inspection. Its documentation is hosted through MagLev.",
+    links:"Launches <b>DDB</b> · docs hosted on <b>MagLev</b>", related:["ddb","maglev","occhio"] },
+  ddbx:{ role:"package", name:"DDBX", tagline:"DDB extension packaging", hub:false,
+    body:"The DDB extension ecosystem \u2014 the packaging mechanism for reusable DDB customizations: <b>custom layouts, user scripts, and custom panels</b>, bundled together. It's not a separate debugging UI; it's how teams make the right layout, script, or panel available once you're inside DDB. Install from the marketplace when cloud-connected, or drag-drop a <b>.ddbx</b> file into a DDB browser window for offline or in-car use.",
+    links:"Packages workflows for <b>DDB</b>", related:["ddb"] },
+  maglev:{ role:"platform", name:"MagLev", tagline:"Platform & developer environment", hub:false,
+    body:"The broader internal development and service platform around these tools \u2014 the monorepo, build/test workflows, and hosted service docs. DDB is described as the unified visualization platform for MagLev and AV, and DDB's docs and deployment are tied into MagLev infrastructure; DriveScrubber's docs live here too. A new hire touches MagLev when setting up the codebase, building services, or using platform docs \u2014 not for pure in-car operator tasks.",
+    links:"Hosts <b>DDB</b> & <b>DriveScrubber</b> · its data side is being replaced by <b>Kratos</b>", related:["ddb","drivescrubber","kratos"] },
+  kratos:{ role:"data", name:"Kratos", tagline:"Current data platform", hub:false,
+    body:"The current data platform MagLev data-platform users onboard to for common read, write, and ETL use cases. It is <b>not a replacement for Occhio, DDB, or DriveScrubber</b> \u2014 instead it replaces older MagLev data-platform offerings: UDC Streams, UDC Upload, MagLev Query, direct parquet access, MagLev Redash, and some Spark/ETL patterns. A new hire uses Kratos to query, upload, stream telemetry, run Spark-style workflows, or migrate old MagLev data use cases.",
+    links:"Replaces old data workflows in <b>MagLev</b> · separate from the viz tools", related:["maglev"] }
+};
+
+/* ---------- OVERVIEW ---------- */
+const OVERVIEW = [
+  {id:"occhio", line:"Run the car and the recording workflow."},
+  {id:"ddb", line:"Inspect and debug synchronized drive data."},
+  {id:"drivescrubber", line:"Find the drive or event you want to inspect."},
+  {id:"ddbx", line:"Package and share DDB workflows."},
+  {id:"maglev", line:"The surrounding platform and developer environment."},
+  {id:"kratos", line:"The current data platform: query, upload, telemetry, ETL."}
+];
+
+/* ---------- MAP GEOMETRY ---------- */
+const NODES = [
+  {id:"occhio",        x:60,  y:210, w:170, h:72, role:"operate", name:"Occhio", sub:"Operate"},
+  {id:"ddb",           x:515, y:200, w:190, h:96, role:"analyze", name:"DDB", sub:"Analyze", hub:true},
+  {id:"drivescrubber", x:340, y:388, w:190, h:72, role:"browse", name:"DriveScrubber", sub:"Browse"},
+  {id:"ddbx",          x:760, y:210, w:170, h:72, role:"package", name:"DDBX", sub:"Package"},
+  {id:"kratos",        x:520, y:552, w:180, h:72, role:"data", name:"Kratos", sub:"Data"}
+];
+const EDGES = [
+  {a:"occhio", b:"ddb", x1:230,y1:246, x2:513,y2:248, lx:372,ly:236, label:"launches / embeds", arrow:true},
+  {a:"occhio", b:"drivescrubber", path:"M145,282 C155,360 250,424 340,424", lx:196,ly:382, label:"after the drive", arrow:true, dashed:true},
+  {a:"drivescrubber", b:"ddb", x1:505,y1:390, x2:568,y2:298, lx:512,ly:344, label:"links into", arrow:true},
+  {a:"ddbx", b:"ddb", x1:758,y1:246, x2:707,y2:248, lx:728,ly:236, label:"packages", arrow:true},
+  {a:"kratos", b:"maglev", x1:610,y1:552, x2:610,y2:518, lx:624,ly:540, label:"replaces older data workflows", dashed:true}
+];
+
+/* ---------- WORKFLOW ---------- */
+const FLOW = [
+  {n:1, tool:"Occhio", role:"operate", name:"Set up & operate", body:"Bring the vehicle up in Occhio \u2014 verify GCID/build, check sensor and health state, then start recording."},
+  {n:2, tool:"DDB (from Occhio)", role:"analyze", name:"Visualize live", body:"Open DDB from Occhio for <b>live / near-live</b> visualization of RC logs, sensors, and RoV streams. Occhio reads the available live streams and connects automatically."},
+  {n:3, tool:"DriveScrubber \u2192 DDB", role:"browse", name:"Browse, then debug", body:"After the drive, use DriveScrubber to browse sessions or clipped events, confirm annotations, then jump into DDB for deeper <b>time-synchronized</b> debugging."},
+  {n:4, tool:"DDBX", role:"package", name:"Share the workflow", body:"Package team-specific DDB workflows as DDBX extensions \u2014 layouts, user scripts, and custom panels bundled together \u2014 and share them."},
+  {n:5, tool:"MagLev · Kratos", role:"platform", name:"Platform & data", body:"Use MagLev and Kratos around the edges for platform, workflows, storage, querying, and data services \u2014 <b>not</b> as the primary in-car UI."}
+];
+
+/* ---------- DATA MODEL ---------- */
+const DM = [
+  {k:"Topic", d:"A named stream of time-stamped messages panels can subscribe to. A message is one record on a topic."},
+  {k:"Panel", d:"Binds a visualization to topics, message paths, or derived outputs, and decides how the data is rendered."},
+  {k:"Layout", d:"A saved workspace that decides which panels show, how large they are, and how they're arranged."}
+];
+
+/* ---------- PANEL TYPES ---------- */
+const PTYPES = [
+  ["Plot","Numeric time-series inspection & correlation",1],
+  ["State Transitions","Discrete mode / state changes over time",1],
+  ["3D","Ego, world, object, lane & marker views",1],
+  ["Video","Synced camera views with overlays",1],
+  ["Map","Spatial context & follow views",1],
+  ["Raw Messages","Field-level inspection; pivot into plots",1],
+  ["Image","Synced still images with overlays",0],
+  ["Text","Readable status summaries",0],
+  ["Table","Structured, tabular inspection",0],
+  ["Gauge","Compact single-value status",0],
+  ["Indicator","Rule-based status light",0],
+  ["Tab","Organize panels into tabs",0],
+  ["Variable Slider","Interactive layout variables",0]
+];
+
+/* ---------- BUILD PATHS ---------- */
+const PATHS = [
+  {name:"Custom layout", accent:"var(--steel)", effort:"\u25CF\u25CB\u25CB", when:"Built-in panels already do the job \u2014 you just want a better arrangement, sizing, and a saved config.",
+   steps:["Start from an existing layout or a blank workspace.","Add built-in panels; choose the topics or fields they visualize; arrange them.","Save the layout so others can reuse it."]},
+  {name:"User script", accent:"var(--r-package)", effort:"\u25CF\u25CF\u25CB", when:"Panels are fine, but the raw data shape isn't \u2014 derive a signal, reshape sensor output, or make markers.",
+   steps:["Write a TypeScript user script or topic generator to transform the data.","Test it in the DDB UI for quick iteration.","Reuse the generated output topic in your layout like any other topic."]},
+  {name:"Custom panel", accent:"var(--amber)", effort:"\u25CF\u25CF\u25CF", when:"The visualization or interaction is bespoke and can't be expressed with built-ins.",
+   steps:["Build it in TypeScript as part of a DDB extension.","Subscribe, advertise, and publish; render however fits (React libs OK).","Test in local DDB UI; add unit tests in the extension-host repo."]}
+];
+
+/* ---------- LEARNING ORDER ---------- */
+const CHAIN = [
+  {tool:"Occhio", role:"operate", text:"Learn the <b>in-car operator flow</b> first."},
+  {tool:"DDB", role:"analyze", text:"Then <b>DDB</b> \u2014 panels, layouts, and topic-level debugging."},
+  {tool:"DriveScrubber", role:"browse", text:"Then <b>DriveScrubber</b>, to move efficiently from events to analysis."},
+  {tool:"DDBX", role:"package", text:"Then <b>DDBX</b>, once you need to reuse or share a workflow."},
+  {tool:"MagLev · Kratos", role:"platform", text:"Finally <b>MagLev and Kratos</b> as platform layers \u2014 especially for dev, workflows, and data services."}
+];
+
+/* ---------- RENDER ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+/* overview */
+(()=>{
+  const w = $("#overview");
+  OVERVIEW.forEach(o=>{
+    const t = TOOLS[o.id]; const r = ROLES[t.role];
+    const b = document.createElement("button");
+    b.className = "ov-card" + (t.hub?" hub":""); b.dataset.id = o.id;
+    b.innerHTML = `<div class="ov-role"><span class="dot" style="background:${r.color}"></span>${r.label}${t.hub?" · hub":""}</div>
+      <div class="ov-name">${t.name}</div><div class="ov-line">${o.line}</div>`;
+    b.addEventListener("click", ()=>{ document.getElementById("map").scrollIntoView(); selectTool(o.id); });
+    w.appendChild(b);
+  });
+})();
+
+/* map */
+function buildMap(){
+  let s = `<svg viewBox="0 0 980 660" class="mapsvg" role="img" aria-label="Tool connection map. DDB is the central hub.">`;
+  s += `<defs><marker id="ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>`;
+  s += `<rect id="env" x="290" y="64" width="650" height="454" rx="16"/>`;
+  s += `<text class="env-label" data-id="maglev" x="308" y="90" tabindex="0" role="button" aria-label="MagLev platform">MagLev \u2014 platform &amp; developer environment</text>`;
+  // edges (lines first, under nodes)
+  EDGES.forEach((e,i)=>{
+    const cls = `edge${e.dashed?" dashed":""}`;
+    const mk = e.arrow?` marker-end="url(#ah)"`:"";
+    s += e.path ? `<path class="${cls}" data-edge="${i}" d="${e.path}"${mk}/>`
+                : `<line class="${cls}" data-edge="${i}" x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}"${mk}/>`;
+  });
+  // nodes
+  NODES.forEach(n=>{
+    const cx = n.x + n.w/2, cy = n.y + n.h/2, rc = ROLES[n.role].color;
+    s += `<g class="node" data-id="${n.id}" tabindex="0" role="button" aria-label="${n.name}, ${ROLES[n.role].label}">`;
+    s += `<rect class="node-box${n.hub?" hub":""}" x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="11"/>`;
+    s += `<circle class="rdot" cx="${cx}" cy="${n.y + (n.hub?20:16)}" r="5" style="fill:${rc}"/>`;
+    s += `<text class="node-name${n.hub?" hub":""}" x="${cx}" y="${cy + (n.hub?6:5)}">${n.name}</text>`;
+    s += `<text class="node-sub" x="${cx}" y="${cy + (n.hub?24:21)}" style="fill:${rc}">${n.sub}${n.hub?" \u00b7 hub":""}</text>`;
+    s += `</g>`;
+  });
+  // edge labels last (painted on top so boxes never clip them)
+  EDGES.forEach((e,i)=>{
+    s += `<text class="edge-label" data-edge="${i}" x="${e.lx}" y="${e.ly}">${e.label}</text>`;
+  });
+  s += `</svg>`;
+  $("#map-canvas").innerHTML = s;
+}
+
+let currentTool = "ddb";
+function renderToolDetail(id){
+  const t = TOOLS[id], r = ROLES[t.role];
+  $("#detail").innerHTML = `
+    <span class="d-cat"><span class="dot" style="background:${r.color}"></span>${r.label}${t.hub?" \u00b7 the hub":""}</span>
+    <div class="d-name">${t.name}</div>
+    <div class="d-exp">${t.tagline}</div>
+    <p class="d-body">${t.body}</p>
+    ${t.links?`<div class="d-links">${t.links}</div>`:""}`;
+}
+function selectTool(id){
+  if(!TOOLS[id]) return;
+  currentTool = id;
+  renderToolDetail(id);
+  const rel = TOOLS[id].related || [];
+  $$(".mapsvg .node").forEach(g=>{
+    const gid = g.dataset.id;
+    g.classList.toggle("sel", gid===id);
+    g.classList.toggle("rel", gid!==id && rel.includes(gid));
+  });
+  const env = $("#env");
+  env.classList.remove("sel","rel");
+  if(id==="maglev") env.classList.add("sel");
+  else if(rel.includes("maglev")) env.classList.add("rel");
+  $$(".mapsvg .edge, .mapsvg .edge-label").forEach(el=>{
+    const e = EDGES[+el.dataset.edge];
+    el.classList.toggle("hot", e.a===id || e.b===id);
+  });
+  $$(".ov-card").forEach(c=> c.classList.toggle("active", c.dataset.id===id));
+}
+buildMap();
+$("#map-canvas").addEventListener("click", e=>{
+  const node = e.target.closest(".node"); if(node){ selectTool(node.dataset.id); return; }
+  const lbl = e.target.closest(".env-label"); if(lbl){ selectTool("maglev"); }
+});
+$("#map-canvas").addEventListener("keydown", e=>{
+  if(e.key==="Enter" || e.key===" "){
+    const node = e.target.closest(".node"); const lbl = e.target.closest(".env-label");
+    if(node){ e.preventDefault(); selectTool(node.dataset.id); }
+    else if(lbl){ e.preventDefault(); selectTool("maglev"); }
+  }
+});
+
+/* workflow */
+(()=>{
+  const w = $("#flow-steps");
+  FLOW.forEach((s,i)=>{
+    const rc = ROLES[s.role].color;
+    const b = document.createElement("button");
+    b.className = "step"; b.dataset.i = i; b.style.borderTopColor = rc;
+    b.innerHTML = `<div class="sn" style="color:${rc}">STEP ${s.n}${i<FLOW.length-1?'<span class="arr">\u2192</span>':''}</div>
+      <div class="st">${s.name}</div><span class="stool">${s.tool}</span>`;
+    b.addEventListener("click", ()=> selectStep(i));
+    w.appendChild(b);
+  });
+})();
+function selectStep(i){
+  const s = FLOW[i], rc = ROLES[s.role].color;
+  $$(".step").forEach(el=> el.classList.toggle("is-active", +el.dataset.i===i));
+  const d = $("#flow-detail");
+  d.style.borderLeftColor = rc;
+  d.innerHTML = `<div class="ft" style="color:${rc}">Step ${s.n} \u00b7 ${s.tool}</div>${s.body}`;
+}
+
+/* data model */
+(()=>{
+  const w = $("#dm");
+  DM.forEach((d,i)=>{
+    const n = document.createElement("div"); n.className="dm-node";
+    n.innerHTML = `<div class="dk">${d.k}</div><div class="dd">${d.d}</div>`;
+    w.appendChild(n);
+    if(i<DM.length-1){ const a=document.createElement("div"); a.className="dm-arrow"; a.textContent="\u2192"; w.appendChild(a); }
+  });
+})();
+
+/* panel types */
+(()=>{
+  const w = $("#ptypes");
+  PTYPES.forEach(([name,desc,core])=>{
+    const c = document.createElement("div"); c.className="pt";
+    c.innerHTML = `<div class="ptn">${core?'<span class="core"></span>':''}${name}</div><div class="ptd">${desc}</div>`;
+    w.appendChild(c);
+  });
+})();
+
+/* build paths */
+(()=>{
+  const w = $("#paths");
+  PATHS.forEach(p=>{
+    const c = document.createElement("div"); c.className="path"; c.style.borderTopColor = p.accent;
+    c.innerHTML = `<div class="ph"><span class="pname">${p.name}</span><span class="effort" style="color:${p.accent}">${p.effort}</span></div>
+      <div class="pwhen">${p.when}</div>
+      <ol>${p.steps.map(s=>`<li>${s}</li>`).join("")}</ol>`;
+    w.appendChild(c);
+  });
+})();
+
+/* learning order */
+(()=>{
+  const w = $("#chain");
+  CHAIN.forEach((c,i)=>{
+    const rc = ROLES[c.role].color;
+    const d = document.createElement("div"); d.className="clink";
+    d.innerHTML = `<div class="cn" style="color:${rc}">${String(i+1).padStart(2,"0")}</div>
+      <div class="ctool" style="color:${rc}">${c.tool}</div>
+      <div class="ctxt">${c.text}</div>`;
+    w.appendChild(d);
+  });
+})();
+
+/* scroll-spy */
+(()=>{
+  const links = $$(".rail a"); const map = {};
+  links.forEach(l=> map[l.getAttribute("href").slice(1)] = l);
+  const obs = new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){ links.forEach(l=>l.classList.remove("active")); if(map[e.target.id]) map[e.target.id].classList.add("active"); } });
+  }, {rootMargin:"-45% 0px -50% 0px"});
+  Object.keys(map).forEach(id=>{ const el=document.getElementById(id); if(el) obs.observe(el); });
+})();
+
+/* init */
+selectTool("ddb");
+selectStep(0);
+/* on narrow screens the map scrolls horizontally — center it on the DDB hub */
+setTimeout(()=>{ const mc=$("#map-canvas"); if(mc.scrollWidth>mc.clientWidth){ mc.scrollLeft=(mc.scrollWidth-mc.clientWidth)/2; } }, 60);
+</script>
+</body>
+</html>
