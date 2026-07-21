@@ -1,0 +1,2078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>U-Turn Sprint · May 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d10;
+    --panel: #14181d;
+    --panel-2: #1a1f26;
+    --border: #262c34;
+    --border-b: #333a43;
+    --text: #e6e9ec;
+    --text-dim: #8a9199;
+    --text-faint: #5c626a;
+
+    --xxl: #ff3b30;
+    --xl:  #ff8c1a;
+    --l:   #ffc233;
+    --m:   #4aa8ff;
+    --s:   #34c47a;
+    --skip:#7a8391;
+
+    --accent: #00d4a1;
+    --accent-dim: #007a5c;
+
+    --ff-mono: "JetBrains Mono", ui-monospace, monospace;
+    --ff-body: "Inter", system-ui, sans-serif;
+
+    --maxw: 1240px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--ff-body);
+    font-weight: 400;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, .mono { font-family: var(--ff-mono); font-size: 0.9em; }
+
+  /* ================== HERO ================== */
+  .hero {
+    border-bottom: 1px solid var(--border);
+    padding: 40px 24px 32px;
+  }
+  .hero-inner { max-width: var(--maxw); margin: 0 auto; }
+  .eyebrow {
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: var(--ff-mono);
+    font-weight: 700;
+    font-size: 42px;
+    line-height: 1.1;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+  .hero-sub {
+    color: var(--text-dim);
+    font-size: 15px;
+    max-width: 720px;
+    margin-bottom: 28px;
+  }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .hero-stat {
+    background: var(--panel);
+    padding: 18px 20px;
+  }
+  .hero-stat-value {
+    font-family: var(--ff-mono);
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .hero-stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* ================== TIMELINE / TABS ================== */
+  .timeline-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+  }
+  .timeline-inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-b) var(--panel);
+  }
+  .timeline-inner::-webkit-scrollbar { height: 6px; }
+  .timeline-inner::-webkit-scrollbar-track { background: var(--panel); }
+  .timeline-inner::-webkit-scrollbar-thumb { background: var(--border-b); border-radius: 3px; }
+  .tab {
+    flex: 0 0 auto;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-right: none;
+    padding: 10px 14px;
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: background 120ms, color 120ms, border-color 120ms;
+    text-align: left;
+    min-width: 96px;
+    position: relative;
+  }
+  .tab:first-child { border-radius: 4px 0 0 4px; }
+  .tab:last-child { border-right: 1px solid var(--border); border-radius: 0 4px 4px 0; }
+  .tab:hover { background: var(--panel-2); color: var(--text); }
+  .tab.active {
+    background: var(--panel-2);
+    color: var(--text);
+    border-color: var(--accent);
+    z-index: 1;
+  }
+  .tab.active + .tab { border-left-color: var(--accent); }
+  .tab-date {
+    display: block;
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 2px;
+  }
+  .tab-rate {
+    font-size: 10px;
+    color: var(--text-faint);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .tab.active .tab-rate { color: var(--text-dim); }
+  .tab-bar {
+    height: 3px;
+    margin-top: 6px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+  .tab-bar-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    border-radius: 2px;
+  }
+  .tab-tester {
+    display: inline-block;
+    font-family: var(--ff-mono);
+    font-size: 9px;
+    padding: 1px 5px;
+    background: var(--border);
+    border-radius: 2px;
+    color: var(--text-dim);
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .tab.active .tab-tester { background: var(--accent-dim); color: var(--text); }
+  .tab.iforv { background: linear-gradient(135deg, var(--panel), #1f2830); }
+  .tab.iforv .tab-date::after { content: " ★"; color: var(--accent); }
+
+  /* ================== SESSION PANEL ================== */
+  .panel-wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+  .session { display: none; }
+  .session.active { display: block; }
+
+  .session-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+  }
+  .session-title {
+    font-family: var(--ff-mono);
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    letter-spacing: -0.005em;
+  }
+  .session-subtitle {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px 28px;
+    font-family: var(--ff-mono);
+    font-size: 12px;
+  }
+  .meta-item { color: var(--text-dim); }
+  .meta-item strong { color: var(--text); font-weight: 500; margin-left: 4px; }
+  .meta-item a { font-family: var(--ff-mono); }
+
+  /* Verdict cards */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left-width: 3px;
+    border-radius: 4px;
+    padding: 14px 16px;
+  }
+  .card.success { border-left-color: var(--s); }
+  .card.warning { border-left-color: var(--l); }
+  .card.critical { border-left-color: var(--xl); }
+  .card.info { border-left-color: var(--m); }
+  .card-icon {
+    font-size: 18px;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .card-title {
+    font-family: var(--ff-mono);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .card-body { font-size: 13px; color: var(--text-dim); }
+
+  /* Severity strip */
+  .sev-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .sev-cell {
+    background: var(--panel);
+    padding: 12px 14px;
+    position: relative;
+  }
+  .sev-cell::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .sev-cell.xxl::before { background: var(--xxl); }
+  .sev-cell.xl::before  { background: var(--xl); }
+  .sev-cell.l::before   { background: var(--l); }
+  .sev-cell.m::before   { background: var(--m); }
+  .sev-cell.s::before   { background: var(--s); }
+  .sev-label {
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    padding-left: 8px;
+  }
+  .sev-cell.xxl .sev-label { color: var(--xxl); }
+  .sev-cell.xl .sev-label  { color: var(--xl); }
+  .sev-cell.l .sev-label   { color: var(--l); }
+  .sev-cell.m .sev-label   { color: var(--m); }
+  .sev-cell.s .sev-label   { color: var(--s); }
+  .sev-value {
+    font-family: var(--ff-mono);
+    font-size: 22px;
+    font-weight: 600;
+    padding-left: 8px;
+    margin-top: 2px;
+  }
+  .sev-desc {
+    font-size: 11px;
+    color: var(--text-faint);
+    padding-left: 8px;
+    margin-top: 4px;
+    line-height: 1.35;
+  }
+
+  /* Section headers */
+  .sect {
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+  .sect-h {
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Event table */
+  .events-wrap {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  table.events {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.events thead th {
+    background: var(--panel-2);
+    color: var(--text-dim);
+    font-family: var(--ff-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+  }
+  table.events tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 100ms;
+  }
+  table.events tbody tr:last-child { border-bottom: none; }
+  table.events tbody tr:hover { background: var(--panel-2); }
+  table.events td {
+    padding: 10px 14px;
+    vertical-align: top;
+  }
+  .col-w   { width: 60px; font-family: var(--ff-mono); color: var(--text-dim); font-weight: 500; }
+  .col-sev { width: 60px; }
+  .col-loc { width: 200px; font-size: 12px; color: var(--text-dim); }
+
+  .chip {
+    display: inline-block;
+    font-family: var(--ff-mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+    line-height: 1.5;
+  }
+  .chip.xxl { background: rgba(255,59,48,0.15);  color: var(--xxl); border: 1px solid rgba(255,59,48,0.35); }
+  .chip.xl  { background: rgba(255,140,26,0.15); color: var(--xl);  border: 1px solid rgba(255,140,26,0.35); }
+  .chip.l   { background: rgba(255,194,51,0.12); color: var(--l);   border: 1px solid rgba(255,194,51,0.30); }
+  .chip.m   { background: rgba(74,168,255,0.12); color: var(--m);   border: 1px solid rgba(74,168,255,0.30); }
+  .chip.s   { background: rgba(52,196,122,0.12); color: var(--s);   border: 1px solid rgba(52,196,122,0.30); }
+  .chip.skip{ background: var(--border);         color: var(--text-dim); border: 1px solid var(--border-b); }
+
+  .event-desc { color: var(--text); }
+  .event-tag {
+    display: inline-block;
+    font-family: var(--ff-mono);
+    font-size: 9px;
+    padding: 1px 5px;
+    background: var(--panel-2);
+    border-radius: 2px;
+    color: var(--text-faint);
+    margin-left: 6px;
+    vertical-align: middle;
+    border: 1px solid var(--border);
+  }
+  .warn-inline { color: var(--xl); }
+  .crit-inline { color: var(--xxl); }
+
+  /* Trends / locations */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 780px) {
+    .two-col { grid-template-columns: 1fr; }
+    h1 { font-size: 32px; }
+    .hero-stats { grid-template-columns: 1fr 1fr; }
+    .col-loc { display: none; }
+  }
+  .list {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 0;
+  }
+  .list-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+  }
+  .list-row:last-child { border-bottom: none; }
+  .list-row-label { color: var(--text-dim); flex: 1; padding-right: 12px; }
+  .list-row-count {
+    font-family: var(--ff-mono);
+    color: var(--text);
+    font-weight: 600;
+    background: var(--panel-2);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+
+  /* Config table */
+  .cfg-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .cfg-table th {
+    background: var(--panel-2);
+    color: var(--text-dim);
+    font-family: var(--ff-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cfg-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .cfg-table tr:last-child td { border-bottom: none; }
+  .cfg-rate {
+    font-family: var(--ff-mono);
+    font-weight: 600;
+  }
+  .cfg-rate.pass { color: var(--s); }
+  .cfg-rate.mid  { color: var(--l); }
+  .cfg-rate.fail { color: var(--xl); }
+
+  /* Callout */
+  .callout {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+  .callout.warn { border-left-color: var(--l); }
+  .callout.crit { border-left-color: var(--xl); }
+
+  /* Overview panel */
+  .overview .cards { margin-bottom: 32px; }
+  .arc {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .arc-h {
+    font-family: var(--ff-mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .arc h3 {
+    font-family: var(--ff-mono);
+    font-size: 16px;
+    margin: 0 0 8px;
+  }
+  .arc p { font-size: 13px; color: var(--text-dim); margin: 0 0 8px; }
+  .arc-week {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .arc-week:last-child { border-bottom: none; padding-bottom: 0; }
+  .arc-week-label {
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding-top: 2px;
+  }
+
+  /* footer */
+  .foot {
+    max-width: var(--maxw);
+    margin: 40px auto 0;
+    padding: 20px 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-faint);
+    font-size: 12px;
+    font-family: var(--ff-mono);
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">R18 · U-Turn Feature Sprint · Reported June 2026</div>
+    <h1>U-Turn Sprint Retrospective</h1>
+    <p class="hero-sub">Twelve in-car U-turn-focused sessions across three weeks in May, plus IFORV validation on 6/10. Sprint goal: 80% success rate on Large-Intersection U-turns for R18 feature completion — <strong style="color:var(--s)">met</strong>.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value">~479</div>
+        <div class="hero-stat-label">U-turn events tested</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">8</div>
+        <div class="hero-stat-label">Builds validated</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">80%</div>
+        <div class="hero-stat-label">Overall pass — goal met</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">95%</div>
+        <div class="hero-stat-label">6/10 IFORV pass</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="timeline-wrap" role="tablist" aria-label="Session timeline">
+  <div class="timeline-inner" id="tabbar"></div>
+</nav>
+
+<main class="panel-wrap" id="panels"></main>
+
+<footer class="foot">
+  U-Turn Sprint · May 2026 · Compiled from 12 in-car test sessions + 6/10 IFORV
+</footer>
+
+<script>
+  // Data — sessions in chronological order
+  const sessions = [
+    // ============ OVERVIEW ============
+{
+  type: 'overview',
+  label: 'Overview',
+  title: 'Sprint at a Glance',
+  subtitle: 'The narrative, the pareto, and the builds — before diving into individual sessions.',
+  verdictCards: [
+    { kind: 'success', icon: '✅', title: 'Goal Met', body: '80% success rate on Large-Intersection U-turns hit by end of sprint (per 5/26 email). Week of 5/26: 84% success rate on Large Intersections.' },
+    { kind: 'success', icon: '⭐', title: 'IFORV Validation', body: 'sft-5748 delivered 95% pass on 6/10 — 19/20 U-turns clean. Only remaining failure: Bowers & Central asymmetric road-graph issue.' },
+    { kind: 'warning', icon: '⚠️', title: 'ODD Deferrals', body: '2-lane and 2-lane + bike configurations formally deferred to R19. Small Intersection ODD unlock deemed too expensive for R18.' },
+    { kind: 'critical', icon: '🚨', title: 'Persistent Blockers', body: 'Bowers & Central asymmetric (road graph). Vehicle navigation deliberately avoiding U-turns in some vehicles. Wide-median without HD map.' },
+  ],
+  arcs: [
+    { week: 'Week 1–2', title: 'Regression discovery', body: 'sft-4640 and sft-4815 regressed vs the sft-4461 baseline. AMO introduced hesitancy, jerkiness, and understeers. CLE U-Turn suite caught the sft-4815 regression before in-car testing on 5/13 — validated the CLE test loop itself.' },
+    { week: 'Week 3', title: 'Solutions land', body: 'SFT-5285 experiment shipped 5/20 and resolved understeer/hesitancy. 5/21 was the best single day (78% on 74 turns). 5/22 hit 82% on 67 U-turns — first session to clear the goal.' },
+    { week: 'Week 4', title: 'Second experiment', body: 'SFT-5386 experiment succeeded and passed mini-CCB. Week 5/26 hit 84% success rate on Large Intersections. Small Intersection formally deferred to R19.' },
+    { week: 'IFORV 6/10', title: 'Final validation', body: 'sft-5748 tested at IFORV. 95% pass rate. Only remaining failure was Bowers & Central asymmetric — a road-graph issue that persisted across every build in the sprint and remains unresolved, awaiting AVCF-8615.' },
+  ],
+  pareto: [
+    { owner: 'AMO', cluster: 'UT jerks / understeer / fishhooks · oversteer into RB · hesitant/stuck', fix: 'SFT-5285 experiment (5/20) · SFT-5386 experiment (5/28, passed mini-CCB) · AVPC-61976 island-nudge safety (6/5)' },
+    { owner: 'CF', cluster: 'UT missed — no topo connectivity · UT oversteer w/ LG–RB overlap · LG too narrow / unstable in turn', fix: 'AVCF-8731 (6/4) · AVCF-8960 extend valid U-turn area (6/4) · AVCF-3923 CRLG on U-turn rails (6/9) · AVCF-8615 asymmetric RL gen (6/23)' },
+    { owner: 'RS', cluster: 'UT missed — wrong rail · UT wobble — flickering · UT infeasible — wrongly filtered', fix: 'CLs 842284, 842052, 842162, 842976 (all landed 5/29)' },
+    { owner: 'RLP', cluster: 'UT missed — no preference · UT wobble — flickering', fix: 'ARLP-1677 rep-rail (merged 5/28) · ARLP-1686 arrowmark preference · CL 835789 (merged)' },
+    { owner: 'RL', cluster: 'Understeer & wobble in turn', fix: 'CL 839718 corridor expansion (5/28)' },
+    { owner: 'YP / WCP / RN', cluster: 'FN yields to oncomers · FP cone blocking · unstable RB detection', fix: 'CL 818422 VRU buffer · CL 822117 truncation persistence (6/2) · RB detection fixes' },
+  ],
+  buildTable: [
+    { build: '45442966.1', buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45442966&vid=1', model: 'sft-4640', dates: '5/12', verdict: 'FAIL', notes: 'Sprint kickoff. Regressed vs sft-4461 baseline.' },
+    { build: '45454651.3', buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45454651&vid=3', model: 'sft-4815 + Feasibility Filter removed', dates: '5/13, 5/14', verdict: 'FAIL', notes: 'CLE U-Turn suite caught this regression before in-car.' },
+    { build: '45500875.2', buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45500875&vid=2', model: 'sft-4815 + Filter', dates: '5/15 AM, 5/19, 5/20 PM', verdict: 'PASS', notes: 'Filter refactor (CLs 796088, 816453, 821169). ~85% aggregate.' },
+    { build: '45565919.9', buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45565919&vid=9', model: 'sft-5285', dates: '5/20 AM, 5/21 AM', verdict: 'MIXED', notes: 'SFT-5285 experiment. Fixed understeer/hesitancy, exposed asymmetric gaps.' },
+    { build: '45588152.4', buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45588152&vid=4', model: '(not stated)', dates: '5/21 PM', verdict: 'FAIL', notes: 'New early-entry behavior introduced oversteer risk.' },
+    { build: '45599836.1', buildUrl: 'https://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45599836&vid=1', model: 'sft-4640', dates: '5/22', verdict: 'PASS', notes: 'Best single-session performance of the sprint. 82% on 67 events.' },
+    { build: '45649850.2', buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45649850&vid=2', model: 'sft-5386', dates: '5/26 PM, 5/27', verdict: 'MIXED', notes: 'Passed mini-CCB. Low PM pass rate driven by navigation refusing U-turns.' },
+    { build: '45915737.1', buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45915737&vid=1', model: 'sft-5748', dates: '6/10 PM (IFORV)', verdict: 'PASS', notes: '95% pass on 20 U-turns. Only fail: Bowers & Central asymmetric.' },
+  ],
+},
+
+// ============ 5/12 AM ============
+{
+  label: '5/12 AM',
+  title: 'PMB U-Turn Focused Drive',
+  subtitle: '3 Structured Routes + Freestyle · No HD Map · Sprint kickoff',
+  build: '45442966.1',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45442966&vid=1',
+  model: 'sft-4640',
+  tester: 'W',
+  barPct: 52,
+  barLabel: '52% M+S',
+  verdictCards: [
+    { kind: 'success', icon: '✅', title: 'No FP U-turns', body: 'No false positives observed across all routes.' },
+    { kind: 'warning', icon: '⚠️', title: 'Hesitant & Inconsistent', body: 'Wobbles, slow starts, fishhooks, oversteer across lane counts; worst on 2-lane.' },
+    { kind: 'critical', icon: '🚨', title: 'Platform Concerns', body: 'ROV failures in NDAS panel, lane keep inoperative, mid-U-turn disengagements (W27, W51).' },
+  ],
+  tallies: { xl: 22, l: 12, m: 18, s: 12, xlDesc: 'missed · no attempt · oversteer · disengage · drive-off red into oncoming', lDesc: 'wobble · fishhook · wide turn · harsh brake · over double yellow · understeer', mDesc: 'slight wobble · jerky · slow · hesitant · braking at end · wide turn', sDesc: 'good turn · correct lane · clean' },
+  pass: [
+    { label: 'Pass Rate (M+S)', value: '52%', rate: 52 },
+    { label: 'Total Events', value: '58', rate: 100 },
+  ],
+  trends: [
+    { label: 'Missed / no attempt (incl. rail present)', count: 17 },
+    { label: 'Wobble (start / end / mid-turn)', count: 11 },
+    { label: 'Fishhook maneuver', count: 7 },
+    { label: 'Jerky execution', count: 6 },
+    { label: 'Under/oversteer (wrong lane / curb)', count: 5 },
+    { label: 'Hesitant start / slow approach', count: 5 },
+    { label: 'Mid-turn disengage / stop', count: 3 },
+  ],
+  locations: [
+    { label: 'Bowers & Mead', detail: 'Missed ×2 (W12, W19)' },
+    { label: 'Bowers & Chromite', detail: 'Missed ×2 (W8, W22)' },
+    { label: 'Scott & Coronado', detail: 'Missed ×2 (W66, W67)' },
+    { label: 'San Tomas & El Camino', detail: 'Fishhook ×2 (W45, W48)' },
+  ],
+  callouts: [
+    { kind: 'crit', text: '⚠️ W58: Drive-off on red during U-turn. W57: Deep oversteer into oncoming at unprotected U-turn. W59+: Lane keep inoperative; multiple ROV failures in NDAS.' },
+    { text: 'ℹ️ 4-lane intersections on San Tomas show better attempt rate but inconsistent execution.' },
+  ],
+  events: [
+    { id: 'W1', sev: 'XL', desc: '5-lane; did not turn enough', loc: '—' },
+    { id: 'W2', sev: 'L', desc: 'HD map no; double-lane wide turn', loc: '—' },
+    { id: 'W4', sev: 'S', desc: '3-lane; slight understeer merge into sublane', loc: '—' },
+    { id: 'W5', sev: 'XL', desc: '2-lane; no attempt with rail present — turned left into parking lot', loc: '—' },
+    { id: 'W6', sev: 'S', desc: '3-lane; good turn', loc: '—' },
+    { id: 'W8', sev: 'XL', desc: '2-lane; not attempted', loc: 'Chromite & Bowers' },
+    { id: 'W9', sev: 'S', desc: '4-lane; wobble at end', loc: 'San Tomas & Walsh' },
+    { id: 'W10', sev: 'M', desc: '3-lane; slightly jerky but good', loc: 'Central & Scott' },
+    { id: 'W11', sev: 'S', desc: '3-lane; turned into merging sublane', loc: 'Scott & Oakmead' },
+    { id: 'W12', sev: 'XL', desc: '2-lane; attempted left turn instead', loc: 'Bowers & Mead' },
+    { id: 'W13', sev: 'L', desc: '3-lane; jerky start, understeer right', loc: 'Bowers & Central' },
+    { id: 'W14', sev: 'XL', desc: '2-lane; missed with U-turn rail present', loc: 'Bowers & Chromite' },
+    { id: 'W16', sev: 'M', desc: '3-lane; wobble at end, turned into far right lane', loc: 'San Tomas & Walsh' },
+    { id: 'W17', sev: 'M', desc: '3-lane; braking at end of turn', loc: 'Scott & Central' },
+    { id: 'W18', sev: 'M', desc: '3-lane; slightly slow on approach', loc: 'Oakmead & Scott' },
+    { id: 'W19', sev: 'XL', desc: '2-lane; missed with U-turn rail present', loc: 'Bowers & Mead' },
+    { id: 'W20', sev: 'XL', desc: '3-lane; came to stop mid-turn at odd angle', loc: 'Bowers & Central' },
+    { id: 'W22', sev: 'XL', desc: '2-lane; no attempt with rail present', loc: 'Bowers & Chromite' },
+    { id: 'W23', sev: 'S', desc: '4-lane; good turn', loc: 'San Tomas & Walsh' },
+    { id: 'W24', sev: 'L', desc: '4-lane; harsh brake and wobble', loc: 'San Tomas & Monroe' },
+    { id: 'W25', sev: 'M', desc: '4-lane; wobble at end', loc: 'San Tomas & Scott' },
+    { id: 'W26', sev: 'L', desc: '4-lane; wobble at end of turn', loc: 'San Tomas & Cabrillo' },
+    { id: 'W27', sev: 'XL', desc: '4-lane; disengaged mid U-turn', loc: 'San Tomas & Mission College' },
+    { id: 'W28', sev: 'M', desc: '4-lane; wobble at end', loc: 'San Tomas & Homestead' },
+    { id: 'W29', sev: 'XL', desc: '4-lane; hesitant at start, assist required', loc: 'San Tomas & Benton' },
+    { id: 'W30', sev: 'L', desc: '4-lane; very hesitant start, jerky', loc: 'San Tomas & Forbes' },
+    { id: 'W31', sev: 'M', desc: '4-lane; slightly jerky end, wide turn', loc: 'San Tomas & Benton' },
+    { id: 'W32', sev: 'M', desc: '3-lane; wobble at end', loc: 'San Tomas & Pruneridge' },
+    { id: 'W33', sev: 'S', desc: '3-lane; slight fishhook at end', loc: 'San Tomas & Forbes' },
+    { id: 'W34', sev: 'S', desc: '3-lane; turned into second lane', loc: 'San Tomas & Saratoga' },
+    { id: 'W35', sev: 'M', desc: '3-lane; wobble at beginning, turned into second lane', loc: '—' },
+    { id: 'W36', sev: 'S', desc: '3-lane; turned into 3rd lane', loc: 'San Tomas & Stevens Creek' },
+    { id: 'W37', sev: 'M', desc: '3-lane; entered second lane, slight wobble', loc: 'San Tomas & Saratoga' },
+    { id: 'W38', sev: 'M', desc: '3-lane; wobble at end', loc: 'San Tomas & Moorpark' },
+    { id: 'W39', sev: 'M', desc: '3-lane; jerky', loc: 'San Tomas & Stevens Creek' },
+    { id: 'W40', sev: 'XL', desc: '3-lane; early oversteer, almost hit curb', loc: 'San Tomas & Moorpark' },
+    { id: 'W41', sev: 'L', desc: '3-lane; turned early over double yellow + wobble', loc: 'San Tomas & Homestead' },
+    { id: 'W42', sev: 'L', desc: '3-lane; wobble', loc: 'San Tomas & Forbes' },
+    { id: 'W43', sev: 'L', desc: '4-lane; fishhook at end', loc: 'San Tomas & Benton' },
+    { id: 'W44', sev: 'M', desc: '4-lane; hesitant start', loc: 'San Tomas & Homestead' },
+    { id: 'W45', sev: 'L', desc: '4-lane; fishhook maneuver', loc: 'San Tomas & El Camino Real' },
+    { id: 'W46', sev: 'M', desc: '4-lane; slight jerk at end', loc: 'San Tomas & Benton' },
+    { id: 'W47', sev: 'L', desc: '4-lane; understeer into carpool lane, fishhook', loc: '—' },
+    { id: 'W48', sev: 'L', desc: '4-lane; fishhook at end', loc: 'San Tomas & El Camino Real' },
+    { id: 'W49', sev: 'S', desc: '4-lane; good turn', loc: 'San Tomas & Monroe' },
+    { id: 'W50', sev: 'L', desc: '4-lane; wide turn into carpool lane, fishhook', loc: 'San Tomas & Cabrillo' },
+    { id: 'W51', sev: 'XL', desc: '3-lane; disengaged mid U-turn', loc: '—' },
+    { id: 'W52', sev: 'XL', desc: '3-lane; made left turn instead', loc: 'Central & Bowers' },
+    { id: 'W53', sev: 'XL', desc: '3-lane; missed turn', loc: 'Walsh & Bowers' },
+    { id: 'W54', sev: 'M', desc: '3-lane; very slow', loc: '—' },
+    { id: 'W55', sev: 'S', desc: '3-lane; good turn', loc: '—' },
+    { id: 'W56', sev: 'XL', desc: '2-lane; not attempted', loc: 'Lafayette & Laurelwood' },
+    { id: 'W57', sev: 'XL', desc: '3-lane; unprotected U-turn, went deep into oncoming <span class="crit-inline">⚠</span>', loc: '—' },
+    { id: 'W58', sev: 'XL', desc: '2-lane; drive-off on red <span class="crit-inline">⚠⚠</span>', loc: 'Lafayette & Aldo' },
+    { id: 'W59', sev: 'XL', desc: '2-lane; no attempt, no lane markings — lane keep inoperative, ROV failures noted', loc: '—' },
+    { id: 'W62', sev: 'XL', desc: '2-lane; not attempted', loc: 'Scott & Olcot' },
+    { id: 'W63', sev: 'XL', desc: '2-lane; no attempt with rail present', loc: 'Jay & Scott' },
+    { id: 'W64', sev: 'XL', desc: '2-lane; no attempt with rail present', loc: 'Scott & Bowers' },
+    { id: 'W65', sev: 'M', desc: '3-lane; unprotected U-turn', loc: '—' },
+    { id: 'W66', sev: 'XL', desc: '2-lane; not attempted', loc: 'Scott & Coronado' },
+    { id: 'W67', sev: 'XL', desc: '2-lane; no attempt with rail present', loc: 'Scott & Coronado' },
+    { id: 'W69a', sev: 'XL', desc: '3-lane; not attempted with rail', loc: 'Central & Bowers' },
+    { id: 'W69b', sev: 'S', desc: '2-lane; good turn', loc: '—' },
+    { id: 'W70', sev: 'M', desc: '3-lane; slightly slow into 3rd lane', loc: 'Central & Scott' },
+  ],
+},
+
+// ============ 5/12 PM ============
+{
+  label: '5/12 PM',
+  title: 'IFORV: Mitigate FP U-Turn',
+  subtitle: 'Route 1: U-turn Route · Route 2: Route 61 · Route 3: P2P Palo Alto',
+  build: '45442966.1',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45442966&vid=1',
+  model: 'sft-4640',
+  tester: 'W',
+  barPct: 33,
+  barLabel: '33% M+S',
+  verdictCards: [
+    { kind: 'success', icon: '✅', title: 'No FP U-turns', body: 'No false-positive U-turns triggered across all routes.' },
+    { kind: 'success', icon: '✅', title: 'No Obvious Regression', body: 'Behavior consistent with prior sessions; no new failure modes identified.' },
+    { kind: 'warning', icon: '⚠️', title: 'Hesitant & Inconsistent U-turns', body: 'Slow starts, wobbles, under/oversteer; pass/fail varies by lane count and location.' },
+  ],
+  tallies: { xl: 12, l: 29, m: 9, s: 11, xlDesc: 'missed U-turn · oversteer · drive-off red · SILC stuck · hard brake · jerk mid-turn', lDesc: 'ghost brake · wobble · lane drift · understeer · hesitant · lane hug · into bike lane', mDesc: 'brake tap · slight hard brake · lane hug · understeer · speed bump · FP', sDesc: 'good U-turn · good DRT · TN U-turn · pass · route start' },
+  pass: [
+    { label: 'Pass Rate (M+S)', value: '33%', rate: 33 },
+    { label: 'Total Events', value: '61', rate: 100 },
+    { label: 'Route 1 U-turn Pass', value: '8%', rate: 8 },
+    { label: 'Route 3 P2P Pass', value: '45%', rate: 45 },
+  ],
+  callouts: [
+    { kind: 'crit', text: '⚠️ Most serious: R61 drive-off on red (event 15) — immediate safety concern.' },
+    { text: 'ℹ️ All TN U-turn scenarios passed — no false positives triggered across any route.' },
+  ],
+  events: [
+    { id: 'R1·1', sev: 'XL', desc: 'Bad U-turn 4-lane; strong ghost brake at start with contender behind', loc: 'Route 1' },
+    { id: 'R1·2a', sev: 'XL', desc: 'APTO SILC stuck; assist to clear way for contender', loc: 'Route 1' },
+    { id: 'R1·2b', sev: 'XL', desc: 'Late SILC into lane split; steering assist required', loc: 'Route 1' },
+    { id: 'R1·2c', sev: 'XL', desc: 'Multiple SILCs in a row missed', loc: 'Route 1' },
+    { id: 'R1·5', sev: 'S', desc: 'U-turn good 3-lane; correct turn into 3rd lane', loc: 'Route 1' },
+    { id: 'R1·6', sev: 'L', desc: 'Ghost brake', loc: 'Route 1' },
+    { id: 'R1·7', sev: 'L', desc: 'Ghost brake at dedicated right turn', loc: 'Route 1' },
+    { id: 'R1·8', sev: 'L', desc: 'U-turn good 2-lane; very slow start, otherwise acceptable', loc: 'Route 1' },
+    { id: 'R1·9', sev: 'L', desc: 'Understeer into wrong lane', loc: 'Route 1' },
+    { id: 'R1·10', sev: 'XL', desc: 'U-turn missed 2-lane; no attempt with rail present', loc: 'Route 1' },
+    { id: 'R1·11', sev: 'L', desc: 'Wobble before U-turn', loc: 'Route 1' },
+    { id: 'R1·12', sev: 'XL', desc: 'U-turn bad 3-lane; oversteer into road boundary', loc: 'Route 1' },
+    { id: 'R2·Start', sev: 'S', desc: 'Route start nominal', loc: 'Route 2 · R61' },
+    { id: 'R2·2', sev: 'M', desc: 'Medium brake tap', loc: 'Route 2' },
+    { id: 'R2·3', sev: 'L', desc: 'Lane drift left', loc: 'Route 2' },
+    { id: 'R2·4', sev: 'L', desc: 'Lane drift left into yellow lane', loc: 'Route 2' },
+    { id: 'R2·5', sev: 'M', desc: 'Harder braking before stop sign', loc: 'Route 2' },
+    { id: 'R2·6', sev: 'L', desc: 'Very hesitant at ULT with no contenders', loc: 'Route 2' },
+    { id: 'R2·7', sev: 'S', desc: 'Good DRT yielding to cross traffic', loc: 'Route 2' },
+    { id: 'R2·8', sev: 'L', desc: 'Wobble before and after split; close to contender', loc: 'Route 2' },
+    { id: 'R2·9', sev: 'L', desc: 'Lane drift left on curvature', loc: 'Route 2' },
+    { id: 'R2·10', sev: 'L', desc: 'Lane drift left over reflectors; overnudging for parked cars right', loc: 'Route 2' },
+    { id: 'R2·11', sev: 'L', desc: 'Very hesitant at ULT with contenders on both ends', loc: 'Route 2' },
+    { id: 'R2·12', sev: 'L', desc: 'Hard braking + jerk left with lead turning right', loc: 'Route 2' },
+    { id: 'R2·13', sev: 'L', desc: 'Lane change jerky at split', loc: 'Route 2' },
+    { id: 'R2·14', sev: 'L', desc: 'Pulse braking before TL', loc: 'Route 2' },
+    { id: 'R2·15', sev: 'XL', desc: 'Drive-off on red <span class="crit-inline">⚠</span>', loc: 'Route 2' },
+    { id: 'R2·16', sev: 'XL', desc: 'Hesitant at ramp with contenders; APTO takeover', loc: 'Route 2' },
+    { id: 'R2·17', sev: 'L', desc: 'Wobble on highway', loc: 'Route 2' },
+    { id: 'R2·18', sev: 'L', desc: 'Wobble during SILC to follow route', loc: 'Route 2' },
+    { id: 'R2·19', sev: 'M', desc: 'Slightly hard brake approaching red TL', loc: 'Route 2' },
+    { id: 'R2·20', sev: 'L', desc: 'Lane hugging close to contender', loc: 'Route 2' },
+    { id: 'R2·21', sev: 'M', desc: 'Lane hug left', loc: 'Route 2' },
+    { id: 'R2·22', sev: 'L', desc: 'AV main CPU consistently at 94%+', loc: 'Route 2 · Platform' },
+    { id: 'R3·1', sev: 'L', desc: 'U-turn good HD map 4-lane; wide turn', loc: 'San Tomas & Monroe' },
+    { id: 'R3·2', sev: 'S', desc: 'U-turn good HD map 4-lane into 4th lane', loc: 'San Tomas & Scott' },
+    { id: 'R3·3', sev: 'L', desc: 'SILC left close to LVIP', loc: 'Route 3 · P2P PA' },
+    { id: 'R3·4', sev: 'L', desc: 'U-turn good HD map 4-lane; slow start and slow at end', loc: 'San Tomas & Monroe' },
+    { id: 'R3·5', sev: 'L', desc: 'U-turn good HD map 3rd of 4 lanes; too early + wobble at end', loc: 'Route 3' },
+    { id: 'R3·6', sev: 'L', desc: 'U-turn good HD map 4-lane; hesitant/wobble at end', loc: 'San Tomas & El Camino Real' },
+    { id: 'R3·7', sev: 'L', desc: 'Wobble before split going straight', loc: 'Route 3' },
+    { id: 'R3·8', sev: 'L', desc: 'SILC right out of turning lane; not following routing', loc: 'Route 3' },
+    { id: 'R3·9', sev: 'L', desc: 'Hesitant at unprotected junction; APTO', loc: 'Route 3' },
+    { id: 'R3·D11', sev: 'L', desc: 'Not yielding to merging contender; contender unable to close gap', loc: 'Route 3' },
+    { id: 'R3·11', sev: 'S', desc: 'TN U-turn — no reaction to median opening left', loc: 'Route 3' },
+    { id: 'R3·12', sev: 'L', desc: 'FN nudge; plenty of room to nudge', loc: 'Route 3' },
+    { id: 'R3·13', sev: 'S', desc: 'TN U-turn — no reaction to median opening left', loc: 'Route 3' },
+    { id: 'R3·14', sev: 'XL', desc: 'U-turn missed; aborted', loc: 'Route 3' },
+    { id: 'R3·15', sev: 'S', desc: 'TN U-turn — no reaction to median opening left', loc: 'Route 3' },
+    { id: 'R3·16', sev: 'L', desc: 'U-turn bad HD map 3-lane; U-turn into bike lane', loc: 'Route 3' },
+    { id: 'R3·17', sev: 'L', desc: 'U-turn bad 3-lane; understeer into bike lane', loc: 'Route 3' },
+    { id: 'R3·18', sev: 'S', desc: 'TN U-turn — no reaction to median opening left', loc: 'Route 3' },
+    { id: 'R3·19', sev: 'XL', desc: 'Hard braking at turn; almost got rear-ended', loc: 'Route 3' },
+    { id: 'R3·20', sev: 'XL', desc: 'Jerk mid-turn; APTO', loc: 'Route 3' },
+    { id: 'R3·21', sev: 'M', desc: 'Understeer at sharp left turn', loc: 'Route 3' },
+    { id: 'R3·22', sev: 'M', desc: 'FP speed bump detection', loc: 'Route 3' },
+  ],
+},
+
+// ============ 5/13 AM ============
+{
+  label: '5/13 AM',
+  title: 'AMO FP U-Turn Build + RS Feasibility Filter Experiment',
+  subtitle: '2-Lane Bike Lane Routes · No HD Map (mostly)',
+  build: '45454651.3',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45454651&vid=3',
+  model: 'sft-4815 + Feasibility Filter removed',
+  tester: 'W',
+  barPct: 54,
+  barLabel: '54% L+M+S',
+  verdictCards: [
+    { kind: 'warning', icon: '⚠️', title: 'Bike Lane Understeer', body: 'Repeated understeer/drift into bike lane on 2-lane+bike configurations.' },
+    { kind: 'warning', icon: '⚠️', title: 'Hesitant & Jerky', body: 'Slow starts, hesitation, jerky endings across multiple U-turn events.' },
+    { kind: 'success', icon: '✅', title: 'Improvement on 3-4 Lane', body: 'Better performance on wider intersections; W27, W28 notably smooth.' },
+  ],
+  tallies: { xl: 3, l: 10, m: 9, s: 6, xlDesc: 'aborted mid-turn · missed with rail · stuck on red', lDesc: 'into bike lane · hesitant · jerky · wobble · too slow · stuck narrow', mDesc: 'understeer bike lane · wobble at end · jerky at end · slightly slow · hesitant', sDesc: 'clean turn · correct lane · smooth · slight correction' },
+  pass: [
+    { label: 'Pass Rate (L+M+S)', value: '54%', rate: 54 },
+    { label: '2-lane + bike issue rate', value: '~70%', rate: 30 },
+    { label: '4-lane issue rate', value: '~20%', rate: 80 },
+  ],
+  callouts: [
+    { kind: 'crit', text: '⚠️ W10: Aborted mid-turn, 2-lane no sign/light. W17: Missed with rail present, 2-lane + bike lane. W23: Stuck mid-turn when TL turned red.' },
+    { text: 'ℹ️ W27 (3-lane, no HD) and W28 (4-lane, HD yes) were the cleanest turns of the session — improvement visible on wider roads.' },
+  ],
+  events: [
+    { id: 'W1', sev: 'L', desc: 'Wobble in LT rail', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/33ec5b72-56ad-4c2d-8993-3afc57e92574/33ec5b72-56ad-4c2d-8993-3afc57e92574' },
+    { id: 'W1', sev: 'M', desc: 'U-turn good, 2-lane + bike lane; understeer into bike lane', loc: 'Lafayette & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/b824251f-49a9-44bc-b6ba-71fd635d65b3/b824251f-49a9-44bc-b6ba-71fd635d65b3' },
+    { id: 'W4', sev: 'L', desc: 'U-turn bad, 2-lane + bike lane + cones; stuck, too narrow', loc: 'Lafayette & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/302a79ec-9ce4-49d1-aa35-7a4b1de286de/302a79ec-9ce4-49d1-aa35-7a4b1de286de' },
+    { id: 'W5', sev: 'M', desc: 'U-turn good, 2-lane + bike lane; wobble at end, drifted into bike lane', loc: 'Lafayette & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/47c7702f-f75e-45ab-8de9-c6bd30199233/47c7702f-f75e-45ab-8de9-c6bd30199233' },
+    { id: 'W8', sev: 'L', desc: 'U-turn good, no HD map, 2-lane; hesitant', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/dd253cac-eb9c-44d2-9454-32689aee1918/dd253cac-eb9c-44d2-9454-32689aee1918' },
+    { id: 'W9', sev: 'M', desc: 'U-turn good', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/3a50f09b-265b-42b6-801a-d51651c66997/3a50f09b-265b-42b6-801a-d51651c66997' },
+    { id: 'W10', sev: 'XL', desc: 'U-turn bad, no HD map, 2-lane no sign/light; aborted mid-turn <span class="crit-inline">⚠</span>', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/370bfa75-55ea-4410-90ce-37e166fc852f/370bfa75-55ea-4410-90ce-37e166fc852f' },
+    { id: 'W11', sev: 'L', desc: 'U-turn good, no HD map, 2-lane; stopped momentarily', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/8c8ebf97-00a4-47b7-9ca9-c799e7c2bd30/8c8ebf97-00a4-47b7-9ca9-c799e7c2bd30' },
+    { id: 'W12', sev: 'M', desc: 'U-turn good, no HD map, 3-lane', loc: 'Bowers', url: 'https://maglev.nvda.ai/av/drivescrubber/events/059c4cbd-4ee7-4749-b052-4c2e3c6a208b/059c4cbd-4ee7-4749-b052-4c2e3c6a208b' },
+    { id: 'W13', sev: 'M', desc: 'U-turn good, no HD map, 3-lane; fishhook at end', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/8a798253-041f-4460-8856-7350f5067de9/8a798253-041f-4460-8856-7350f5067de9' },
+    { id: 'W14', sev: 'S', desc: 'U-turn good, no HD map, 2-lane wide merge, between median', loc: 'Oakmead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/0ee02dbb-9614-4a98-93da-dbda8498faaf/0ee02dbb-9614-4a98-93da-dbda8498faaf' },
+    { id: 'W15', sev: 'M', desc: 'U-turn good, no HD map, 3-lane; slightly slow at end', loc: 'Bowers & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/78492643-c965-4d1a-94c4-041be2790460/78492643-c965-4d1a-94c4-041be2790460' },
+    { id: 'W16', sev: 'L', desc: 'U-turn good, no HD map, 2-lane; hesitant start, jerky at end', loc: 'Bowers & Chromite', url: 'https://maglev.nvda.ai/av/drivescrubber/events/0d36966d-c70e-4500-8972-3a973384c944/0d36966d-c70e-4500-8972-3a973384c944' },
+    { id: 'W17', sev: 'XL', desc: 'U-turn missed, no HD map, 2-lane + bike lane; missed with rail present <span class="crit-inline">⚠</span>', loc: 'Bowers & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/763b76db-222a-49b5-941d-f815891db62b/763b76db-222a-49b5-941d-f815891db62b' },
+    { id: 'W18', sev: 'L', desc: 'U-turn good, no HD map, 2-lane + bike lane; hesitant, jerky at end', loc: 'Bowers & Chromite', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9d7d979b-eb38-4f5c-a817-78c67e879eea/9d7d979b-eb38-4f5c-a817-78c67e879eea' },
+    { id: 'W19', sev: 'L', desc: 'U-turn good, no HD map, 2-lane + bike lane; drifted into bike lane, unprotected', loc: 'Olcott & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/18c3aa8a-18f7-4db7-85f4-43702c188792/18c3aa8a-18f7-4db7-85f4-43702c188792' },
+    { id: 'W19b', sev: 'M', desc: 'U-turn good, no HD map, 2-lane + bike lane; slightly tight with hesitation, smooth overall', loc: 'Bowers & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ea6c1840-c5a3-4071-9854-d29eeb9494ef/ea6c1840-c5a3-4071-9854-d29eeb9494ef' },
+    { id: 'W21', sev: 'L', desc: 'U-turn good, no HD map, 2-lane + bike lane; too close to curb', loc: 'Scott & Montgomery', url: 'https://maglev.nvda.ai/av/drivescrubber/events/224f3d54-7b0a-4bd3-9007-b5fb2ea1ba85/224f3d54-7b0a-4bd3-9007-b5fb2ea1ba85' },
+    { id: 'W19c', sev: 'S', desc: 'U-turn good, no HD map, 2-lane + bike lane; slight correction, smooth', loc: 'Scott & Coronado', url: 'https://maglev.nvda.ai/av/drivescrubber/events/65529257-1d8f-43d4-bdfe-eceb973f2a2a/65529257-1d8f-43d4-bdfe-eceb973f2a2a' },
+    { id: 'W23', sev: 'S', desc: 'U-turn good, no HD map, 2-lane + bike lane', loc: 'Scott & Olcott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/617709cb-fd5a-4bd5-9820-31f3231bc45d/617709cb-fd5a-4bd5-9820-31f3231bc45d' },
+    { id: 'W23b', sev: 'XL', desc: 'U-turn bad, no HD map, 2-lane + bike lane; very slow then stuck when TL turned red <span class="crit-inline">⚠</span>', loc: 'Scott & Octavius', url: 'https://maglev.nvda.ai/av/drivescrubber/events/edbcbb3f-d54c-4793-8b0d-efc25c007cb5/edbcbb3f-d54c-4793-8b0d-efc25c007cb5' },
+    { id: 'W25', sev: 'M', desc: 'U-turn good, no HD map, 2-lane + bike lane; jerky at end', loc: 'Scott & Jay', url: 'https://maglev.nvda.ai/av/drivescrubber/events/30beccb6-8ba2-4b4a-a9b9-203c699b575f/30beccb6-8ba2-4b4a-a9b9-203c699b575f' },
+    { id: 'W26', sev: 'L', desc: 'U-turn bad, no HD map, 2-lane + bike lane; too slow, light turned red mid-turn, yielded to oncoming', loc: 'Scott & Olcott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9d5b3837-02ad-4cc3-a702-fe8e04cf9202/9d5b3837-02ad-4cc3-a702-fe8e04cf9202' },
+    { id: 'W27', sev: 'S', desc: 'U-turn good, no HD map, 3-lane; improvement — only slight wobble during correction', loc: 'San Tomas & Monroe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7a848f96-3c01-40c3-9cf3-9b50b73c9814/7a848f96-3c01-40c3-9cf3-9b50b73c9814' },
+    { id: 'W28', sev: 'S', desc: 'U-turn good, HD map yes, 4-lane; smooth, into 3rd lane', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/3bd41319-a024-4ab7-8040-0fa7e0f75a08/3bd41319-a024-4ab7-8040-0fa7e0f75a08' },
+    { id: 'W29', sev: 'M', desc: 'U-turn good, no HD map, 4-lane; wobble at end, straight into 3rd lane', loc: 'San Tomas & El Camino Real' },
+  ],
+},
+
+// ============ 5/14 PM ============
+{
+  label: '5/14 PM',
+  title: 'AMO FP U-Turn Build + RS Feasibility Filter Experiment',
+  subtitle: 'No HD Map · 2-lane, 3-lane, 4-lane + bike lane configurations',
+  build: '45454651.3',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45454651&vid=3',
+  model: 'sft-4815 + Feasibility Filter removed',
+  tester: 'W',
+  barPct: 62,
+  barLabel: '62% L+M+S',
+  verdictCards: [
+    { kind: 'warning', icon: '⚠️', title: '2-lane + bike lane struggles', body: 'Repeated aborts, oversteer, fishhook, and LK degradation on narrow 2-lane + bike configurations.' },
+    { kind: 'critical', icon: '🚨', title: 'LK Degradation', body: 'TDS → ACC drops mid-turn (W11, W24, W25); pattern on 2-3 lane no HD map.' },
+    { kind: 'success', icon: '✅', title: '3-4 Lane Performing Better', body: 'Most S events on 3-4 lane; 2 perfect manual U-turns logged (W28, W29).' },
+  ],
+  tallies: { xl: 11, l: 5, m: 5, s: 8, xlDesc: 'abort mid-turn · missed · oversteer · LK degrade · creep w/ oncoming · jerk mid-turn', lDesc: 'slow unprotected · understeer · hesitant stop · fishhook bike lane · very slow', mDesc: 'fishhook · smooth · slow start · jerky · fishhook', sDesc: 'good turn · nominal · perfect manual' },
+  pass: [
+    { label: 'Pass Rate (L+M+S)', value: '62%', rate: 62 },
+    { label: '3+ Lane Good', value: '76%', rate: 76 },
+    { label: '2-Lane + Bike Good', value: '50%', rate: 50 },
+    { label: '2-Lane Only Good', value: '33%', rate: 33 },
+  ],
+  trends: [
+    { sev: 'XL', label: 'Abort mid-turn (2-lane + bike)', count: 4 },
+    { sev: 'XL', label: 'LK degradation TDS→ACC', count: 3 },
+    { sev: 'M', label: 'Fishhook at end of turn', count: 3 },
+    { sev: 'L', label: 'Hesitant / slow with oncoming', count: 2 },
+    { sev: 'XL', label: 'Oversteer / jerk mid-turn', count: 2 },
+    { sev: 'XL', label: 'Creeping U-turn w/ oncoming', count: 1 },
+  ],
+  locations: [
+    { label: 'Lafayette (various cross streets)', detail: 'XL ×5' },
+    { label: 'Central & Lafayette', detail: 'XL ×2 (LK degrade)' },
+    { label: 'Bowers & Central', detail: 'XL ×2' },
+  ],
+  callouts: [
+    { kind: 'crit', text: '⚠️ W22: Oversteer at Lafayette & Palm — very bad, APTO. W11: LK degraded TDS→ACC mid-session. W13: Creeping U-turn into oncoming — CPTO.' },
+    { text: 'ℹ️ W28 & W29 perfect manual U-turns logged — useful baseline reference for expected behavior.' },
+  ],
+  events: [
+    { id: 'W1', sev: 'S', desc: 'U-turn good, 3-lane, no HD map', loc: 'Bowers & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5da1a347-58f3-447b-a013-24cf55fa504d/5da1a347-58f3-447b-a013-24cf55fa504d' },
+    { id: 'W2', sev: 'XL', desc: 'U-turn missed, 4-lane slanted intersection; gave up when throttle assisted — APTO <span class="crit-inline">⚠</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ae6eae12-2354-45a8-a283-1d2019437cde/ae6eae12-2354-45a8-a283-1d2019437cde' },
+    { id: 'W3', sev: 'S', desc: 'U-turn good, 3-lane, no HD map; nominal', loc: 'Bowers & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5f354ab6-77d2-4cb5-9fa8-9e78cdd5dc0c/5f354ab6-77d2-4cb5-9fa8-9e78cdd5dc0c' },
+    { id: 'W4', sev: 'L', desc: 'U-turn bad, median, slow unprotected with oncoming approaching — APTO; throttle', loc: 'Oakmead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/fb2b7b96-ce0d-4f2a-9bdc-892148309b74/fb2b7b96-ce0d-4f2a-9bdc-892148309b74' },
+    { id: 'W5', sev: 'S', desc: 'U-turn good, 3-lane, no HD map', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f3a3edae-3489-44a5-a97b-0fad94717a41/f3a3edae-3489-44a5-a97b-0fad94717a41' },
+    { id: 'W6', sev: 'M', desc: 'U-turn good, 2-lane + bike lane; fishhook but smooth', loc: 'Bowers & Chromite', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d42ef9b1-7d22-448c-8e07-12093c4dfd06/d42ef9b1-7d22-448c-8e07-12093c4dfd06' },
+    { id: 'W6b', sev: 'M', desc: 'U-turn good, 3-lane + bike lane; slow start', loc: 'Bowers & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/29483e13-95b7-4d4f-8d17-6e0e61b2fcd9/29483e13-95b7-4d4f-8d17-6e0e61b2fcd9' },
+    { id: 'W8', sev: 'L', desc: 'U-turn good, 4-lane; understeer into DRT lane', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f192afaf-2ffa-4c39-8176-ad7938cee604/f192afaf-2ffa-4c39-8176-ad7938cee604' },
+    { id: 'W9', sev: 'S', desc: 'U-turn good, 4-lane, no HD map', loc: 'Bowers & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/bd3d2943-5796-48ca-8468-8685ad980f86/bd3d2943-5796-48ca-8468-8685ad980f86' },
+    { id: 'W10', sev: 'XL', desc: 'U-turn bad, 4-lane; jerk right mid-turn <span class="crit-inline">⚠</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d603f1df-dccb-4184-af80-6de5b0b6e60c/d603f1df-dccb-4184-af80-6de5b0b6e60c' },
+    { id: 'W11', sev: 'XL', desc: 'LK degraded — TDS dropped to ACC <span class="crit-inline">⚠</span>', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/b7b28c92-b1bb-44d9-ae80-ccf14775c648/b7b28c92-b1bb-44d9-ae80-ccf14775c648' },
+    { id: 'W12', sev: 'M', desc: 'U-turn good, 2-lane + bike lane; slightly jerky fishhook at end', loc: 'Scott & Jay', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ecc620d8-a432-4ba2-b78e-65240c9f9d1b/ecc620d8-a432-4ba2-b78e-65240c9f9d1b' },
+    { id: 'W13', sev: 'XL', desc: 'U-turn bad, 2-lane + bike lane; creeping U-turn with oncoming contenders — CPTO <span class="crit-inline">⚠</span>', loc: 'Scott & Coronado', url: 'https://maglev.nvda.ai/av/drivescrubber/events/da50bbde-6942-4a88-a339-331f01c46a8c/da50bbde-6942-4a88-a339-331f01c46a8c' },
+    { id: 'W14', sev: 'M', desc: 'U-turn good, 2-lane + bike lane; fishhook jerky', loc: 'Laurelwood & Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/90790fd7-ea33-4cb5-86c6-4a14b8d48083/90790fd7-ea33-4cb5-86c6-4a14b8d48083' },
+    { id: 'W15', sev: 'XL', desc: 'U-turn bad, 2-lane + bike lane; elevation difference, aborted <span class="crit-inline">⚠</span>', loc: 'Comstock & Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f7dbe1aa-2f5d-4bf5-8efc-95642b2dd304/f7dbe1aa-2f5d-4bf5-8efc-95642b2dd304' },
+    { id: 'W15b', sev: 'XL', desc: 'U-turn bad, 2-lane + bike lane; stuck — APTO <span class="crit-inline">⚠</span>', loc: 'Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d38c411a-7cf9-499c-9b43-7ae56ab020d2/d38c411a-7cf9-499c-9b43-7ae56ab020d2' },
+    { id: 'W16', sev: 'M', desc: 'U-turn good, 2-lane + bike lane; fishhook', loc: 'Laurelwood & Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f3a99122-431e-466e-83c2-69b647e74a78/f3a99122-431e-466e-83c2-69b647e74a78' },
+    { id: 'W18', sev: 'L', desc: 'U-turn good, 2-lane; very hesitant, stopping in middle, very tight turn', loc: 'Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ad01dc08-02f1-4cf3-b64c-3e23c3b8176d/ad01dc08-02f1-4cf3-b64c-3e23c3b8176d' },
+    { id: 'W19', sev: 'L', desc: 'U-turn good, 2-lane + bike lane; fishhook into bike lane, very slow with oncoming present', loc: 'Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/57d27224-10c0-4ae3-9eb5-a5fef8946dc4/57d27224-10c0-4ae3-9eb5-a5fef8946dc4' },
+    { id: 'W20', sev: 'XL', desc: 'U-turn bad, 2-lane + bike lane; abort mid-turn — APTO <span class="crit-inline">⚠</span>', loc: 'Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d23faae7-b772-449a-ac7f-814cd1d2724e/d23faae7-b772-449a-ac7f-814cd1d2724e' },
+    { id: 'W21', sev: 'XL', desc: 'U-turn bad, 2-lane + bike lane; abort mid-turn <span class="crit-inline">⚠</span>', loc: 'Comstock & Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f423dfaa-097e-4f35-94ba-9d43dc8b6990/f423dfaa-097e-4f35-94ba-9d43dc8b6990' },
+    { id: 'W22', sev: 'XL', desc: 'U-turn bad, 2-lane + bike lane; oversteer — APTO, very bad <span class="crit-inline">⚠⚠</span>', loc: 'Lafayette & Palm', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5efc1ffc-21b2-4525-99a5-60257c0272b3/5efc1ffc-21b2-4525-99a5-60257c0272b3' },
+    { id: 'W23', sev: 'S', desc: 'U-turn good, 3-lane, no HD map', loc: 'Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/83c6193f-c864-4e55-9d26-e37f37aa19f1/83c6193f-c864-4e55-9d26-e37f37aa19f1' },
+    { id: 'W24', sev: 'XL', desc: 'U-turn bad, 3-lane; LK degradation mid-turn — APTO <span class="crit-inline">⚠</span>', loc: 'Central & Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f106da13-ca3b-49e9-a5c8-c66807232232/f106da13-ca3b-49e9-a5c8-c66807232232' },
+    { id: 'W25', sev: 'XL', desc: 'U-turn bad, 3-lane; LK degradation <span class="crit-inline">⚠</span>', loc: 'Central & Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/0ad3e3a2-965b-4761-8eb3-f924df32504a/0ad3e3a2-965b-4761-8eb3-f924df32504a' },
+    { id: 'W25b', sev: 'L', desc: 'U-turn good, 2-lane + bike lane; very slow', loc: 'Monroe median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/e1108962-686d-4dca-8274-dd46324f1cfa/e1108962-686d-4dca-8274-dd46324f1cfa' },
+    { id: 'W26', sev: 'S', desc: 'U-turn good, 3-lane + bike lane, no HD map', loc: 'Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/711428e6-bc7b-4fe8-acac-06620fbca0c1/711428e6-bc7b-4fe8-acac-06620fbca0c1' },
+    { id: 'W28', sev: 'S', desc: 'Perfect manual U-turn ★', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1511b917-efb9-405c-9fff-965470664fe5/1511b917-efb9-405c-9fff-965470664fe5' },
+    { id: 'W29', sev: 'S', desc: 'Perfect manual U-turn ★', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/26cbd0b9-4c3b-443c-afd8-05c1d5a5e02c/26cbd0b9-4c3b-443c-afd8-05c1d5a5e02c' },
+  ],
+},
+
+// ============ 5/15 AM ============
+{
+  label: '5/15 AM',
+  title: 'IFORV: 5/15 U-Turn Testing',
+  subtitle: '1st Drive (Tester: O) · 2nd Drive (Tester: A) · 4-lane, 3-lane, 2-lane + bike lane',
+  build: '45500875.2',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45500875&vid=2',
+  model: 'sft-4815',
+  tester: 'O + A',
+  barPct: 90,
+  barLabel: '90% L+M+S',
+  verdictCards: [
+    { kind: 'warning', icon: '⚠️', title: 'Wobble, Fishhook & Understeer Persistent', body: 'Most common issues across both drives; present in all lane configs.' },
+    { kind: 'critical', icon: '🚨', title: 'Safety Critical (2nd Drive)', body: 'A15: Failed to stop at red light twice — APTO. A17: Huge oversteer 2-lane + bike. A6 + O12: LK degrade mid-turn.' },
+    { kind: 'success', icon: '✅', title: '4-Lane Performing Best', body: 'Highest pass rate on 4-lane across both drives; performance drops significantly on 2-lane configs.' },
+  ],
+  tallies: { xxl: 1, xl: 3, l: 7, m: 14, s: 12, xxlDesc: 'ran red light ×2 · APTO', xlDesc: 'LK degrade · missed U-turn · huge oversteer · lateral jerk', lDesc: 'wobble · oversteer early · understeer bike lane · jerky · braked mid-turn', mDesc: 'fishhook · smooth · slight understeer · slight wobble · lane drift · jerky at end', sDesc: 'great U-turn · clean lane · sanity check · out of scope' },
+  pass: [
+    { label: 'Pass Rate (L+M+S)', value: '90%', rate: 90 },
+    { label: '4-Lane Good', value: '87%', rate: 87 },
+    { label: '3-Lane Good', value: '73%', rate: 73 },
+    { label: '2-Lane + Bike Good', value: '33%', rate: 33 },
+  ],
+  callouts: [
+    { kind: 'crit', text: '⚠️ A15 XXL: Failed to stop at red light twice — Arques East & Wolfe. A17 XL: Huge oversteer + lateral jerk, 2-lane + bike lane. O12 XL: LK degrade, didn\'t recover, planner overshot intersection. A6 XL: Missed U-turn, LK degrade mid-turn (recovered).' },
+    { text: 'ℹ️ O18 (wouldn\'t attempt 2-lane) and O19 (missed 2-lane + bike) suggest 2-lane no-attempt pattern consistent with prior sessions. A14 excluded (out of scope).' },
+  ],
+  events: [
+    { id: 'O1', sev: 'S', desc: 'Sanity check before picking up from Voyager', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/527d031f-1e0c-4e9d-8ae0-b22e155e952e/527d031f-1e0c-4e9d-8ae0-b22e155e952e' },
+    { id: 'O2', sev: 'S', desc: 'Start of testing', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/01bfe1d3-ff4e-4c10-a596-bd350f2b71c2/01bfe1d3-ff4e-4c10-a596-bd350f2b71c2' },
+    { id: 'O3', sev: 'S', desc: 'U-turn good, no map, 4-lane; entered 3rd lane, smooth', loc: 'San Tomas & Monroe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/46e2b079-6f92-47ee-abe2-7c6e5485c455/46e2b079-6f92-47ee-abe2-7c6e5485c455' },
+    { id: 'O4', sev: 'M', desc: 'U-turn good, 4-lane', loc: 'San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5f6cbe80-2a2a-4916-9de0-bae96a4e9369/5f6cbe80-2a2a-4916-9de0-bae96a4e9369' },
+    { id: 'O5', sev: 'M', desc: 'U-turn good, 4-lane; slight understeer at end, entered 3rd and 4th lane', loc: 'San Tomas & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/61137197-816b-4362-8690-7604198860a8/61137197-816b-4362-8690-7604198860a8' },
+    { id: 'O6', sev: 'M', desc: 'Lane drift between intersections', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/216fa3a1-3dd6-4cb0-b0e3-f87d6b80b39a/216fa3a1-3dd6-4cb0-b0e3-f87d6b80b39a' },
+    { id: 'O7', sev: 'M', desc: 'U-turn pass, 4-lane; fishhook at end, went into 3rd and 4th lane', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f6d41d38-17b0-42f2-8fad-1979e665eb60/f6d41d38-17b0-42f2-8fad-1979e665eb60' },
+    { id: 'O8', sev: 'L', desc: 'U-turn failure; oversteer, braked in middle of maneuver', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/e34c15aa-ad08-496f-821c-41c53b32147a/e34c15aa-ad08-496f-821c-41c53b32147a' },
+    { id: 'O9', sev: 'M', desc: 'U-turn good; slight fishhook at end', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/27ada12f-b8c7-47d7-be01-38f67bc2ef51/27ada12f-b8c7-47d7-be01-38f67bc2ef51' },
+    { id: 'O10', sev: 'M', desc: 'U-turn pass, 4-lane; stuck at start, understeer, drifted into 4th lane', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2eadc71b-d0eb-4a27-8d4b-6ac722cf3023/2eadc71b-d0eb-4a27-8d4b-6ac722cf3023' },
+    { id: 'O11', sev: 'M', desc: 'U-turn; wobble and understeer, corrected into 4th lane', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/07161927-f5f6-4876-a239-31c73c3ac76c/07161927-f5f6-4876-a239-31c73c3ac76c' },
+    { id: 'O12', sev: 'XL', desc: 'U-turn bad; LK degradation, didn\'t recover, planner overshot intersection — APTO <span class="crit-inline">⚠</span>', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/4565ed62-5744-42d1-b224-cdc3c95b3f6d/4565ed62-5744-42d1-b224-cdc3c95b3f6d' },
+    { id: 'O13', sev: 'M', desc: 'U-turn; slight understeer', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5ebeb1b0-17f7-4338-9c4f-6f213ca3ab91/5ebeb1b0-17f7-4338-9c4f-6f213ca3ab91' },
+    { id: 'O14', sev: 'M', desc: 'U-turn, 3-lane; understeer, fishhook', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9bf4e376-a5f6-4c55-8309-2948ea3c2797/9bf4e376-a5f6-4c55-8309-2948ea3c2797' },
+    { id: 'O15', sev: 'M', desc: 'U-turn, 3-lane; slight fishhook at end, understeer', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/0e8bd499-b837-4893-bd98-f23afacc27b0/0e8bd499-b837-4893-bd98-f23afacc27b0' },
+    { id: 'O16', sev: 'S', desc: 'U-turn, 2-lane; slight drift into merging lane, fishhook', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/8bddfbff-3436-442f-84d6-a5818b4409fe/8bddfbff-3436-442f-84d6-a5818b4409fe' },
+    { id: 'O17', sev: 'M', desc: 'U-turn, 3-lane; understeer', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f0dcdc74-b38e-488e-a40f-09c81dfbe036/f0dcdc74-b38e-488e-a40f-09c81dfbe036' },
+    { id: 'O18', sev: 'S', desc: 'U-turn not taken; would not attempt 2-lane turn', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5c9b9181-d429-4799-a5b8-34e41282b620/5c9b9181-d429-4799-a5b8-34e41282b620' },
+    { id: 'O19', sev: 'S', desc: 'U-turn missed, 2-lane + bike lane', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/8f28f3d3-543a-43cb-84f9-4048033f895a/8f28f3d3-543a-43cb-84f9-4048033f895a' },
+    { id: 'A1', sev: 'S', desc: 'U-turn good, 4-lane; slight fishhook, position 2.2 out of 4 lanes', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ae171fb8-df56-42e8-bf44-d6c44b6f1657/ae171fb8-df56-42e8-bf44-d6c44b6f1657' },
+    { id: 'A2', sev: 'M', desc: 'U-turn 4-lane; position 3.5 into 4, slight wobble during turn', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/0fb0aef8-3525-478d-8fe5-8194175ae303/0fb0aef8-3525-478d-8fe5-8194175ae303' },
+    { id: 'A3', sev: 'S', desc: 'Great U-turn; slid right into 2nd lane, slight flicker RB', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/fce69ce1-21ed-4325-b70f-b65d6ccf7709/fce69ce1-21ed-4325-b70f-b65d6ccf7709' },
+    { id: 'A4', sev: 'L', desc: 'U-turn good; oversteer and wobble at end, initiated too early', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/24594f66-16f1-4541-b76d-133f3dc69a04/24594f66-16f1-4541-b76d-133f3dc69a04' },
+    { id: 'A5', sev: 'L', desc: 'U-turn bad; many wobbles, ended in 3rd lane', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7dfe2860-32e6-43c6-b67a-ed36f24f4acf/7dfe2860-32e6-43c6-b67a-ed36f24f4acf' },
+    { id: 'A6', sev: 'XL', desc: 'Missed U-turn; planner targeting left turn; LK degradation mid-turn, recovered <span class="crit-inline">⚠</span>', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/cbc0ecd3-7b02-4275-8632-78f7ddca28e9/cbc0ecd3-7b02-4275-8632-78f7ddca28e9' },
+    { id: 'A7', sev: 'S', desc: 'Great 3-lane U-turn', loc: 'Bowers & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1083f2d6-d61e-4f45-9995-0c945d5b89fb/1083f2d6-d61e-4f45-9995-0c945d5b89fb' },
+    { id: 'A8', sev: 'L', desc: 'U-turn 3-lane; wobble, downward U-turn', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9e269f98-2908-41f5-8ff7-f9731082f1f7/9e269f98-2908-41f5-8ff7-f9731082f1f7' },
+    { id: 'A9', sev: 'M', desc: 'U-turn good, 3-lane; jerky/wobble at end', loc: 'Wolfe & Kifer', url: 'https://maglev.nvda.ai/av/drivescrubber/events/74381c33-4c7d-4602-b903-735d41ec213c/74381c33-4c7d-4602-b903-735d41ec213c' },
+    { id: 'A10', sev: 'L', desc: 'U-turn good, 3-lane + bike lane; understeer into bike lane, fishhook', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2a618e9b-65af-4c31-b6be-847aa742e722/2a618e9b-65af-4c31-b6be-847aa742e722' },
+    { id: 'A11', sev: 'L', desc: 'U-turn 3-lane + bike lane; jerky and wobble during turn', loc: 'Wolfe & Evelyn', url: 'https://maglev.nvda.ai/av/drivescrubber/events/6ba16cf5-225e-4c24-bbd6-0d6ba6d1392e/6ba16cf5-225e-4c24-bbd6-0d6ba6d1392e' },
+    { id: 'A12', sev: 'L', desc: 'U-turn pass, 3-lane + bike lane; jerky and slow', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5ebb7381-5868-4cb3-9c28-855d3b30651e/5ebb7381-5868-4cb3-9c28-855d3b30651e' },
+    { id: 'A13', sev: 'M', desc: 'U-turn good, 3-lane + bike lane; slight fishhook at end', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/98545352-ee8e-470c-a6b9-b31e5e2c1c7e/98545352-ee8e-470c-a6b9-b31e5e2c1c7e' },
+    { id: 'A14', sev: 'S', desc: 'Invisible U-turn; turn radius too steep — out of scope', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/c29100ad-66ea-40d2-93d3-6a918dc6aeab/c29100ad-66ea-40d2-93d3-6a918dc6aeab' },
+    { id: 'A15', sev: 'XXL', desc: 'Failed to stop at red light twice; driver takeover <span class="crit-inline">⚠⚠</span>', loc: 'Arques East & Wolfe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/b1bf0fa9-c792-4d0b-b41f-6b9ef82170ce/b1bf0fa9-c792-4d0b-b41f-6b9ef82170ce' },
+    { id: 'A16', sev: 'S', desc: 'Great U-turn, 3-lane; turned into 2nd lane', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/6d253958-bfa3-4b5c-83d3-e75be44d41ba/6d253958-bfa3-4b5c-83d3-e75be44d41ba' },
+    { id: 'A17', sev: 'XL', desc: 'Huge oversteer + lateral jerk after end of U-turn, 2-lane + bike lane <span class="crit-inline">⚠</span>', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/3b913289-d2f3-4644-b858-8ad3c9dac095/3b913289-d2f3-4644-b858-8ad3c9dac095' },
+    { id: 'A18', sev: 'S', desc: 'Great U-turn; kept in lane well, brief pause after completing turn', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1be9f027-4cb0-4db4-9c68-ca2cf0b2bb02/1be9f027-4cb0-4db4-9c68-ca2cf0b2bb02' },
+  ],
+},
+
+// ============ 5/19 ============
+{
+  label: '5/19',
+  title: 'U-Turn Test — SF',
+  subtitle: '3rd St Corridor, San Francisco · New filter refactor validated',
+  build: '45500875.2',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45500875&vid=2',
+  model: 'sft-4815 + Feasibility Filter',
+  session: 'ebc9128a',
+  sessionUrl: 'https://maglev.nvda.ai/av/drivescrubber/drives/666773',
+  tester: 'W',
+  vehicle: '174-745',
+  barPct: 84,
+  barLabel: '84% pass',
+  verdictCards: [
+    { kind: 'success', icon: '✅', title: 'Strong 3rd St Performance', body: 'Majority of turns along 3rd St corridor completed cleanly, including no-HD-map conditions. Multiple S-rated turns at Mariposa, 20th, 23rd, and Cesar Chavez.' },
+    { kind: 'warning', icon: '⚠️', title: 'Roundabout Mapping Issue', body: 'W14, W16 at unmapped roundabout — system cut through roundabout, W16 resulted in FN yield to oncoming traffic and CPTO. Roundabout needs to be mapped.' },
+    { kind: 'critical', icon: '🚨', title: 'Safety Critical Events', body: 'W16: XXL — cut roundabout with FN yield (CPTO). W3: XL — self-disengagement. W6: XL — missed U-turn. W15: XL — understeer requiring APTO.' },
+  ],
+  tallies: { xxl: 1, xl: 3, l: 1, m: 6, s: 10, xxlDesc: 'roundabout · FN yield · CPTO', xlDesc: 'self-disengage · missed U-turn · cut roundabout · understeer APTO', lDesc: 'oversteer APTO', mDesc: 'slight understeer · fishhook correction · oversteer self-corrected · brake tap', sDesc: 'good U-turn · no HD map · correct skip' },
+  pass: [
+    { label: 'U-Turn Pass Rate', value: '84%', rate: 84 },
+    { label: 'Attempts counted', value: '16/19', rate: 100 },
+  ],
+  trends: [
+    { sev: 'XXL', label: 'Roundabout cut + FN yield to oncoming (CPTO)', count: 1 },
+    { sev: 'XL', label: 'Roundabout cut (unmapped — needs mapping)', count: 2 },
+    { sev: 'XL', label: 'Self-disengagement', count: 1 },
+    { sev: 'XL', label: 'Missed U-turn', count: 1 },
+    { sev: 'M', label: 'Fishhook / oversteer (self-corrected)', count: 3 },
+    { sev: 'M', label: 'Slight understeer', count: 2 },
+    { sev: 'M', label: 'Brake tap during turn', count: 1 },
+  ],
+  locations: [
+    { label: 'Evans & 3rd St (roundabout)', detail: 'XXL + XL' },
+    { label: '3rd & 20th St', detail: 'M × 2' },
+    { label: '3rd & 23rd St', detail: 'M × 1' },
+    { label: '3rd & Mariposa', detail: 'S' },
+    { label: 'Cesar Chavez & 3rd', detail: 'S' },
+    { label: 'Hudson & 3rd', detail: 'M (self-corrected)' },
+  ],
+  callouts: [
+    { kind: 'crit', text: '🚨 W14 + W16: Roundabout at Evans & 3rd not mapped — system treated as standard intersection. W16 resulted in CPTO (FN yield to oncoming traffic). Roundabout mapping required before re-testing.' },
+    { text: 'ℹ️ No-HD-map turns performed well throughout — W4, W5, W7, W8, W9 all S or M along 3rd St corridor. Consistent behavior without map data is a positive signal for SF route coverage.' },
+  ],
+  events: [
+    { id: 'W1', sev: 'S', desc: 'U-turn good overall; too close to median at start — APTO, steering assist', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1077fd03-bb56-4776-bb31-447af10cd71d/1077fd03-bb56-4776-bb31-447af10cd71d' },
+    { id: 'W2', sev: 'S', desc: 'U-turn good', loc: '3rd & Mariposa', url: 'https://maglev.nvda.ai/av/drivescrubber/events/639bb0fd-a156-4f88-9003-a40cb52ba9f0/639bb0fd-a156-4f88-9003-a40cb52ba9f0' },
+    { id: 'W3', sev: 'XL', desc: 'Self-disengagement <span class="crit-inline">⚠</span>', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d17bdca5-5945-4e4d-a5b5-bc231d268c0c/d17bdca5-5945-4e4d-a5b5-bc231d268c0c' },
+    { id: 'W4', sev: 'S', desc: 'U-turn good — no HD map', loc: '3rd & 20th St', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a3bb2627-1a4f-4b50-a829-aefc4334b2fb/a3bb2627-1a4f-4b50-a829-aefc4334b2fb' },
+    { id: 'W5', sev: 'M', desc: 'U-turn good — no HD map; wobble at end', loc: '3rd & 19th St', url: 'https://maglev.nvda.ai/av/drivescrubber/events/084bae2d-6c41-4d6f-86f8-5d90c177627b/084bae2d-6c41-4d6f-86f8-5d90c177627b' },
+    { id: 'W6', sev: 'XL', desc: 'U-turn missed <span class="crit-inline">⚠</span>', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7e092744-93b4-42cf-a1e5-61e529f3ed2e/7e092744-93b4-42cf-a1e5-61e529f3ed2e' },
+    { id: 'W7', sev: 'S', desc: 'U-turn good — no HD map', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/75b11ee0-cd99-4075-87dc-1a0e14c29278/75b11ee0-cd99-4075-87dc-1a0e14c29278' },
+    { id: 'W8', sev: 'S', desc: 'U-turn good — no HD map', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1e5919f0-503b-413d-944e-103aeeb1d87b/1e5919f0-503b-413d-944e-103aeeb1d87b' },
+    { id: 'W9', sev: 'M', desc: 'U-turn good — no HD map; brake tap during turn', loc: '3rd & 23rd St', url: 'https://maglev.nvda.ai/av/drivescrubber/events/b0daa2bb-6d02-471f-989e-ae301d38dca3/b0daa2bb-6d02-471f-989e-ae301d38dca3' },
+    { id: 'W10', sev: 'S', desc: 'U-turn good', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1128e579-a2d9-4573-be32-b9db98c7ea08/1128e579-a2d9-4573-be32-b9db98c7ea08' },
+    { id: 'W11', sev: 'S', desc: 'U-turn good', loc: 'Cesar Chavez & 3rd', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f9753423-2579-4d75-a879-1c495290e399/f9753423-2579-4d75-a879-1c495290e399' },
+    { id: 'W12', sev: 'M', desc: 'U-turn good; oversteer into median, self-corrected', loc: 'Hudson & 3rd', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7007ff1e-eb88-47c9-a199-d35752121a4f/7007ff1e-eb88-47c9-a199-d35752121a4f' },
+    { id: 'W13', sev: 'L', desc: 'U-turn bad; oversteer at end — APTO', loc: 'Evans & 3rd', url: 'https://maglev.nvda.ai/av/drivescrubber/events/de1742b3-1de1-4ba2-8317-433cd707bba2/de1742b3-1de1-4ba2-8317-433cd707bba2' },
+    { id: 'W14', sev: 'XL', desc: 'Cut roundabout — roundabout not mapped <span class="crit-inline">⚠</span> (needs mapping)', loc: 'Evans & 3rd (roundabout)', url: 'https://maglev.nvda.ai/av/drivescrubber/events/036ff136-2fd8-4f32-8f14-8ea7f04b64f3/036ff136-2fd8-4f32-8f14-8ea7f04b64f3' },
+    { id: 'W15', sev: 'XL', desc: 'U-turn bad; understeer — APTO <span class="crit-inline">⚠</span>', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1bbe8254-d150-458d-9145-ba269c3088c6/1bbe8254-d150-458d-9145-ba269c3088c6' },
+    { id: 'W16', sev: 'XXL', desc: 'Cut roundabout; FN yield to oncoming traffic — CPTO <span class="crit-inline">⚠⚠</span>', loc: 'Evans & 3rd (roundabout)', url: 'https://maglev.nvda.ai/av/drivescrubber/events/994b04ff-c400-4ef1-b357-9c912eb4ecdd/994b04ff-c400-4ef1-b357-9c912eb4ecdd' },
+    { id: 'W17', sev: 'S', desc: 'Correct no U-turn at left-turn-only ground sign', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ec6a7666-0912-419e-9e72-9118aa7d7d0b/ec6a7666-0912-419e-9e72-9118aa7d7d0b' },
+    { id: 'W18', sev: 'M', desc: 'U-turn good; slight understeer', loc: '3rd & 20th', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7427f0e0-a952-4fb9-84ac-bb86434c2fea/7427f0e0-a952-4fb9-84ac-bb86434c2fea' },
+    { id: 'W19', sev: 'M', desc: 'U-turn good; slight fishhook correction', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/704d0316-a4f0-44f7-b566-e8229e89242b/704d0316-a4f0-44f7-b566-e8229e89242b' },
+    { id: 'W20', sev: 'M', desc: 'U-turn good; slight fishhook at end', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/23eaa966-bca5-4f60-b32b-a616406d2780/23eaa966-bca5-4f60-b32b-a616406d2780' },
+    { id: 'W21', sev: 'S', desc: 'U-turn good', loc: '3rd & 20th', url: 'https://maglev.nvda.ai/av/drivescrubber/events/fdcf0994-5563-42d6-bf67-3fa9648a377b/fdcf0994-5563-42d6-bf67-3fa9648a377b' },
+  ],
+},
+
+// ============ 5/20 AM ============
+{
+  label: '5/20 AM',
+  title: 'U-Turn Build Comparison — AM',
+  subtitle: 'San Tomas / El Camino / Lafayette Corridor · SFT-5285 experiment',
+  build: '45565919.9',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45565919&vid=9',
+  model: 'sft-5285',
+  session: '7e4b2dc2',
+  sessionUrl: 'https://maglev.nvda.ai/av/drivescrubber/drives/667452',
+  tester: 'W',
+  vehicle: '174-323',
+  barPct: 69,
+  barLabel: '69% pass',
+  verdictCards: [
+    { kind: 'success', icon: '✅', title: 'Strong 3+4 Lane Performance', body: 'Near-perfect pass rate on San Tomas 3–4 lane (91%). All configurations completed cleanly with no HD map.' },
+    { kind: 'warning', icon: '⚠️', title: 'Subtle Wobble Throughout', body: 'Consistent minor wobbles at end of turns across the session — quality issue but persistent.' },
+    { kind: 'info', icon: '📋', title: 'Narrow / Asymmetric Avoided', body: '16 XL missed on narrow / asymmetric configs (as expected — R18 OOD).' },
+  ],
+  tallies: { xl: 16, l: 1, m: 22, s: 13, xlDesc: 'missed narrow · asymmetric · 3+bike · 2-lane', lDesc: 'large wobble (Cabrillo)', mDesc: 'wobble · understeer (turn completed)', sDesc: 'good turn · into 2nd lane' },
+  pass: [
+    { label: 'U-Turn Pass Rate', value: '69%', rate: 69 },
+    { label: '3+4 Lane', value: '91% (32/35)', rate: 91 },
+    { label: 'Asymmetric', value: '20% (1/5)', rate: 20 },
+    { label: '2-Lane + Bike (wide)', value: '15% (2/13)', rate: 15 },
+  ],
+  trends: [
+    { sev: 'XL', label: 'Missed — 2-lane narrow / asymmetric (ODD)', count: 10 },
+    { sev: 'XL', label: 'Missed — 3-lane (Lafayette / Bowers corridor)', count: 4 },
+    { sev: 'XL', label: 'Missed — 3+bike lane El Camino / asymmetric', count: 2 },
+    { sev: 'M', label: 'Wobble / understeer (turn completed)', count: 21 },
+    { sev: 'L', label: 'Large wobble (San Tomas & Cabrillo)', count: 1 },
+  ],
+  callouts: [
+    { text: '📌 W47: Regression — missed 3-lane at Central & Bowers; system usually completes this turn.' },
+    { text: 'ℹ️ W42: Correct TN — navigation showed U-turn but intersection had no U-turn sign; system correctly did not attempt. Not included in pass rate.' },
+  ],
+  events: [
+    { id: 'W1', sev: 'M', desc: 'U-turn good, no HD map; understeer with wobble', loc: 'San Tomas & Monroe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7e198a1a-9c35-49ed-a04e-c03cd184399c/7e198a1a-9c35-49ed-a04e-c03cd184399c' },
+    { id: 'W2', sev: 'S', desc: 'U-turn good, HD map, 4-lane', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/e31f7d82-6d5a-4eda-940b-2451dd9dcc30/e31f7d82-6d5a-4eda-940b-2451dd9dcc30' },
+    { id: 'W3', sev: 'L', desc: 'U-turn bad, no HD map, 4-lane; large wobble but completed', loc: 'San Tomas & Cabrillo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/fb1a698f-cbd3-491c-8303-3d604b26f156/fb1a698f-cbd3-491c-8303-3d604b26f156' },
+    { id: 'W4', sev: 'M', desc: 'U-turn good, no HD map, 4-lane; wobble, understeer', loc: 'San Tomas & El Camino Real', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9a2f7e9a-393e-4c67-b06b-d2ee0811e691/9a2f7e9a-393e-4c67-b06b-d2ee0811e691' },
+    { id: 'W5', sev: 'M', desc: 'U-turn good, no HD map, 4-lane; wobble, understeer', loc: 'San Tomas & Monroe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/b69816fc-2b41-47e1-acfa-16538e20963f/b69816fc-2b41-47e1-acfa-16538e20963f' },
+    { id: 'W6', sev: 'M', desc: 'U-turn good, no HD map, 4-lane; wobble, understeer', loc: 'San Tomas & Benton', url: 'https://maglev.nvda.ai/av/drivescrubber/events/60d3708f-740c-4abf-a722-29dc9cc605c9/60d3708f-740c-4abf-a722-29dc9cc605c9' },
+    { id: 'W7', sev: 'M', desc: 'U-turn good, no HD map, 4-lane; wobble, understeer', loc: 'San Tomas & Cabrillo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/491f3b26-cdca-4fdb-8322-dc4dc9b64613/491f3b26-cdca-4fdb-8322-dc4dc9b64613' },
+    { id: 'W8', sev: 'S', desc: 'U-turn good, no HD map, 4-lane; understeer', loc: 'San Tomas & El Camino Real', url: 'https://maglev.nvda.ai/av/drivescrubber/events/016f61a2-00e4-4175-a76a-b50eabb7f589/016f61a2-00e4-4175-a76a-b50eabb7f589' },
+    { id: 'W9', sev: 'XL', desc: 'U-turn missed, narrow 2+bike lane, no HD map; proceeded LT with oncoming approaching — CPTO <span class="crit-inline">⚠</span>', loc: 'Monroe median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7fe261c2-7c40-486d-8ab9-75c2048971a7/7fe261c2-7c40-486d-8ab9-75c2048971a7' },
+    { id: 'W10', sev: 'M', desc: 'U-turn good, no HD map, 4-lane; wobble, understeer, into 2nd/3rd lane', loc: 'San Tomas & Homestead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/443dad7a-40f0-49e4-9230-16033e5e0d32/443dad7a-40f0-49e4-9230-16033e5e0d32' },
+    { id: 'W11', sev: 'M', desc: 'U-turn good, no HD map, 4-lane; wobble, understeer', loc: 'San Tomas & Benton', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a110f00c-b5e0-4ffb-882d-78475b1720a0/a110f00c-b5e0-4ffb-882d-78475b1720a0' },
+    { id: 'W12', sev: 'M', desc: 'U-turn good, no HD map, 3-lane; wobble, understeer', loc: 'San Tomas & Forbes', url: 'https://maglev.nvda.ai/av/drivescrubber/events/36d66c5c-629a-46f9-a92c-297f97c19269/36d66c5c-629a-46f9-a92c-297f97c19269' },
+    { id: 'W13', sev: 'S', desc: 'U-turn good, no HD map, 4-lane; wobble', loc: 'San Tomas & Homestead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1fcac507-060c-404d-b18b-9d9a47eb112a/1fcac507-060c-404d-b18b-9d9a47eb112a' },
+    { id: 'W14', sev: 'M', desc: 'U-turn good, no HD map, 3-lane; wobble, understeer', loc: 'San Tomas & Pruneridge', url: 'https://maglev.nvda.ai/av/drivescrubber/events/abf39e77-37b1-4c46-b843-008bd148feca/abf39e77-37b1-4c46-b843-008bd148feca' },
+    { id: 'W15', sev: 'S', desc: 'U-turn good, no HD map, 4-lane; slight fishhook correction at end', loc: 'San Tomas & Forbes', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ef1c8e43-1f8b-46b3-9c2f-9cff70dd4b92/ef1c8e43-1f8b-46b3-9c2f-9cff70dd4b92' },
+    { id: 'W16', sev: 'S', desc: 'U-turn good, no HD map, 2nd lane of 3; slow at start', loc: 'San Tomas & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/72df65da-9c4d-4c92-973c-5a20d4546fd7/72df65da-9c4d-4c92-973c-5a20d4546fd7' },
+    { id: 'W17', sev: 'S', desc: 'U-turn good, no HD map, 3-lane; slight understeer at end', loc: 'San Tomas & Pruneridge', url: 'https://maglev.nvda.ai/av/drivescrubber/events/090731c0-13e1-41ed-b32a-ce5d0e96b66a/090731c0-13e1-41ed-b32a-ce5d0e96b66a' },
+    { id: 'W18', sev: 'M', desc: 'U-turn good, no HD map, 3/4-lane; wobble at end', loc: 'San Tomas & Stevens Creek', url: 'https://maglev.nvda.ai/av/drivescrubber/events/0c4213b6-a419-453c-b278-951415d706b8/0c4213b6-a419-453c-b278-951415d706b8' },
+    { id: 'W19', sev: 'S', desc: 'U-turn good, no HD map, 3-lane', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/8c2b56a2-3b58-45d8-9b55-22d3b5e1408e/8c2b56a2-3b58-45d8-9b55-22d3b5e1408e' },
+    { id: 'W20', sev: 'M', desc: 'U-turn good, no HD map, 3-lane; wobble throughout', loc: 'San Tomas & Moorpark', url: 'https://maglev.nvda.ai/av/drivescrubber/events/509ca475-657c-4f4c-9cc9-bb07b4c19fae/509ca475-657c-4f4c-9cc9-bb07b4c19fae' },
+    { id: 'W21', sev: 'S', desc: 'U-turn good, no HD map, 3-lane', loc: 'San Tomas & Stevens Creek', url: 'https://maglev.nvda.ai/av/drivescrubber/events/03509859-c8ba-4d2d-a9ff-88ba2c316245/03509859-c8ba-4d2d-a9ff-88ba2c316245' },
+    { id: 'W22', sev: 'S', desc: 'U-turn good, no HD map, 3-lane; slight oversteer', loc: 'San Tomas & Williams', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d20fcd79-3184-4da4-9d1d-34547e8cfa79/d20fcd79-3184-4da4-9d1d-34547e8cfa79' },
+    { id: 'W23', sev: 'S', desc: 'U-turn good, no HD map, 3-lane; slight understeer at end', loc: 'San Tomas & Stevens Creek', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9bafaab8-9ec6-4784-9ad0-f648134377a0/9bafaab8-9ec6-4784-9ad0-f648134377a0' },
+    { id: 'W24', sev: 'S', desc: 'U-turn good, no HD map, 3-lane; slow start', loc: 'San Tomas & Moorpark', url: 'https://maglev.nvda.ai/av/drivescrubber/events/28955963-a261-4b5c-b84c-2253149863b3/28955963-a261-4b5c-b84c-2253149863b3' },
+    { id: 'W25', sev: 'S', desc: 'U-turn good, no HD map, 3-lane', loc: 'San Tomas & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/c7f5c893-df0b-4228-b808-acc657439f9f/c7f5c893-df0b-4228-b808-acc657439f9f' },
+    { id: 'W26', sev: 'XL', desc: 'U-turn missed, no HD map, 3+bike lane; asymmetric <span class="crit-inline">⚠</span>', loc: 'El Camino Real & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f8a94691-7c1e-47e0-9947-d6331fba68cb/f8a94691-7c1e-47e0-9947-d6331fba68cb' },
+    { id: 'W27', sev: 'XL', desc: 'U-turn missed, no HD map, 3+bike lane <span class="crit-inline">⚠</span>', loc: 'El Camino Real', url: 'https://maglev.nvda.ai/av/drivescrubber/events/3073683c-e0f9-46d0-9b94-fbd37e1638b4/3073683c-e0f9-46d0-9b94-fbd37e1638b4' },
+    { id: 'W28', sev: 'M', desc: 'U-turn good, no HD map, 3+bike lane; understeer into bike lane', loc: 'El Camino Real median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/af40375c-01b4-4fc0-9bf1-f2d4f4b6329a/af40375c-01b4-4fc0-9bf1-f2d4f4b6329a' },
+    { id: 'W29', sev: 'M', desc: 'U-turn good, no HD map, 3-lane; asymmetric, understeer', loc: 'Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a2a636de-0f2b-44e1-8b45-d8038ab608fd/a2a636de-0f2b-44e1-8b45-d8038ab608fd' },
+    { id: 'W30', sev: 'XL', desc: 'U-turn missed, no HD map, 2 wide lane; asymmetric <span class="crit-inline">⚠</span>', loc: 'El Camino Real & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/4401e554-319d-42a2-b292-ac372bd547a5/4401e554-319d-42a2-b292-ac372bd547a5' },
+    { id: 'W31', sev: 'M', desc: 'U-turn infeasible, no HD map, 2+bike lane — TN correct skip', loc: 'San Tomas & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/e34deccf-c1f2-44b3-a1aa-611a35c0d5dd/e34deccf-c1f2-44b3-a1aa-611a35c0d5dd' },
+    { id: 'W32', sev: 'M', desc: 'U-turn good, no HD map, 2-lane; hesitant, understeer', loc: 'Keystone & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/87503c0c-6afc-4094-9a49-26572bc01c38/87503c0c-6afc-4094-9a49-26572bc01c38' },
+    { id: 'W33', sev: 'XL', desc: 'U-turn missed (infeasible?), no HD map, 2+bike lane <span class="crit-inline">⚠</span>', loc: 'Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1eae1dad-6060-43eb-9462-4eeb7049041d/1eae1dad-6060-43eb-9462-4eeb7049041d' },
+    { id: 'W34', sev: 'XL', desc: 'U-turn missed (infeasible?), no HD map, 2 wide lane; asymmetric <span class="crit-inline">⚠</span>', loc: 'El Camino Real & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/b355df28-3213-471a-832c-4a265f36c332/b355df28-3213-471a-832c-4a265f36c332' },
+    { id: 'W35', sev: 'XL', desc: 'U-turn missed, no HD map, 2+bike lane; unprotected <span class="crit-inline">⚠</span>', loc: 'Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/db5efe98-4475-4ee9-a422-4ddc721b3b60/db5efe98-4475-4ee9-a422-4ddc721b3b60' },
+    { id: 'W36', sev: 'M', desc: 'U-turn good, no HD map, 3-lane; wobble', loc: 'Central & De La Cruz', url: 'https://maglev.nvda.ai/av/drivescrubber/events/3b3c07c9-a4b4-4e82-a6f8-ee1939752744/3b3c07c9-a4b4-4e82-a6f8-ee1939752744' },
+    { id: 'W37', sev: 'XL', desc: 'U-turn missed, no HD map, 3-lane <span class="crit-inline">⚠</span>', loc: 'Laurelwood & Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/387fc528-bcce-4eb8-8dd8-29327d137d33/387fc528-bcce-4eb8-8dd8-29327d137d33' },
+    { id: 'W38', sev: 'XL', desc: 'U-turn missed, no HD map, 2-lane <span class="crit-inline">⚠</span>', loc: 'Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/709b199f-5d4c-45a1-9473-f4733fbea484/709b199f-5d4c-45a1-9473-f4733fbea484' },
+    { id: 'W39', sev: 'XL', desc: 'U-turn missed (infeasible?), no HD map, 2-lane; model wanted to U-turn, gave up, went straight <span class="crit-inline">⚠</span>', loc: 'Lafayette & Aldo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/99b42ab0-071e-4627-a297-b95859bf752f/99b42ab0-071e-4627-a297-b95859bf752f' },
+    { id: 'W40', sev: 'XL', desc: 'U-turn missed (infeasible?), no HD map, 2-lane; unprotected <span class="crit-inline">⚠</span>', loc: 'Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/c141752f-a180-4e3a-b881-bd84369613f1/c141752f-a180-4e3a-b881-bd84369613f1' },
+    { id: 'W41', sev: 'XL', desc: 'U-turn missed (infeasible?), no HD map, 2-lane; initiated then proceeded straight — unprotected <span class="crit-inline">⚠</span>', loc: 'Lafayette & Aldo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/47cf2bfe-e6ae-474e-93ad-2a4d0e56626b/47cf2bfe-e6ae-474e-93ad-2a4d0e56626b' },
+    { id: 'W42', sev: 'S', desc: 'Good TN — navigation showed U-turn but intersection has no U-turn sign; correct no-attempt ★', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/6ce2b9ab-b06d-4dc9-b4e3-98909692ea1d/6ce2b9ab-b06d-4dc9-b4e3-98909692ea1d' },
+    { id: 'W43', sev: 'M', desc: 'U-turn good, no HD map, 3-lane, central median with TL; wobble, fishhook correction', loc: 'Central median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f8dd488d-0a41-4bd4-8b3c-7a0fbb672eb7/f8dd488d-0a41-4bd4-8b3c-7a0fbb672eb7' },
+    { id: 'W44', sev: 'M', desc: 'U-turn good, no HD map, 3-lane with TL; understeer', loc: 'Central & Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/801207ef-5a14-44c4-a6bc-b8d7f4cb7db3/801207ef-5a14-44c4-a6bc-b8d7f4cb7db3' },
+    { id: 'W45', sev: 'S', desc: 'U-turn good, no HD map, 3-lane', loc: 'Central & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/20c4d1a7-0d12-4e01-acce-490cdc221d6b/20c4d1a7-0d12-4e01-acce-490cdc221d6b' },
+    { id: 'W46', sev: 'M', desc: 'U-turn good, no HD map, 3-lane; wobble, understeer', loc: 'Central & Lafayette', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d330710c-5c31-4d75-98e2-33907a67c87e/d330710c-5c31-4d75-98e2-33907a67c87e' },
+    { id: 'W47', sev: 'XL', desc: 'U-turn missed, no HD map, 3-lane; wobble, asymmetric — regression (usually completed) <span class="crit-inline">⚠</span>', loc: 'Central & Bowers', url: 'https://maglev.nvda.ai/av/drivescrubber/events/b7bbbd2d-9252-4a82-9e2b-ce941ac8b3b7/b7bbbd2d-9252-4a82-9e2b-ce941ac8b3b7' },
+    { id: 'W48', sev: 'M', desc: 'U-turn good, no HD map, 3-lane; wobble at end', loc: 'Bowers & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/bf4d8f44-0542-4b7e-b884-7bdd04ab715c/bf4d8f44-0542-4b7e-b884-7bdd04ab715c' },
+    { id: 'W49', sev: 'M', desc: 'U-turn good, no HD map, 3-lane, Bowers median; slow', loc: 'Bowers median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ed47a3c7-a6e4-47cc-ba32-98e16d8a55b6/ed47a3c7-a6e4-47cc-ba32-98e16d8a55b6' },
+    { id: 'W50', sev: 'XL', desc: 'U-turn missed (infeasible?), no HD map, 2+bike lane <span class="crit-inline">⚠</span>', loc: 'Chromite & Bowers', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7d9d63e8-15a7-44e1-9665-68f5514dc8d7/7d9d63e8-15a7-44e1-9665-68f5514dc8d7' },
+    { id: 'W51', sev: 'XL', desc: 'U-turn missed (infeasible?), no HD map, 2+bike lane <span class="crit-inline">⚠</span>', loc: 'Kifer & Bowers', url: 'https://maglev.nvda.ai/av/drivescrubber/events/c7414f1f-893f-4da5-8f1f-ff975394c11a/c7414f1f-893f-4da5-8f1f-ff975394c11a' },
+    { id: 'W52', sev: 'M', desc: 'U-turn good, no HD map, 3-lane; slightly jerky', loc: 'Oakmead & Corvin', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d4beb1e6-84f1-42bd-a541-05128227e89d/d4beb1e6-84f1-42bd-a541-05128227e89d' },
+    { id: 'W53', sev: 'XL', desc: 'U-turn missed, no HD map, 2 wide lane; gave up at start, went straight — unprotected <span class="crit-inline">⚠</span>', loc: 'Corvin median' },
+  ],
+},
+
+// ============ 5/20 PM ============
+{
+  label: '5/20 PM',
+  title: 'U-Turn Build Comparison — PM',
+  subtitle: 'Oakmead / Arques + San Tomas repeat · sft-4640 return',
+  build: '45500875.2',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45500875&vid=2',
+  model: 'sft-4640',
+  session: '4e2fdc0d / 75b3bc78',
+  sessionUrl: 'https://maglev.nvda.ai/av/drivescrubber/drives/667704',
+  tester: 'W',
+  vehicle: '174-323',
+  barPct: 74,
+  barLabel: '74% pass',
+  verdictCards: [
+    { kind: 'success', icon: '✅', title: 'Tighter Radius vs AM', body: 'PM Pt.2 repeated the San Tomas corridor with tighter turns than AM build — 3rd–4th lane position, slightly more compact radius.' },
+    { kind: 'warning', icon: '⚠️', title: 'Arques FN Yields', body: 'PM Pt.1 revealed repeated FN yield failures on wide 2-lane + bike configurations at Arques — likely unstable road graph lacking topo nodes.' },
+    { kind: 'info', icon: '📋', title: 'Correct Asymmetric Avoidance', body: 'Both builds equally avoided asymmetric and narrow U-turns. W42 AM: correct TN no U-turn where navigation showed U-turn but no sign.' },
+  ],
+  tallies: { xl: 6, l: 1, m: 11, s: 5, xlDesc: 'FN yield · missed 2+bike (Arques) · no rail', lDesc: 'unstable road graph', mDesc: 'wobble · understeer · into merging lane', sDesc: 'good turn · unprotected · yielded' },
+  pass: [
+    { label: 'U-Turn Pass Rate', value: '74%', rate: 74 },
+    { label: '3+4 Lane', value: '100% (8/8)', rate: 100 },
+    { label: '2-Lane + Bike (Arques)', value: '60% (3/5)', rate: 60 },
+  ],
+  trends: [
+    { sev: 'XL', label: 'FN yield to oncoming (Arques — road graph)', count: 2 },
+    { sev: 'XL', label: 'Missed — 2-lane + bike / wide lanes (Arques)', count: 3 },
+    { sev: 'XL', label: 'Missed — no rail (Arques)', count: 1 },
+    { sev: 'M', label: 'Wobble / understeer (turn completed)', count: 10 },
+    { sev: 'L', label: 'Unstable road graph — 2+bike, Arques median', count: 1 },
+  ],
+  callouts: [
+    { kind: 'warn', text: '⚠️ Arques corridor (PM Pt.1): Repeated FN yield failures on wide 2-lane + bike configurations (W16, W17, W19). Suspected cause: unstable road graph with missing topo nodes, resulting in poor prediction of oncoming contenders. Requires road graph investigation before further testing on this corridor.' },
+  ],
+  events: [
+    { id: 'Pt1·W12', sev: 'M', desc: 'U-turn good, no HD map, 2+merging lane; into merging lane', loc: 'Arques & Oakmead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1a84528d-a0ff-4898-b60a-a09962572c7a/1a84528d-a0ff-4898-b60a-a09962572c7a' },
+    { id: 'Pt1·W13', sev: 'S', desc: 'U-turn good, no HD map, 2+turning lane; unprotected', loc: 'Oakmead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1e7b5340-25b7-4c94-afdf-6fb235574caa/1e7b5340-25b7-4c94-afdf-6fb235574caa' },
+    { id: 'Pt1·W14', sev: 'M', desc: 'U-turn good, no HD map, 3-lane; oversteer at end, fishhook', loc: 'Lakeside & Oakmead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9b9878aa-009d-4418-b2ad-34ddcfc33ab2/9b9878aa-009d-4418-b2ad-34ddcfc33ab2' },
+    { id: 'Pt1·W15', sev: 'S', desc: 'U-turn good, no HD map, 2+merging lane; unprotected', loc: 'Oakmead median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/23658e90-35ed-4643-a5c1-d0f4b46095b6/23658e90-35ed-4643-a5c1-d0f4b46095b6' },
+    { id: 'Pt1·W16', sev: 'XL', desc: 'U-turn bad, no HD map, 2 wide+bike lane; FN yield to oncoming — unprotected <span class="crit-inline">⚠</span>', loc: 'Arques (wide)', url: 'https://maglev.nvda.ai/av/drivescrubber/events/89e1048f-c1c7-41de-bc0d-25b8ef005c08/89e1048f-c1c7-41de-bc0d-25b8ef005c08' },
+    { id: 'Pt1·W17', sev: 'XL', desc: 'U-turn bad, no HD map, 2 wide+bike lane; FN yield to oncoming — unprotected <span class="crit-inline">⚠</span>', loc: 'Arques', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2d179f88-7a75-4747-833c-d89303a3a892/2d179f88-7a75-4747-833c-d89303a3a892' },
+    { id: 'Pt1·W18', sev: 'XL', desc: 'U-turn missed, no HD map, 2 wide+bike lane <span class="crit-inline">⚠</span>', loc: 'Arques', url: 'https://maglev.nvda.ai/av/drivescrubber/events/17ceb2ff-25ae-430e-b8d7-d00a197186d7/17ceb2ff-25ae-430e-b8d7-d00a197186d7' },
+    { id: 'Pt1·W19', sev: 'XL', desc: 'U-turn bad, no HD map, 2 wide+bike lane; unprotected — no rail <span class="crit-inline">⚠</span>', loc: 'Arques', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a446b808-6b3b-4daf-ab05-33840fe341ac/a446b808-6b3b-4daf-ab05-33840fe341ac' },
+    { id: 'Pt1·W20', sev: 'XL', desc: 'U-turn missed, no HD map, 2 wide+bike lane <span class="crit-inline">⚠</span>', loc: 'Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2a0d97f8-a2c3-42b0-a444-9749acd6c488/2a0d97f8-a2c3-42b0-a444-9749acd6c488' },
+    { id: 'Pt1·W21', sev: 'XL', desc: 'U-turn missed, no HD map, 2 wide+bike lane; possibly infeasible (very wide) <span class="crit-inline">⚠</span>', loc: 'Scott & Oakmead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ad1d5bdb-8b5d-4134-9c3e-40fcfbc52de7/ad1d5bdb-8b5d-4134-9c3e-40fcfbc52de7' },
+    { id: 'Pt1·W22', sev: 'M', desc: 'U-turn good, no HD map, 2+merging lane; unprotected', loc: 'Oakmead median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ebdce732-ea55-4003-a33d-ab7ea5c83243/ebdce732-ea55-4003-a33d-ab7ea5c83243' },
+    { id: 'Pt2·W1', sev: 'M', desc: 'U-turn good; wobble', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/30a31d8a-9136-4bd3-bc56-d9b509137bc5/30a31d8a-9136-4bd3-bc56-d9b509137bc5' },
+    { id: 'Pt2·W2', sev: 'M', desc: 'U-turn good; wobble, 3rd into 4-lane — tighter than AM build', loc: 'San Tomas & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1168058f-9cd3-44d9-b6fc-ca78992c6a82/1168058f-9cd3-44d9-b6fc-ca78992c6a82' },
+    { id: 'Pt2·W3', sev: 'M', desc: 'U-turn good; slight wobble during correction', loc: 'San Tomas & Monroe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f0c50a32-a208-4417-b536-0a6ac44d2584/f0c50a32-a208-4417-b536-0a6ac44d2584' },
+    { id: 'Pt2·W4', sev: 'S', desc: 'U-turn good, HD map, 4-lane', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/dfa2d121-18f4-408f-abb5-92021a18af15/dfa2d121-18f4-408f-abb5-92021a18af15' },
+    { id: 'Pt2·W5', sev: 'M', desc: 'U-turn good, no HD map, 4-lane; wobble', loc: 'San Tomas & Cabrillo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/02ed07a5-86d3-46d6-be4f-a21fab569019/02ed07a5-86d3-46d6-be4f-a21fab569019' },
+    { id: 'Pt2·W6', sev: 'M', desc: 'U-turn good, no HD map, 4-lane; jerky start', loc: 'San Tomas & Monroe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/52143473-8ce0-40f8-a362-f475c1bb2618/52143473-8ce0-40f8-a362-f475c1bb2618' },
+    { id: 'Pt2·W7', sev: 'M', desc: 'U-turn good, no HD map, 4-lane; slight oversteer, fishhook', loc: 'San Tomas & El Camino Real', url: 'https://maglev.nvda.ai/av/drivescrubber/events/42c6bc8d-2004-4781-8b6d-8df719e40473/42c6bc8d-2004-4781-8b6d-8df719e40473' },
+    { id: 'Pt2·W8', sev: 'S', desc: 'U-turn good, no HD map, 2+merging lane; unprotected, yield, wobble at end', loc: 'Oakmead Pkwy median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/06a465f7-3f4e-4fc8-a7bc-f27b227cc4ea/06a465f7-3f4e-4fc8-a7bc-f27b227cc4ea' },
+    { id: 'Pt2·W9', sev: 'M', desc: 'U-turn good, no HD map, 2+merging lane', loc: 'Oakmead & Arques', url: 'https://maglev.nvda.ai/av/drivescrubber/events/dc3be551-7d75-4bdf-a1e4-50edc0d7df39/dc3be551-7d75-4bdf-a1e4-50edc0d7df39' },
+    { id: 'Pt2·W10', sev: 'S', desc: 'U-turn good, no HD map, 2+merging lane; unprotected, yielding', loc: 'Oakmead Pkwy median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7055a1f4-0789-4f6a-a912-eb274a84db90/7055a1f4-0789-4f6a-a912-eb274a84db90' },
+    { id: 'Pt2·W11', sev: 'M', desc: 'U-turn infeasible, no HD map, 2+bike lane — TN correct skip', loc: 'Lakeside & Arques', url: 'https://maglev.nvda.ai/av/drivescrubber/events/16271f13-c9a4-419e-baf1-ba920e8cb9d1/16271f13-c9a4-419e-baf1-ba920e8cb9d1' },
+    { id: 'Pt2·W12', sev: 'L', desc: 'U-turn good, no HD map, 2+bike lane; unprotected — unstable road graph, may need HD map', loc: 'Arques median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/13677a04-ef5e-485f-a95d-c65f458c09e5/13677a04-ef5e-485f-a95d-c65f458c09e5' },
+  ],
+},
+// ============ 5/21 AM ============
+{
+  label: '5/21 AM',
+  title: 'U-Turn Test — SF (3rd St Corridor)',
+  subtitle: 'Wide-median configurations · SFT-5285 experiment validation',
+  build: '45565919.9',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45565919&vid=9',
+  model: 'sft-5285',
+  tester: 'W',
+  vehicle: '174-232',
+  session: 'bcc2bad5',
+  sessionUrl: 'https://maglev.nvda.ai/av/drivescrubber/drives/668747',
+  route: 'SF · 3rd St',
+  barPct: 81,
+  barLabel: '81% pass',
+  verdictCards: [
+    { kind: 'success', icon: '✅', title: 'HD Map Turns — Perfect', body: 'All 14 HD-map turns completed successfully (100%). Wide median geometry handled well across 1-lane and 2-lane configurations when map data is available.' },
+    { kind: 'warning', icon: '⚠️', title: 'No-HD-Map Struggles', body: '67% pass rate without HD map (12/18). Cargo corridor: inconsistent results at same location — oversteer, understeer, and abort across repeated attempts.' },
+    { kind: 'critical', icon: '🚨', title: '6 XL Events', body: 'All XL events on no-HD-map turns. W18 abort mid-turn, W19/W20 understeer/oversteer at Cargo, W7/W13/W29 oversteer or understeer close to median curb (APTO).' },
+  ],
+  tallies: { xl: 6, l: 2, m: 11, s: 13, xlDesc: 'oversteer median · understeer curb · abort mid-turn', lDesc: 'large wobble · oversteer close to median', mDesc: 'understeer · oversteer self-corrected · fishhook · wobble', sDesc: 'good turn · ped yield · fishhook minor' },
+  pass: [
+    { label: 'U-Turn Pass Rate', value: '81%', rate: 81 },
+    { label: 'HD Map', value: '100%', rate: 100 },
+    { label: 'No HD Map', value: '67%', rate: 67 },
+  ],
+  config: [
+    { config: '1-Lane + Wide Median', rate: 75, count: '6/8', notes: 'W19, W20 XL at Cargo — inconsistent each attempt' },
+    { config: '2-Lane + Wide Median', rate: 83, count: '20/24', notes: 'W7, W13, W18, W29 XL; mostly oversteer/understeer at no-HD-map locations' },
+    { config: 'With HD Map', rate: 100, count: '14/14', notes: 'Perfect — all turns completed across 1-lane and 2-lane wide median configs' },
+    { config: 'No HD Map', rate: 67, count: '12/18', notes: '6 XL events all no-HD-map; Cargo corridor most problematic' },
+  ],
+  trends: [
+    { sev: 'XL', label: 'Oversteer into median / curb — APTO', count: 4 },
+    { sev: 'XL', label: 'Understeer into curb — APTO', count: 1 },
+    { sev: 'XL', label: 'Abort mid-turn (steered then went straight)', count: 1 },
+    { sev: 'L', label: 'Large wobble / oversteer close to median', count: 2 },
+    { sev: 'M', label: 'Understeer / oversteer (self-corrected)', count: 7 },
+    { sev: 'M', label: 'Fishhook / wobble (turn completed)', count: 4 },
+  ],
+  locations: [
+    { label: 'Cargo & 3rd (no HD map)', detail: 'XL ×3 (W18-20)' },
+    { label: '3rd & 20th / 23rd', detail: 'M ×4' },
+    { label: '3rd & Mariposa', detail: 'M + S' },
+    { label: '3rd & Carroll (no HD map)', detail: 'XL W7' },
+    { label: '3rd & Hudson (no HD map)', detail: 'XL W13' },
+    { label: 'Mission Bay Blvd N (no HD map)', detail: 'XL W29' },
+    { label: '3rd & Jamestown / Key (HD map)', detail: 'S ×3' },
+  ],
+  callouts: [
+    { kind: 'crit', text: '⚠️ Cargo corridor (W18–W20): 3 consecutive XL events at same location — abort, understeer, oversteer. Inconsistent results each attempt. No HD map; likely requires map coverage.' },
+    { text: 'ℹ️ Unique this session: wide-median 1-lane configurations. Generally handled well with HD map. Without HD map, median geometry causes trajectory instability.' },
+  ],
+  events: [
+    { id: 'W1', sev: 'S', desc: 'U-turn good, 1-lane wide median; slightly slow · <span class="event-tag">HD</span>', loc: '3rd & Jamestown', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f419f9c5-c151-4435-bfc3-69c549842adc/f419f9c5-c151-4435-bfc3-69c549842adc' },
+    { id: 'W2', sev: 'M', desc: 'U-turn good, 1-lane wide median; too close to median left · <span class="event-tag">HD</span>', loc: '3rd & Le Comte', url: 'https://maglev.nvda.ai/av/drivescrubber/events/74aae6cb-a850-430a-9485-419cfe47f36c/74aae6cb-a850-430a-9485-419cfe47f36c' },
+    { id: 'W3', sev: 'M', desc: 'U-turn good, 2-lane wide median; fishhook correction · <span class="event-tag">HD</span>', loc: '3rd & Paul', url: 'https://maglev.nvda.ai/av/drivescrubber/events/fcfd4d22-f067-4c5c-b8fc-3dc478a25079/fcfd4d22-f067-4c5c-b8fc-3dc478a25079' },
+    { id: 'W4', sev: 'S', desc: 'U-turn good, 1-lane wide median; excellent · <span class="event-tag">HD</span>', loc: '3rd & Le Comte', url: 'https://maglev.nvda.ai/av/drivescrubber/events/501c04a8-5f89-4393-985a-a1f7c05b92a2/501c04a8-5f89-4393-985a-a1f7c05b92a2' },
+    { id: 'W5', sev: 'S', desc: 'U-turn good, 1-lane wide median; very good · <span class="event-tag">HD</span>', loc: '3rd & Jamestown', url: 'https://maglev.nvda.ai/av/drivescrubber/events/41f1ab45-0166-4775-b5c2-27f8c6d4399b/41f1ab45-0166-4775-b5c2-27f8c6d4399b' },
+    { id: 'W6', sev: 'S', desc: 'U-turn good, 1-lane wide median; slight brake tap at start · <span class="event-tag">HD</span>', loc: '3rd & Key', url: 'https://maglev.nvda.ai/av/drivescrubber/events/0e158949-a439-4219-8167-e6a4fbfa65e8/0e158949-a439-4219-8167-e6a4fbfa65e8' },
+    { id: 'W7', sev: 'XL', desc: 'U-turn bad, 2-lane wide median; too close to median curb — APTO <span class="crit-inline">⚠</span>', loc: '3rd & Carroll', url: 'https://maglev.nvda.ai/av/drivescrubber/events/77cd33eb-7222-4231-a560-8282d9ac8f25/77cd33eb-7222-4231-a560-8282d9ac8f25' },
+    { id: 'W8', sev: 'S', desc: 'U-turn good, 2-lane wide median; slight wobble · <span class="event-tag">HD</span>', loc: '3rd & Gilman', url: 'https://maglev.nvda.ai/av/drivescrubber/events/82b80359-3978-4977-adf2-e1209b13d1f3/82b80359-3978-4977-adf2-e1209b13d1f3' },
+    { id: 'W9', sev: 'S', desc: 'U-turn good, 2-lane wide median; slight jerk at start · <span class="event-tag">HD</span>', loc: '3rd & Williams', url: 'https://maglev.nvda.ai/av/drivescrubber/events/4cbd15bb-6440-43ef-bc6e-0784fe3a214d/4cbd15bb-6440-43ef-bc6e-0784fe3a214d' },
+    { id: 'W10', sev: 'S', desc: 'U-turn good, 2-lane wide median', loc: '3rd & Wallace', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2c85b6d6-0db4-48cc-ba38-16be0a73c7bf/2c85b6d6-0db4-48cc-ba38-16be0a73c7bf' },
+    { id: 'W11', sev: 'M', desc: 'U-turn good, 2-lane wide median; understeer · <span class="event-tag">HD</span>', loc: '3rd & Jerrold', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9e74d86d-cdfc-402d-bd5f-20863ad15c7e/9e74d86d-cdfc-402d-bd5f-20863ad15c7e' },
+    { id: 'W12', sev: 'S', desc: 'U-turn good, 1-lane wide median · <span class="event-tag">HD</span>', loc: '3rd & Evans', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a0802f70-ba66-4b8f-aa90-ded883cdb82f/a0802f70-ba66-4b8f-aa90-ded883cdb82f' },
+    { id: 'W13', sev: 'XL', desc: 'U-turn bad, 2-lane wide median; oversteer into median curb — APTO <span class="crit-inline">⚠</span>', loc: '3rd & Hudson', url: 'https://maglev.nvda.ai/av/drivescrubber/events/52075016-c6cc-4eba-a78f-44a284086722/52075016-c6cc-4eba-a78f-44a284086722' },
+    { id: 'W14', sev: 'M', desc: 'U-turn good, 2-lane wide median; turned early through yellow lane marking', loc: '3rd & Cesar Chavez', url: 'https://maglev.nvda.ai/av/drivescrubber/events/353ddc37-ca14-4409-bdfc-925d1343e718/353ddc37-ca14-4409-bdfc-925d1343e718' },
+    { id: 'W15', sev: 'M', desc: 'U-turn good, 2-lane wide median; wobble mid-turn · <span class="event-tag">HD</span>', loc: '3rd & Evans', url: 'https://maglev.nvda.ai/av/drivescrubber/events/37845344-2fe9-45c8-a035-210022ef5a3a/37845344-2fe9-45c8-a035-210022ef5a3a' },
+    { id: 'W16', sev: 'S', desc: 'U-turn good, 2-lane wide median with TL; fishhook at start, unprotected — yielded', loc: 'Cargo & 3rd', url: 'https://maglev.nvda.ai/av/drivescrubber/events/4e0ae4c0-9728-46e9-9dc5-77f885b50f47/4e0ae4c0-9728-46e9-9dc5-77f885b50f47' },
+    { id: 'W17', sev: 'S', desc: 'U-turn good, 2-lane wide median · <span class="event-tag">HD</span>', loc: 'Cargo & 3rd', url: 'https://maglev.nvda.ai/av/drivescrubber/events/64bce180-964c-4731-808c-44993970d589/64bce180-964c-4731-808c-44993970d589' },
+    { id: 'W18', sev: 'XL', desc: 'U-turn bad, 2-lane wide median; aborted after steering left, proceeded straight <span class="crit-inline">⚠</span>', loc: 'Cargo median gap', url: 'https://maglev.nvda.ai/av/drivescrubber/events/64bce180-964c-4731-808c-44993970d589/64bce180-964c-4731-808c-44993970d589' },
+    { id: 'W19', sev: 'XL', desc: 'U-turn bad, 1-lane wide median; understeer into curb right — APTO <span class="crit-inline">⚠</span>', loc: 'Cargo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9a5d9ab5-9bd1-4f4c-ae5c-36a9252e3ccf/9a5d9ab5-9bd1-4f4c-ae5c-36a9252e3ccf' },
+    { id: 'W20', sev: 'XL', desc: 'U-turn bad, 1-lane wide median; oversteer into median left — APTO; different results each attempt <span class="crit-inline">⚠</span>', loc: 'Cargo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/02b10e1d-0cdc-4336-964c-86d344e172b2/02b10e1d-0cdc-4336-964c-86d344e172b2' },
+    { id: 'W21', sev: 'S', desc: 'U-turn good, 2-lane wide median; fishhook at end, hard turn', loc: '3rd & 20th', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a2cd0cc1-4db6-4be6-9728-eab4a5583b72/a2cd0cc1-4db6-4be6-9728-eab4a5583b72' },
+    { id: 'W22', sev: 'M', desc: 'U-turn good, 2-lane wide median; could have yielded more to ped CW', loc: '3rd & 23rd', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1a4843d6-6a6a-4dee-88ef-ede57d22db57/1a4843d6-6a6a-4dee-88ef-ede57d22db57' },
+    { id: 'W23', sev: 'M', desc: 'U-turn good, 2-lane wide median; oversteer close to median left', loc: '3rd & 20th', url: 'https://maglev.nvda.ai/av/drivescrubber/events/37b10521-8296-403a-af4a-4944ea1c9178/37b10521-8296-403a-af4a-4944ea1c9178' },
+    { id: 'W24', sev: 'M', desc: 'U-turn good, 2-lane wide median; oversteer close to median left, wobble', loc: '3rd & 23rd', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d84d3b30-6960-4d33-b95d-638d4dc82ecd/d84d3b30-6960-4d33-b95d-638d4dc82ecd' },
+    { id: 'W25', sev: 'M', desc: 'U-turn good, 2-lane wide median; understeer', loc: '3rd & Mariposa', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ca201faa-90f2-4163-8742-50cd4dbd4f73/ca201faa-90f2-4163-8742-50cd4dbd4f73' },
+    { id: 'W26', sev: 'M', desc: 'U-turn good, 2-lane wide median; oversteer at start, slight wobble at end', loc: '3rd & 20th', url: 'https://maglev.nvda.ai/av/drivescrubber/events/002daebf-4de3-4d7c-abd1-8797a85bf062/002daebf-4de3-4d7c-abd1-8797a85bf062' },
+    { id: 'W27', sev: 'L', desc: 'U-turn good, 2-lane wide median; large wobble, overall acceptable · <span class="event-tag">HD</span>', loc: '3rd & 16th', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5a161c27-026a-4a42-a6db-739db6b70478/5a161c27-026a-4a42-a6db-739db6b70478' },
+    { id: 'W28', sev: 'S', desc: 'U-turn good, 2-lane wide median; understeer', loc: '3rd & Mariposa', url: 'https://maglev.nvda.ai/av/drivescrubber/events/8524a574-4727-4fa1-8831-a391bda63b55/8524a574-4727-4fa1-8831-a391bda63b55' },
+    { id: 'W29', sev: 'XL', desc: 'U-turn bad, 2+turning lane wide median; oversteer into median — APTO <span class="crit-inline">⚠</span>', loc: '3rd & Mission Bay Blvd N', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7726b052-7ef0-49d1-adb6-33e299f981d0/7726b052-7ef0-49d1-adb6-33e299f981d0' },
+    { id: 'W30', sev: 'S', desc: 'U-turn good, 2-lane wide median; yielded to ped CW — good case · <span class="event-tag">HD</span>', loc: '3rd & King', url: 'https://maglev.nvda.ai/av/drivescrubber/events/014f30fd-d269-44f5-a36d-50edd5bf239a/014f30fd-d269-44f5-a36d-50edd5bf239a' },
+    { id: 'W31', sev: 'M', desc: 'U-turn good, 2-lane wide median; could yield more to OOT bike · <span class="event-tag">HD</span>', loc: '4th & Channel', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a3ef666b-7fa0-4e7b-a0aa-bf8f602a0f58/a3ef666b-7fa0-4e7b-a0aa-bf8f602a0f58' },
+    { id: 'W32', sev: 'L', desc: 'U-turn good, 2-lane wide median; oversteer too close to median', loc: '3rd & Mission Bay South', url: 'https://maglev.nvda.ai/av/drivescrubber/events/da952084-ffe7-489e-b7ca-9f4152c18cd6/da952084-ffe7-489e-b7ca-9f4152c18cd6' },
+  ],
+},
+
+// ============ 5/21 PM ============
+{
+  label: '5/21 PM',
+  title: 'U-Turn Test — Santa Clara / Sunnyvale',
+  subtitle: 'Early-entry behavior emerges · Bowers & Central asymmetric persists',
+  build: '45588152.4',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45588152&vid=4',
+  tester: 'W',
+  vehicle: '174-323',
+  session: '7cd32684',
+  sessionUrl: 'https://maglev.nvda.ai/av/drivescrubber/drives/668951',
+  route: 'SC/SV · San Tomas / Stevens Creek / Lafayette',
+  barPct: 66,
+  barLabel: '66% pass',
+  verdictCards: [
+    { kind: 'warning', icon: '⚠️', title: 'Early Turn Entry + Oversteer', body: 'This build consistently initiates U-turns early, cutting into the turn before intersection center. Causes wobble and oversteer toward median curb — APTO required at intersections where other builds performed normally. Noted across both 4-lane and 3-lane.' },
+    { kind: 'critical', icon: '🚨', title: 'Safety Critical Events', body: 'W18 XXL: accelerated into curb without rail on unprotected U-turn (CPTO). W31 XL: late yield during unprotected U-turn — ego stopped in path of oncoming (APTO). W14 XL: false-positive U-turn attempt. W39 XL: aborted, FN yield on subsequent LT.' },
+    { kind: 'note', icon: '📋', title: 'Asymmetric & Narrow Misses', body: 'Asymmetric intersections continue to be missed consistently (30% pass, 3/10). 2-lane configurations struggled across the board (25%, 2/8). 4-lane San Tomas corridor remained strong at 100% despite early-entry behavior.' },
+  ],
+  tallies: { xxl: 1, xl: 12, l: 3, m: 5, s: 17, xxlDesc: 'no rail acceleration into curb · CPTO', xlDesc: 'asymmetric missed · oversteer median · late yield · FN yield · +1 FP excluded', lDesc: 'early cut + wobble · large wobble completed', mDesc: 'wobble / understeer · early cut self-corrected', sDesc: 'good turn · tighter radius · into 2nd lane' },
+  pass: [
+    { label: 'U-Turn Pass Rate', value: '66%', rate: 66 },
+    { label: '4-Lane', value: '100%', rate: 100 },
+    { label: '3-Lane', value: '67%', rate: 67 },
+    { label: 'Asymmetric', value: '30%', rate: 30 },
+  ],
+  config: [
+    { config: '4-Lane', rate: 100, count: '9/9', notes: 'Early entry noted throughout (W6, W7 tighter into 2nd lane); W4, W10 L-rated for excessive early cut' },
+    { config: '3-Lane (incl. asymmetric)', rate: 67, count: '14/21', notes: 'W26, W29, W36 XL at Bowers & Central (asymmetric); W19–W22 XL at Stevens Creek' },
+    { config: '3+4 Lane Combined', rate: 77, count: '23/30', notes: 'R18 scope' },
+    { config: 'Asymmetric Intersection', rate: 30, count: '3/10', notes: 'W9, W11 S/M; W15, W16, W19, W22, W26, W29, W36 XL — consistent with prior builds' },
+    { config: '2-Lane (narrow / wide)', rate: 25, count: '2/8', notes: 'W18 XXL (CPTO), W31 XL (late yield), W39 XL (FN yield), W40 XL; W17, W35 S' },
+    { config: 'With HD Map', rate: 100, count: '2/2', notes: 'W1, W2 — 4-lane San Tomas & Walsh' },
+    { config: 'No HD Map', rate: 64, count: '23/36', notes: 'All XL events on no-HD-map turns' },
+  ],
+  trends: [
+    { sev: 'XL', label: 'Asymmetric intersection missed (all no HD map)', count: 7 },
+    { sev: 'XL', label: 'Oversteer into median curb — APTO', count: 2 },
+    { sev: 'XL', label: 'Late yield / FN yield (unprotected)', count: 2 },
+    { sev: 'XXL', label: 'No rail — accelerated into curb (CPTO)', count: 1 },
+    { sev: 'L', label: 'Early cut + excessive wobble (completed)', count: 3 },
+    { sev: 'M', label: 'Wobble / understeer (self-corrected)', count: 5 },
+  ],
+  locations: [
+    { label: 'Bowers & Central (asymmetric)', detail: 'XL ×3 (W26, W29, W36)' },
+    { label: 'Stevens Creek & Saratoga (asymmetric)', detail: 'XL ×3 (W19, W20, W21)' },
+    { label: 'Stevens Creek median', detail: 'XXL W18 · XL W22' },
+    { label: 'San Tomas & Walsh (4-lane)', detail: 'M ×2 (early cut)' },
+    { label: 'San Tomas & Homestead (4-lane)', detail: 'L (W10)' },
+    { label: 'Bowers & Walsh / Scott (3-lane)', detail: 'S ×3' },
+    { label: 'Oakmead corridor', detail: 'S ×3 · XL W31' },
+  ],
+  callouts: [
+    { kind: 'crit', text: '🚨 W18 XXL: Unprotected U-turn with no rail — system accelerated toward curb without yielding (CPTO). Stevens Creek median.' },
+    { kind: 'crit', text: '⚠️ W31 XL: Late yield on unprotected U-turn caused ego to stop in path of oncoming traffic (APTO). Oakmead.' },
+    { text: '📌 Build note (W13): This build initiates U-turns early, cutting into the turn before center — sometimes excessively causing wobble and oversteer. New behavior for this build.' },
+    { text: 'ℹ️ Tighter turn radius noted as new behavior (W6, W7 into 2nd lane) — may be intentional design. When well-executed produces cleaner S-rated turns; when excessive causes L/XL oversteer.' },
+  ],
+  events: [
+    { id: 'W1', sev: 'M', desc: 'U-turn good, 4-lane; early start over yellow lane, fishhook into 2nd lane · <span class="event-tag">HD</span>', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a11c46ff-069e-4eb7-91b3-1a3b1c69fdfe/a11c46ff-069e-4eb7-91b3-1a3b1c69fdfe' },
+    { id: 'W2', sev: 'M', desc: 'U-turn good, 4-lane; turns early cutting corner, understeer · <span class="event-tag">HD</span>', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/571c8443-60eb-4d8d-8b4f-bf9c0688e30b/571c8443-60eb-4d8d-8b4f-bf9c0688e30b' },
+    { id: 'W3', sev: 'S', desc: 'U-turn good, 4-lane; excellent', loc: 'San Tomas & Cabrillo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d883a461-0d03-42c6-8575-82180d9d099e/d883a461-0d03-42c6-8575-82180d9d099e' },
+    { id: 'W4', sev: 'L', desc: 'U-turn good, 4-lane; cuts early too much, wobble', loc: 'San Tomas & Monroe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/72833ef7-0dec-4061-a13f-5a4c45b1bab6/72833ef7-0dec-4061-a13f-5a4c45b1bab6' },
+    { id: 'W5', sev: 'M', desc: 'U-turn good, 4-lane; wobble at start (to avoid curb?)', loc: 'San Tomas & El Camino Real', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a1860bf9-88f3-4d74-9eed-f338df6bcbad/a1860bf9-88f3-4d74-9eed-f338df6bcbad' },
+    { id: 'W6', sev: 'S', desc: 'U-turn good, 4-lane; turned into 2nd lane — new tighter behavior', loc: 'San Tomas & Cabrillo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/8af6a0cf-02c9-40b5-a78f-c6da9e6f5715/8af6a0cf-02c9-40b5-a78f-c6da9e6f5715' },
+    { id: 'W7', sev: 'S', desc: 'U-turn good, 4-lane; into 2nd lane again, tighter turns on this build', loc: 'San Tomas & Homestead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1b81e8a5-1b68-4041-a9b0-53adeaf852ca/1b81e8a5-1b68-4041-a9b0-53adeaf852ca' },
+    { id: 'W8', sev: 'M', desc: 'U-turn good, 4-lane; wobble and understeer into 4th lane', loc: 'San Tomas & Benton', url: 'https://maglev.nvda.ai/av/drivescrubber/events/17930a71-fcd1-4994-b9c1-b0f03610226c/17930a71-fcd1-4994-b9c1-b0f03610226c' },
+    { id: 'W9', sev: 'M', desc: 'U-turn good, 3-lane; understeer · <span class="event-tag">Asymmetric</span>', loc: 'San Tomas & Forbes', url: 'https://maglev.nvda.ai/av/drivescrubber/events/99a70fce-0b76-42d7-b0ab-fe8720a6c50f/99a70fce-0b76-42d7-b0ab-fe8720a6c50f' },
+    { id: 'W10', sev: 'L', desc: 'U-turn bad, 4-lane; cut early too much, wobbles, completed', loc: 'San Tomas & Homestead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/28b6a526-8d2d-48be-a67e-97c7246ca9c9/28b6a526-8d2d-48be-a67e-97c7246ca9c9' },
+    { id: 'W11', sev: 'S', desc: 'U-turn good, 3-lane · <span class="event-tag">Asymmetric</span>', loc: 'San Tomas & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/4d872a0d-6d4d-4e74-9856-054eea30b7b9/4d872a0d-6d4d-4e74-9856-054eea30b7b9' },
+    { id: 'W12', sev: 'S', desc: 'U-turn good, 3-lane; cuts a little early', loc: 'San Tomas & Pruneridge', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a4eed18d-bd55-4bf3-86ab-9bb556eca321/a4eed18d-bd55-4bf3-86ab-9bb556eca321' },
+    { id: 'W14', sev: 'XL', desc: 'False positive U-turn attempt <span class="crit-inline">⚠</span> — excluded from U-turn pass rate', loc: '—' },
+    { id: 'W15', sev: 'XL', desc: 'U-turn missed, 2+bike lane; possibly infeasible <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Pruneridge & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/17cd82bd-f079-45bc-9431-120f2b068499/17cd82bd-f079-45bc-9431-120f2b068499' },
+    { id: 'W16', sev: 'XL', desc: 'U-turn missed, 2 wide lane; possibly infeasible <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Stevens Creek & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/bf6ca609-05ac-4581-897a-3e37db4e3060/bf6ca609-05ac-4581-897a-3e37db4e3060' },
+    { id: 'W17', sev: 'S', desc: 'U-turn good, 2 wide lane; slightly slanted asymmetric, slight wobble at start', loc: 'Keystone & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2984c0c4-9b54-4e2d-aad0-1d7cd49291ee/2984c0c4-9b54-4e2d-aad0-1d7cd49291ee' },
+    { id: 'W18', sev: 'XXL', desc: 'U-turn bad, 2 wide lane; no rail — accelerated into curb — CPTO <span class="crit-inline">⚠⚠</span>', loc: 'Stevens Creek median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d36b1f9c-2dd4-4121-9bcb-5234be22c0d9/d36b1f9c-2dd4-4121-9bcb-5234be22c0d9' },
+    { id: 'W19', sev: 'XL', desc: 'U-turn missed, 3+bike lane; possibly infeasible <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Stevens Creek & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a5b55977-f643-4001-bb41-ebb57a95dfbd/a5b55977-f643-4001-bb41-ebb57a95dfbd' },
+    { id: 'W20', sev: 'XL', desc: 'U-turn missed, 3+bike lane; looks too wide to be infeasible — rail appeared narrow <span class="crit-inline">⚠</span>', loc: 'Stevens Creek median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/410f56e4-a2fd-412f-908e-9519b82282df/410f56e4-a2fd-412f-908e-9519b82282df' },
+    { id: 'W21', sev: 'XL', desc: 'U-turn missed, 3+bike lane; too wide to be infeasible — unprotected, yielded to traffic <span class="crit-inline">⚠</span>', loc: 'Stevens Creek median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/8fb59284-2b98-42c8-a14a-e3df85abe850/8fb59284-2b98-42c8-a14a-e3df85abe850' },
+    { id: 'W22', sev: 'XL', desc: 'U-turn bad, 3+bike lane; oversteer into median curb — APTO <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Stevens Creek & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/da270232-1020-4a4a-8df4-febd6f072cdd/da270232-1020-4a4a-8df4-febd6f072cdd' },
+    { id: 'W23', sev: 'S', desc: 'U-turn good, 3+bike lane', loc: 'San Tomas & Stevens Creek', url: 'https://maglev.nvda.ai/av/drivescrubber/events/34662e29-7541-4b9e-955f-ab4fc617760e/34662e29-7541-4b9e-955f-ab4fc617760e' },
+    { id: 'W24', sev: 'S', desc: 'U-turn good, 3+bike lane', loc: 'Bowers & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/e46c6dbf-b3fd-4c6d-bd96-7f1a603f8cda/e46c6dbf-b3fd-4c6d-bd96-7f1a603f8cda' },
+    { id: 'W25', sev: 'S', desc: 'U-turn good, 3+bike lane', loc: 'Bowers & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/cff4ac3f-d5cd-4c59-ae9f-54bf3520dc2b/cff4ac3f-d5cd-4c59-ae9f-54bf3520dc2b' },
+    { id: 'W26', sev: 'XL', desc: 'U-turn missed, 3-lane <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/533ef4f9-8b67-4d3a-a49d-fdb79a290f16/533ef4f9-8b67-4d3a-a49d-fdb79a290f16' },
+    { id: 'W27', sev: 'S', desc: 'U-turn good, 3-lane', loc: 'Bowers & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ebd71513-2438-4d5b-bb90-937e10fc978d/ebd71513-2438-4d5b-bb90-937e10fc978d' },
+    { id: 'W28', sev: 'S', desc: 'U-turn good, 3+bike lane', loc: 'Bowers & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/66db11b5-12f1-4269-8030-3fbc62ded226/66db11b5-12f1-4269-8030-3fbc62ded226' },
+    { id: 'W29', sev: 'XL', desc: 'U-turn missed, 3-lane <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/4ff05234-ca26-4fa5-b831-f3e64d3f6bc8/4ff05234-ca26-4fa5-b831-f3e64d3f6bc8' },
+    { id: 'W30', sev: 'S', desc: 'U-turn good, 3-lane · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/e59dc48f-5888-438b-9002-e6fc25b22ec5/e59dc48f-5888-438b-9002-e6fc25b22ec5' },
+    { id: 'W31', sev: 'XL', desc: 'U-turn bad, 2+merging lane; late yield — stopped in path of oncoming — APTO <span class="crit-inline">⚠</span>', loc: 'Oakmead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/55a8c04f-54be-4dbc-9a93-70415834b172/55a8c04f-54be-4dbc-9a93-70415834b172' },
+    { id: 'W32', sev: 'S', desc: 'U-turn good, 3-lane; slow start', loc: 'Oakmead & Arques', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1913e142-4c3e-433e-bf9a-23b9fcf3e282/1913e142-4c3e-433e-bf9a-23b9fcf3e282' },
+    { id: 'W33', sev: 'S', desc: 'U-turn good, 3-lane; unprotected', loc: 'Oakmead median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2fc1841c-b38b-411d-95a7-88f6ebac852f/2fc1841c-b38b-411d-95a7-88f6ebac852f' },
+    { id: 'W34', sev: 'S', desc: 'U-turn good, 3-lane', loc: 'Oakmead & Arques', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9d1639fa-227c-452d-a5d9-4dc5ff126951/9d1639fa-227c-452d-a5d9-4dc5ff126951' },
+    { id: 'W35', sev: 'S', desc: 'U-turn good, 2+merging lane; unprotected', loc: 'Oakmead median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/bfd134ee-27e4-43e6-9b02-d91ea1cf83f9/bfd134ee-27e4-43e6-9b02-d91ea1cf83f9' },
+    { id: 'W36', sev: 'XL', desc: 'U-turn missed, 3-lane; noodle flickered before attempt then aborted <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/c2d8cbe2-a0f4-4090-ba1b-69813685e079/c2d8cbe2-a0f4-4090-ba1b-69813685e079' },
+    { id: 'W37', sev: 'S', desc: 'U-turn good, 3+bike lane', loc: 'Wolfe & Kifer', url: 'https://maglev.nvda.ai/av/drivescrubber/events/8f3995a1-2d00-4029-8461-eae4d3c6a562/8f3995a1-2d00-4029-8461-eae4d3c6a562' },
+    { id: 'W38', sev: 'L', desc: 'U-turn bad, 3+bike lane; two large wobbles but completed', loc: 'Wolfe & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2c9ff4b2-c02d-40ef-9d02-32dc94e61713/2c9ff4b2-c02d-40ef-9d02-32dc94e61713' },
+    { id: 'W39', sev: 'XL', desc: 'U-turn bad, 2+bike lane; aborted, FN yield on subsequent LT <span class="crit-inline">⚠</span>', loc: 'Scott & Octavius', url: 'https://maglev.nvda.ai/av/drivescrubber/events/da270232-1020-4a4a-8df4-febd6f072cdd/da270232-1020-4a4a-8df4-febd6f072cdd' },
+    { id: 'W40', sev: 'XL', desc: 'U-turn missed, 2+bike lane; possibly infeasible — looked wide enough <span class="crit-inline">⚠</span>', loc: 'Scott & Bowers', url: 'https://maglev.nvda.ai/av/drivescrubber/events/fdd39e14-97a7-4399-882f-3ecec6a0e2d9/fdd39e14-97a7-4399-882f-3ecec6a0e2d9' },
+  ],
+},
+
+// ============ 5/22 ============
+{
+  label: '5/22',
+  title: 'U-Turn Test — South Bay',
+  subtitle: 'Best session pass rate of the sprint · El Camino Real 11 consecutive S/M',
+  build: '45599836.1',
+  buildUrl: 'https://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45599836&vid=1',
+  model: 'sft-4640',
+  tester: 'W',
+  vehicle: '174-323',
+  session: '0ae35126',
+  sessionUrl: 'https://maglev.nvda.ai/av/drivescrubber/drives/670171',
+  route: 'SC · San Tomas / El Camino / Saratoga / Wolfe / Bowers',
+  barPct: 82,
+  barLabel: '82% pass ★',
+  verdictCards: [
+    { kind: 'success', icon: '✅', title: 'Strong Overall Pass Rate', body: '82% overall across 67 events — best session pass rate yet for this route. San Tomas 4-lane and El Camino 3-lane corridors both performed well. Unprotected turns showed consistent yielding behavior. W20: correct TN at no-U-turn-sign intersection.' },
+    { kind: 'warning', icon: '⚠️', title: 'Asymmetric & Road Graph Issues', body: 'Asymmetric intersections remain problematic at 58% (7/12). Repeated misses at Stevens Creek & Saratoga and Bowers & Central. W38 and W60 flagged as road-graph issues. W42 XL: FN yield to oncoming during unprotected U-turn (CPTO).' },
+    { kind: 'note', icon: '📋', title: 'Classical Arbitration + Wobble', body: 'Classical mode noted on several turns (W6, W10, W11, W14, W15, W25, W30, W46) — wobble and oversteer pattern consistent with hybrid sessions. W53 L: understeer into loading zone with DPV. W69 L: came to stop mid-turn but completed.' },
+  ],
+  tallies: { xl: 12, l: 7, m: 23, s: 25, xlDesc: 'asymmetric missed · oversteer curb · FN yield CPTO · road graph · blocking contender', lDesc: 'big wobble completed · oversteer APTO · stop mid-turn · understeer DPV', mDesc: 'wobble / understeer · fishhook · early cut · hesitant start', sDesc: 'good turn · into 2nd lane · unprotected yield · dedicated U-turn' },
+  pass: [
+    { label: 'U-Turn Pass Rate', value: '82%', rate: 82 },
+    { label: '3+4 Lane', value: '82%', rate: 82 },
+    { label: '4-Lane', value: '89%', rate: 89 },
+    { label: 'Asymmetric', value: '58%', rate: 58 },
+  ],
+  config: [
+    { config: '4-Lane', rate: 89, count: '17/19', notes: 'W63 XL Wolfe & Evelyn missed; W65 XL Wolfe & Central missed (late detection?); W23 L big wobble' },
+    { config: '3-Lane (incl. asym / +bike)', rate: 79, count: '34/43', notes: 'Asymmetric misses at Stevens Creek & Saratoga, Bowers & Central; W42 XL FN yield CPTO; W47 XL blocking contender' },
+    { config: '3+4 Lane Combined', rate: 82, count: '51/62', notes: 'R18 scope' },
+    { config: 'Asymmetric Intersection', rate: 58, count: '7/12', notes: 'W35, W36, W37, W39, W41 XL (Stevens Creek / Saratoga); W45, W52 S/M passed' },
+    { config: '2-Lane (wide / merging / bike)', rate: 80, count: '4/5', notes: 'W57 XL Lakeside & Arques missed (infeasible?); W40, W54, W56, W58 passed' },
+    { config: 'With HD Map', rate: 100, count: '1/1', notes: 'W3 only — San Tomas & Walsh' },
+    { config: 'No HD Map', rate: 82, count: '54/66', notes: 'Solid no-HD-map performance across most corridors' },
+  ],
+  trends: [
+    { sev: 'XL', label: 'Asymmetric missed (Stevens Creek / Saratoga)', count: 5 },
+    { sev: 'XL', label: 'Asymmetric missed (Bowers & Central)', count: 3 },
+    { sev: 'XL', label: 'Wolfe corridor missed (road graph / late detection)', count: 2 },
+    { sev: 'XL', label: 'FN yield / blocking contender (unprotected)', count: 2 },
+    { sev: 'XL', label: 'Oversteer into median curb — APTO', count: 1 },
+    { sev: 'L', label: 'Big wobble / oversteer (completed)', count: 5 },
+    { sev: 'L', label: 'Stop mid-turn / understeer (completed)', count: 2 },
+    { sev: 'M', label: 'Wobble / understeer (self-corrected)', count: 23 },
+  ],
+  locations: [
+    { label: 'Stevens Creek & Saratoga (asymmetric)', detail: 'XL ×4 (W35, W36, W37, W41)' },
+    { label: 'Bowers & Central (asymmetric)', detail: 'XL ×3 (recurring pattern)' },
+    { label: 'Wolfe corridor (median / Evelyn)', detail: 'XL ×2 (W63, W65)' },
+    { label: 'San Tomas & Homestead', detail: 'L + M ×3 (W23, W26, W27)' },
+    { label: 'El Camino Real corridor', detail: 'S ×9 (W8–W19) ★' },
+    { label: 'Bowers / Scott / Oakmead', detail: 'S ×7 (W49–W51, W55, W56)' },
+    { label: 'Wolfe & Arques / Stewart / Kifer', detail: 'S + M ×4' },
+  ],
+  callouts: [
+    { kind: 'crit', text: '🚨 W42 XL: FN yield to oncoming during unprotected U-turn — CPTO. Stevens Creek median.' },
+    { kind: 'crit', text: '⚠️ W47 XL: Yielding but blocked contender path — APTO. Bowers median. W53 L: Understeer into loading zone with DPV present — APTO.' },
+    { text: '📌 W43: Unexpected U-turn rail present — requires investigation. W44: Noodle selected U-turn unexpectedly — requires investigation. W38, W60: Road graph issues suspected — Saratoga median and Wolfe median.' },
+    { text: 'ℹ️ El Camino Real corridor (W8–W19) performed exceptionally well — 11 consecutive S/M turns including unprotected, asymmetric, and classical-mode scenarios. Wolfe corridor was mixed. W20: correct TN — no U-turn sign at intersection.' },
+  ],
+  events: [
+    { id: 'W1', sev: 'M', desc: 'U-turn good, 4-lane; wobble, early turn', loc: 'San Tomas & Monroe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/42f83d76-08c3-4efa-9ce4-be5169abc2c8/42f83d76-08c3-4efa-9ce4-be5169abc2c8' },
+    { id: 'W3', sev: 'S', desc: 'U-turn good, 4-lane; brake tap at start · <span class="event-tag">HD</span>', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9e2e1318-9fcf-4d24-aec9-6e747962010b/9e2e1318-9fcf-4d24-aec9-6e747962010b' },
+    { id: 'W4', sev: 'S', desc: 'U-turn good, 4-lane; slight oversteer into 2nd lane, with cones', loc: 'San Tomas & Cabrillo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/c6a5af73-a364-4398-880e-fbe8df2736ef/c6a5af73-a364-4398-880e-fbe8df2736ef' },
+    { id: 'W5', sev: 'M', desc: 'U-turn good, 4-lane; slight wobble, into 2nd lane', loc: 'San Tomas & Monroe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a82bf8ab-42de-4cd5-bcee-b5cd13575dc1/a82bf8ab-42de-4cd5-bcee-b5cd13575dc1' },
+    { id: 'W6', sev: 'S', desc: 'U-turn good, 4-lane; slightly hesitant, very slight wobble · <span class="event-tag">Classical</span>', loc: 'San Tomas & El Camino Real', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1eba5d86-fd0e-4818-b201-97242ffed65b/1eba5d86-fd0e-4818-b201-97242ffed65b' },
+    { id: 'W7', sev: 'S', desc: 'U-turn good, 4-lane; into 2nd lane', loc: 'San Tomas & Cabrillo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/736036fd-1b16-4efa-a3a8-fd1947e004e2/736036fd-1b16-4efa-a3a8-fd1947e004e2' },
+    { id: 'W8', sev: 'S', desc: 'U-turn good, 3-lane; unprotected', loc: 'El Camino Real median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1ecdd925-f525-493c-b5f9-d6a0de661e5f/1ecdd925-f525-493c-b5f9-d6a0de661e5f' },
+    { id: 'W9', sev: 'S', desc: 'U-turn good, 3-lane', loc: 'El Camino Real & Los Padres', url: 'https://maglev.nvda.ai/av/drivescrubber/events/e19c20b6-6212-45a3-89d9-55f33f046ef7/e19c20b6-6212-45a3-89d9-55f33f046ef7' },
+    { id: 'W10', sev: 'M', desc: 'U-turn good, 3-lane; hesitant, corrected into 2nd lane · <span class="event-tag">Classical</span>', loc: 'El Camino Real & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/01853994-f108-45e6-b49f-3791887c7a24/01853994-f108-45e6-b49f-3791887c7a24' },
+    { id: 'W11', sev: 'S', desc: 'U-turn good, 3-lane; dedicated U-turn · <span class="event-tag">Classical</span>', loc: 'El Camino Real & McCormick', url: 'https://maglev.nvda.ai/av/drivescrubber/events/fc174592-41ad-4223-8e14-9adede26db57/fc174592-41ad-4223-8e14-9adede26db57' },
+    { id: 'W12', sev: 'S', desc: 'U-turn good, 3-lane', loc: 'El Camino Real & Los Padres', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d3f45bdc-704c-49a4-be46-722e2fd48963/d3f45bdc-704c-49a4-be46-722e2fd48963' },
+    { id: 'W13', sev: 'S', desc: 'U-turn good, 3-lane', loc: 'El Camino Real & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ad1439be-63fd-4f2f-ad70-668a7f6f7d82/ad1439be-63fd-4f2f-ad70-668a7f6f7d82' },
+    { id: 'W14', sev: 'S', desc: 'U-turn good, 3-lane; slight wobble twice · <span class="event-tag">Classical</span>', loc: 'El Camino Real & McCormick', url: 'https://maglev.nvda.ai/av/drivescrubber/events/549f9ac9-967e-49d0-8208-a214a2a58b81/549f9ac9-967e-49d0-8208-a214a2a58b81' },
+    { id: 'W15', sev: 'M', desc: 'U-turn good, 3-lane; slanted, wobble · <span class="event-tag">Classical</span>', loc: 'El Camino Real & Lincoln', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f3aba7bd-770b-4bfe-9535-412880f9922f/f3aba7bd-770b-4bfe-9535-412880f9922f' },
+    { id: 'W16', sev: 'S', desc: 'U-turn good, 3-lane; unprotected, yielded to oncoming', loc: 'El Camino Real median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f8f7f231-46d3-43cb-9cd2-f792914d55aa/f8f7f231-46d3-43cb-9cd2-f792914d55aa' },
+    { id: 'W17', sev: 'S', desc: 'U-turn good, 3-lane; slight understeer at end', loc: 'El Camino Real & Monroe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d44a99a2-c346-488f-8acf-125f0c40b32e/d44a99a2-c346-488f-8acf-125f0c40b32e' },
+    { id: 'W18', sev: 'S', desc: 'U-turn good, 3-lane · <span class="event-tag">Asymmetric</span>', loc: 'El Camino Real & Lincoln', url: 'https://maglev.nvda.ai/av/drivescrubber/events/17f8e8e9-2039-4c76-80d9-ea3d03c6f0bf/17f8e8e9-2039-4c76-80d9-ea3d03c6f0bf' },
+    { id: 'W19', sev: 'S', desc: 'U-turn good, 3-lane; unprotected, yielded', loc: 'El Camino Real & Main median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/c276dc4f-e2b1-4de0-b5b6-a73c099194eb/c276dc4f-e2b1-4de0-b5b6-a73c099194eb' },
+    { id: 'W20', sev: 'S', desc: 'Good TN — no U-turn sign at intersection; correct no-attempt ★', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a40d66d6-ecaa-4812-981c-14902fd4a6c9/a40d66d6-ecaa-4812-981c-14902fd4a6c9' },
+    { id: 'W21', sev: 'M', desc: 'U-turn good, 4-lane; understeer into 4th lane', loc: 'San Tomas & Benton', url: 'https://maglev.nvda.ai/av/drivescrubber/events/b3ac6e5d-ee26-458f-b1b1-b2f048f1de2c/b3ac6e5d-ee26-458f-b1b1-b2f048f1de2c' },
+    { id: 'W22', sev: 'M', desc: 'U-turn good, 4-lane; understeer, fishhook at end', loc: 'San Tomas & El Camino Real', url: 'https://maglev.nvda.ai/av/drivescrubber/events/94c792ae-6015-4e9d-91d0-9053f5aa8196/94c792ae-6015-4e9d-91d0-9053f5aa8196' },
+    { id: 'W23', sev: 'L', desc: 'U-turn bad, 4-lane; big wobbles, completed · <span class="event-tag">Classical</span>', loc: 'San Tomas & Homestead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/c4b857be-9558-4a69-a47c-7f9a9cb96ce3/c4b857be-9558-4a69-a47c-7f9a9cb96ce3' },
+    { id: 'W24', sev: 'M', desc: 'U-turn good, 4-lane; hesitant start, understeer, wobble at end', loc: 'San Tomas & Benton', url: 'https://maglev.nvda.ai/av/drivescrubber/events/0b4ad0e5-8596-4864-959f-0d6493d97f0f/0b4ad0e5-8596-4864-959f-0d6493d97f0f' },
+    { id: 'W25', sev: 'M', desc: 'U-turn good, 3-lane; fishhook at start · <span class="event-tag">Classical</span> · <span class="event-tag">Asymmetric</span>', loc: 'San Tomas & Forbes', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9aa2902d-12c9-4b8b-879d-dd3e35036247/9aa2902d-12c9-4b8b-879d-dd3e35036247' },
+    { id: 'W26', sev: 'M', desc: 'U-turn good, 4-lane; early cut, wobble', loc: 'San Tomas & Homestead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/86643420-db6e-4277-9b34-9235ab5034a3/86643420-db6e-4277-9b34-9235ab5034a3' },
+    { id: 'W27', sev: 'M', desc: 'U-turn good, 4-lane; wobble at start and end', loc: 'San Tomas & Homestead', url: 'https://maglev.nvda.ai/av/drivescrubber/events/48c03b06-70c0-4e8f-a998-77047bb09dc8/48c03b06-70c0-4e8f-a998-77047bb09dc8' },
+    { id: 'W28', sev: 'M', desc: 'U-turn good, 4-lane; wobble and understeer', loc: 'San Tomas & Forbes', url: 'https://maglev.nvda.ai/av/drivescrubber/events/8e465e32-4893-4649-8ed9-63d6d498ebe9/8e465e32-4893-4649-8ed9-63d6d498ebe9' },
+    { id: 'W29', sev: 'S', desc: 'U-turn good, 3-lane; into 2nd lane · <span class="event-tag">Asymmetric</span>', loc: 'San Tomas & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5dd355ef-d358-4971-9383-03e438159b7d/5dd355ef-d358-4971-9383-03e438159b7d' },
+    { id: 'W30', sev: 'L', desc: 'U-turn bad, 3-lane; oversteer close to curb at start, wobble · <span class="event-tag">Classical</span>', loc: 'San Tomas & Forbes', url: 'https://maglev.nvda.ai/av/drivescrubber/events/41561ba9-e293-49c8-9813-d6b5ec32b592/41561ba9-e293-49c8-9813-d6b5ec32b592' },
+    { id: 'W31', sev: 'M', desc: 'U-turn good, 3-lane; slight wobble at end', loc: 'San Tomas & Stevens Creek', url: 'https://maglev.nvda.ai/av/drivescrubber/events/951c8409-5b71-4106-a483-b0507c787893/951c8409-5b71-4106-a483-b0507c787893' },
+    { id: 'W32', sev: 'S', desc: 'U-turn good, 3-lane; into 2nd lane · <span class="event-tag">Asymmetric</span>', loc: 'San Tomas & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f8d55a9f-8c08-47e0-af62-3e5005b3e5a9/f8d55a9f-8c08-47e0-af62-3e5005b3e5a9' },
+    { id: 'W33', sev: 'M', desc: 'U-turn good, 3-lane; unprotected, understeer', loc: 'Stevens Creek median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/827eda4e-2581-4e32-b2b5-6ca6e9256581/827eda4e-2581-4e32-b2b5-6ca6e9256581' },
+    { id: 'W34', sev: 'S', desc: 'U-turn good, 4-lane; into 3rd lane with cones right', loc: 'San Tomas & Stevens Creek', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d8ecef8a-ffef-4893-a88d-056b54671e64/d8ecef8a-ffef-4893-a88d-056b54671e64' },
+    { id: 'W35', sev: 'XL', desc: 'U-turn missed, 3-lane <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Stevens Creek & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/de0c684a-543d-4451-a430-f2f1864bf9fd/de0c684a-543d-4451-a430-f2f1864bf9fd' },
+    { id: 'W36', sev: 'XL', desc: 'U-turn missed, 3-lane; noodle flickered left then aborted <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Stevens Creek & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ef5a6862-ff22-4219-ab80-7b55f2502368/ef5a6862-ff22-4219-ab80-7b55f2502368' },
+    { id: 'W37', sev: 'XL', desc: 'U-turn bad, 3-lane; oversteer into median curb — APTO <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'San Tomas & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/bca0ae48-542e-40b5-9000-db55071636e4/bca0ae48-542e-40b5-9000-db55071636e4' },
+    { id: 'W38', sev: 'XL', desc: 'U-turn bad, 3-lane; bad road graph <span class="crit-inline">⚠</span>', loc: 'Saratoga median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/98da673c-4720-47f0-b24e-11b5a115f43a/98da673c-4720-47f0-b24e-11b5a115f43a' },
+    { id: 'W39', sev: 'XL', desc: 'U-turn missed, 3-lane; no attempt, noodle never selected U-turn rail <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'San Tomas & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/cde6a119-d75d-476f-92f5-53d02f1efde5/cde6a119-d75d-476f-92f5-53d02f1efde5' },
+    { id: 'W40', sev: 'M', desc: 'U-turn good, 2+bike lane; understeer, slight wobble at end', loc: 'Saratoga & Keystone', url: 'https://maglev.nvda.ai/av/drivescrubber/events/cec1c773-c514-43d0-b5fc-bc851e2fa117/cec1c773-c514-43d0-b5fc-bc851e2fa117' },
+    { id: 'W41', sev: 'XL', desc: 'U-turn missed, 3-lane <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Stevens Creek & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a805bf1f-c36c-4863-b9f8-dc9f20355cb3/a805bf1f-c36c-4863-b9f8-dc9f20355cb3' },
+    { id: 'W42', sev: 'XL', desc: 'U-turn bad, 3-lane; unprotected — FN yield to oncoming — CPTO <span class="crit-inline">⚠⚠</span>', loc: 'Stevens Creek median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/be51b829-b3d2-43d2-8d2c-659daf3f7fa5/be51b829-b3d2-43d2-8d2c-659daf3f7fa5' },
+    { id: 'W45', sev: 'S', desc: 'U-turn good, 3-lane · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1e4d24c6-0446-4747-bd52-67557deeecc3/1e4d24c6-0446-4747-bd52-67557deeecc3' },
+    { id: 'W46', sev: 'L', desc: 'U-turn bad, 3-lane; oversteer — APTO · <span class="event-tag">Classical</span>', loc: 'Scott & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/414f518d-8fed-4a6b-abac-6b0dfac676b1/414f518d-8fed-4a6b-abac-6b0dfac676b1' },
+    { id: 'W47', sev: 'XL', desc: 'U-turn bad, 3-lane; yielding but blocking contender — APTO <span class="crit-inline">⚠</span>', loc: 'Bowers median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/341adc29-7b89-40bc-a98f-f2668ef8b0e4/341adc29-7b89-40bc-a98f-f2668ef8b0e4' },
+    { id: 'W48', sev: 'L', desc: 'U-turn bad, 3-lane; wobble and stuck after turn — APTO · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ca3f78b2-cec7-465b-883d-2d14d71e7d8e/ca3f78b2-cec7-465b-883d-2d14d71e7d8e' },
+    { id: 'W49', sev: 'S', desc: 'U-turn good, 3-lane; brake tap at start', loc: 'Scott & Bowers', url: 'https://maglev.nvda.ai/av/drivescrubber/events/6df9e2e9-c15e-4067-adee-f862ab478ab3/6df9e2e9-c15e-4067-adee-f862ab478ab3' },
+    { id: 'W50', sev: 'S', desc: 'U-turn good, 3-lane; unprotected, yielded, understeer at end', loc: 'Bowers', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5cd1eace-2963-4af9-a7b4-e7c195840468/5cd1eace-2963-4af9-a7b4-e7c195840468' },
+    { id: 'W51', sev: 'S', desc: 'U-turn good, 3-lane; wobble at start', loc: 'Bowers & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ab281623-a2fc-4c94-9e72-0cf38007730a/ab281623-a2fc-4c94-9e72-0cf38007730a' },
+    { id: 'W52', sev: 'M', desc: 'U-turn good, 3-lane; cut too early · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/02022704-d02b-4f43-ada4-a40696054d6a/02022704-d02b-4f43-ada4-a40696054d6a' },
+    { id: 'W53', sev: 'L', desc: 'U-turn bad, 3-lane; unprotected — understeer into loading zone with DPV — APTO <span class="crit-inline">⚠</span>', loc: 'Scott median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/42f24a6d-d269-491d-9765-6fac47eb6d9f/42f24a6d-d269-491d-9765-6fac47eb6d9f' },
+    { id: 'W54', sev: 'M', desc: 'U-turn good, 2+merging lane; unprotected, hesitant start, slight wobble at end', loc: 'Oakmead median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5b796f54-7edc-4e8c-b822-b3576630b146/5b796f54-7edc-4e8c-b822-b3576630b146' },
+    { id: 'W55', sev: 'S', desc: 'U-turn good, 3-lane', loc: 'Oakmead & Arques', url: 'https://maglev.nvda.ai/av/drivescrubber/events/6be1dc06-90ba-4989-bd26-f87d630d104c/6be1dc06-90ba-4989-bd26-f87d630d104c' },
+    { id: 'W56', sev: 'S', desc: 'U-turn good, 2 wide lane; unprotected', loc: 'Oakmead median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7ac4040d-074e-4fbf-9fb8-9934e32faa89/7ac4040d-074e-4fbf-9fb8-9934e32faa89' },
+    { id: 'W57', sev: 'XL', desc: 'U-turn missed, 2+bike lane; possibly infeasible <span class="crit-inline">⚠</span>', loc: 'Lakeside & Arques', url: 'https://maglev.nvda.ai/av/drivescrubber/events/cb53c8a4-b9fe-4880-a078-19c53b1a1b5f/cb53c8a4-b9fe-4880-a078-19c53b1a1b5f' },
+    { id: 'W58', sev: 'M', desc: 'U-turn good, 2+bike lane; unprotected, slow start — poor road graph at start', loc: 'Arques median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/44cb9ebb-f205-4485-b87b-37215daa5f06/44cb9ebb-f205-4485-b87b-37215daa5f06' },
+    { id: 'W59', sev: 'M', desc: 'U-turn good, 4-lane; brake tap mid-turn', loc: 'Wolfe & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5e44f89f-63a3-4326-ab7d-dfb878d0e571/5e44f89f-63a3-4326-ab7d-dfb878d0e571' },
+    { id: 'W60', sev: 'XL', desc: 'U-turn missed, 3-lane; road graph issue? <span class="crit-inline">⚠</span>', loc: 'Wolfe median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/b7482f7e-d93f-4855-9b6b-15499ffb6c67/b7482f7e-d93f-4855-9b6b-15499ffb6c67' },
+    { id: 'W61', sev: 'M', desc: 'U-turn good, 3+bike lane; wobbly', loc: 'Wolfe & Kifer', url: 'https://maglev.nvda.ai/av/drivescrubber/events/99000e36-b41e-4dbf-8284-35982ac539de/99000e36-b41e-4dbf-8284-35982ac539de' },
+    { id: 'W62', sev: 'M', desc: 'U-turn good, 4-lane; brake and wobble', loc: 'Wolfe & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/85b14f50-4103-455a-a477-b96aa6a7e90a/85b14f50-4103-455a-a477-b96aa6a7e90a' },
+    { id: 'W63', sev: 'XL', desc: 'U-turn missed, 4-lane <span class="crit-inline">⚠</span>', loc: 'Wolfe & Evelyn', url: 'https://maglev.nvda.ai/av/drivescrubber/events/723d6c2f-e4d2-42c4-8b7b-2d717c0f6a3d/723d6c2f-e4d2-42c4-8b7b-2d717c0f6a3d' },
+    { id: 'W64', sev: 'S', desc: 'U-turn good, 3+bike lane; slight understeer', loc: 'Wolfe & Arques', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7f00ef77-f46c-4e0b-bb28-ab8b8b979131/7f00ef77-f46c-4e0b-bb28-ab8b8b979131' },
+    { id: 'W65', sev: 'XL', desc: 'U-turn missed, 4-lane; approaching green at higher speed — possible late detection <span class="crit-inline">⚠</span>', loc: 'Wolfe & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d27eab03-2d64-4466-8487-c825e9051c86/d27eab03-2d64-4466-8487-c825e9051c86' },
+    { id: 'W66', sev: 'L', desc: 'U-turn good, 4-lane; fast entry, wobble, unprotected — yielded', loc: 'Wolfe median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/6cb5dfd7-4b1c-42a0-8b25-ff4c30ad8f8f/6cb5dfd7-4b1c-42a0-8b25-ff4c30ad8f8f' },
+    { id: 'W67', sev: 'M', desc: 'U-turn good, 3+bike lane; brake tap at start', loc: 'Wolfe & Fair Oaks Park', url: 'https://maglev.nvda.ai/av/drivescrubber/events/6d165724-2ffb-4f92-be29-c085966aa502/6d165724-2ffb-4f92-be29-c085966aa502' },
+    { id: 'W68', sev: 'S', desc: 'U-turn good, 3+bike lane', loc: 'Wolfe & Stewart', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2c002e8f-4e49-47bb-89c5-f8ec745272a7/2c002e8f-4e49-47bb-89c5-f8ec745272a7' },
+    { id: 'W69', sev: 'L', desc: 'U-turn bad, 3+bike lane; came to stop mid-turn, completed', loc: 'Wolfe & Fair Oaks Park', url: 'https://maglev.nvda.ai/av/drivescrubber/events/96941902-bb6c-4950-8e61-a8f84449162b/96941902-bb6c-4950-8e61-a8f84449162b' },
+    { id: 'W70', sev: 'M', desc: 'U-turn good, 3+bike lane; close to median', loc: 'Wolfe & Arques', url: 'https://maglev.nvda.ai/av/drivescrubber/events/914de86a-b278-4e4a-8305-be89c017cb20/914de86a-b278-4e4a-8305-be89c017cb20' },
+    { id: 'W71', sev: 'M', desc: 'U-turn good, 3+bike lane; understeer', loc: 'Central & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/31fa0c8d-6b9b-4784-bf74-8955bb8c1ff4/31fa0c8d-6b9b-4784-bf74-8955bb8c1ff4' },
+  ],
+},
+
+// ============ 5/26 PM ============
+{
+  label: '5/26 PM',
+  title: 'U-Turn Stress Test — SC (3 Sessions)',
+  subtitle: 'Navigation refusing U-turns limited scope · Bowers & Central road-graph persists',
+  build: '45649850.2',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45649850&vid=2',
+  model: 'sft-5386',
+  tester: 'W',
+  vehicle: '174-323',
+  route: 'SC · San Tomas / Stevens Creek / Bowers / Scott',
+  barPct: 58,
+  barLabel: '58% pass',
+  verdictCards: [
+    { kind: 'note', icon: '🗺️', title: 'Testing Limitation — Nav Refusing U-Turns', body: 'Vehicle navigation consistently refused to route U-turns independently. Only route-forced U-turns were executed, preventing a full and diverse sweep across regions. Results may not be fully representative of build performance.' },
+    { kind: 'success', icon: '✅', title: '4-Lane Remains Strong', body: 'All 6 four-lane turns completed successfully (100%) across sessions 1 and 3. San Tomas corridor consistent. Slight wobble and fishhook noted but all S or M rated.' },
+    { kind: 'warning', icon: '⚠️', title: 'Road Graph Issues — Possible Regression', body: 'Multiple XL events linked to poor or missing road graph: W6 S1 (proceeds into curb CPTO), W7 S1 (no rail), W10 S3 (missing rail — previously present, potential regression), W13 S3 (road graph not formed at speed), W16 S3 (noodle flicker).' },
+    { kind: 'critical', icon: '🚨', title: 'Safety Critical Events', body: 'S1 W9 XXL: FN yield to oncoming during unprotected U-turn. S1 W6 XL: proceeded straight into curb (CPTO) — poor road graph / missing noodle. S3 W1 XL: oversteer into curb (APTO). 2-lane + bike lane: 20% pass rate across all sessions.' },
+  ],
+  tallies: { xxl: 1, xl: 13, l: 1, m: 6, s: 12, xxlDesc: 'FN yield oncoming', xlDesc: 'road graph / no rail · asymmetric missed · 2-lane missed · oversteer curb', lDesc: 'ghost brake', mDesc: 'wobble · fishhook · into bike lane', sDesc: 'good turn · unprotected yield' },
+  pass: [
+    { label: 'U-Turn Pass Rate', value: '58%', rate: 58 },
+    { label: '3+4 Lane', value: '74%', rate: 74 },
+    { label: '4-Lane', value: '100%', rate: 100 },
+    { label: '2-Lane + Bike', value: '20%', rate: 20 },
+  ],
+  config: [
+    { config: '4-Lane', rate: 100, count: '6/6', notes: 'S1 W1–W3, S3 W20–W22; minor wobble/fishhook only' },
+    { config: '3-Lane (incl. +bike)', rate: 65, count: '11/17', notes: 'Road graph / asymmetric misses dominate; Bowers & Central recurring XL' },
+    { config: '3+4 Lane Combined', rate: 74, count: '17/23', notes: 'R18 scope' },
+    { config: 'Asymmetric Intersection', rate: 25, count: '1/4', notes: 'W7 S3 pass; W7 S1, W13 S3, W16 S3 XL — Bowers & Central consistent failure' },
+    { config: '2-Lane + Bike / Merging', rate: 20, count: '2/10', notes: 'S3 W14 S (Oakmead yield), S3 W3 M (jerky); 8 XL misses/bad across Scott / Oakmead / Saratoga' },
+    { config: 'With HD Map', rate: 100, count: '3/3', notes: 'S1 W1, S3 W20, S3 W22 — all 4-lane, all S' },
+    { config: 'No HD Map', rate: 53, count: '16/30', notes: 'All XL/XXL events on no-HD-map turns' },
+  ],
+  trends: [
+    { sev: 'XL', label: '2-lane + bike missed / bad (Scott / Saratoga)', count: 8 },
+    { sev: 'XL', label: 'Road graph / missing rail (no attempt or CPTO)', count: 5 },
+    { sev: 'XL', label: 'Asymmetric 3-lane missed (Bowers & Central)', count: 3 },
+    { sev: 'XXL', label: 'FN yield to oncoming (unprotected)', count: 1 },
+    { sev: 'M', label: 'Wobble / fishhook (completed)', count: 6 },
+  ],
+  locations: [
+    { label: 'Bowers & Central (asymmetric)', detail: 'XL ×3 (W7 S1, W13, W16 S3)' },
+    { label: 'Scott & Olcott / Coronado (2+bike)', detail: 'XL ×3 (S1 W2/4/5 · S3 W19)' },
+    { label: 'Stevens Creek median (road graph)', detail: 'XXL + XL (W6, W7, W9 S1)' },
+    { label: 'Oakmead median (unprotected)', detail: 'XL W10 (missing rail) · S W14 (good yield)' },
+    { label: 'Bowers & Walsh / Scott (3+bike)', detail: 'S ×5 (W9, W11, W15 S3 + S2)' },
+    { label: 'San Tomas 4-lane', detail: 'S/M ×6 — consistent' },
+  ],
+  callouts: [
+    { kind: 'crit', text: '🚨 S1 W9 XXL: FN yield to oncoming during unprotected U-turn at Saratoga 3+bike lane.' },
+    { kind: 'crit', text: '⚠️ S1 W6 XL: Poor road graph + missing noodle — system proceeded straight into curb (CPTO). S3 W10 XL: Rail missing at Oakmead median — previously present in prior builds. Potential road graph regression.' },
+    { text: '📌 Possible regression (S3 W10): Rail at Oakmead median unprotected turn was present in prior sessions but missing in this build. Bowers & Central asymmetric (W13, W16) — road graph not properly formed at higher approach speed.' },
+    { text: 'ℹ️ Bowers corridor (Walsh / Scott) performed well consistently — S-rated across multiple sessions. Main failure cluster on Scott narrow lanes, Stevens Creek median, and asymmetric Bowers & Central. 4-lane San Tomas remains the most reliable.' },
+  ],
+  events: [
+    // Session 1: San Tomas / Stevens Creek / Saratoga
+    { id: 'S1·W1', sev: 'S', desc: 'U-turn good, 4-lane · <span class="event-tag">HD</span>', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/856cebf4-f5d9-4e65-b407-1d595aafa11d/856cebf4-f5d9-4e65-b407-1d595aafa11d' },
+    { id: 'S1·W2', sev: 'M', desc: 'U-turn good, 4-lane; wobble at end', loc: 'San Tomas & El Camino Real', url: 'https://maglev.nvda.ai/av/drivescrubber/events/086eae7c-952a-4e54-bab2-3ee18ec1d353/086eae7c-952a-4e54-bab2-3ee18ec1d353' },
+    { id: 'S1·W3', sev: 'M', desc: 'U-turn good, 4-lane; slight wobble at end (3rd into 4th lane)', loc: 'San Tomas & Cabrillo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f050e510-7e66-4d44-aaa8-5dbeb5461d82/f050e510-7e66-4d44-aaa8-5dbeb5461d82' },
+    { id: 'S1·W4', sev: 'S', desc: 'U-turn good, 3-lane', loc: 'El Camino Real', url: 'https://maglev.nvda.ai/av/drivescrubber/events/fc226c45-8515-46a1-922f-67b5faffd31e/fc226c45-8515-46a1-922f-67b5faffd31e' },
+    { id: 'S1·W5', sev: 'M', desc: 'U-turn good, 3+bike lane; into bike lane', loc: 'Stevens Creek & Cabot', url: 'https://maglev.nvda.ai/av/drivescrubber/events/63c65a0a-e0e2-4826-b040-8b3b7e7f3625/63c65a0a-e0e2-4826-b040-8b3b7e7f3625' },
+    { id: 'S1·W6', sev: 'XL', desc: 'U-turn bad, 3+bike lane; poor road graph, missing noodle — proceeded straight into curb — CPTO <span class="crit-inline">⚠⚠</span>', loc: 'Stevens Creek median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/3535b42e-4aad-413e-b397-842620f85234/3535b42e-4aad-413e-b397-842620f85234' },
+    { id: 'S1·W7', sev: 'XL', desc: 'U-turn missed, 3+bike lane; no rail — attempted LT instead — unprotected <span class="crit-inline">⚠</span>', loc: 'Stevens Creek median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/1151a04a-0059-4ccc-80b3-7af5e9bf0462/1151a04a-0059-4ccc-80b3-7af5e9bf0462' },
+    { id: 'S1·W8', sev: 'XL', desc: 'U-turn missed, 2+bike lane; possibly infeasible <span class="crit-inline">⚠</span>', loc: 'Saratoga & Doyle', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7ca090e2-4cbe-4f02-a468-295d6ca239a6/7ca090e2-4cbe-4f02-a468-295d6ca239a6' },
+    { id: 'S1·W9', sev: 'XXL', desc: 'U-turn bad, 3+bike lane; FN yield to oncoming during unprotected U-turn <span class="crit-inline">⚠⚠</span>', loc: 'Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f8174c3b-9b1a-4818-910e-f76e2c92bc57/f8174c3b-9b1a-4818-910e-f76e2c92bc57' },
+    // Session 2: Bowers / Scott
+    { id: 'S2·W1', sev: 'L', desc: 'U-turn bad, 3-lane; ghost brake at start [Alfred]', loc: 'Central & Bowers', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9e2da681-6cb2-4eb6-a79b-10ebc3352242/9e2da681-6cb2-4eb6-a79b-10ebc3352242' },
+    { id: 'S2·W2', sev: 'S', desc: 'U-turn good, 3+bike lane [Alfred]', loc: 'Scott & Bowers', url: 'https://maglev.nvda.ai/av/drivescrubber/events/4e18413a-87c4-4ed6-a604-2c73e35bb85c/4e18413a-87c4-4ed6-a604-2c73e35bb85c' },
+    // Session 3: Scott / Bowers / Oakmead / San Tomas
+    { id: 'S3·W1', sev: 'XL', desc: 'U-turn bad, 2+bike lane; oversteer into curb — APTO; slow start, jerky <span class="crit-inline">⚠</span>', loc: 'Scott & Octavius', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9d594a08-4176-4d5f-9d4a-b9b4b053fc99/9d594a08-4176-4d5f-9d4a-b9b4b053fc99' },
+    { id: 'S3·W2', sev: 'XL', desc: 'U-turn missed, 2+bike lane; LT instead <span class="crit-inline">⚠</span>', loc: 'Scott & Olcott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d0d32289-8ba2-4e35-bffa-be1bf7a02c0a/d0d32289-8ba2-4e35-bffa-be1bf7a02c0a' },
+    { id: 'S3·W3', sev: 'M', desc: 'U-turn good, 2+bike lane; jerky', loc: 'Scott & Octavius', url: 'https://maglev.nvda.ai/av/drivescrubber/events/38c16dec-05e6-41e9-afa1-2e2e044a9193/38c16dec-05e6-41e9-afa1-2e2e044a9193' },
+    { id: 'S3·W4', sev: 'XL', desc: 'U-turn missed, 2+bike lane; possibly infeasible <span class="crit-inline">⚠</span>', loc: 'Scott & Olcott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/16c6f982-a6b8-4045-8afb-50c2926ffdc5/16c6f982-a6b8-4045-8afb-50c2926ffdc5' },
+    { id: 'S3·W5', sev: 'XL', desc: 'U-turn missed, 2+bike lane; possibly infeasible <span class="crit-inline">⚠</span>', loc: 'Scott & Coronado', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ff56f6b6-a4e8-4fd4-a3ad-55e59fd5dcc9/ff56f6b6-a4e8-4fd4-a3ad-55e59fd5dcc9' },
+    { id: 'S3·W6', sev: 'S', desc: 'U-turn good, 3+bike lane', loc: 'Bowers & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ef0c0865-7b0c-48c4-b1fc-85f5f333b112/ef0c0865-7b0c-48c4-b1fc-85f5f333b112' },
+    { id: 'S3·W7', sev: 'XL', desc: 'U-turn missed, 3+bike lane <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a7f19e0c-05ea-4823-8469-13099abe5231/a7f19e0c-05ea-4823-8469-13099abe5231' },
+    { id: 'S3·W8', sev: 'S', desc: 'U-turn good, 3+bike lane · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ef1111c4-ff31-458b-b456-05c9e20cf25a/ef1111c4-ff31-458b-b456-05c9e20cf25a' },
+    { id: 'S3·W9', sev: 'S', desc: 'U-turn good, 3+bike lane', loc: 'Bowers & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/28620c95-f0d0-410f-9ffd-1d6b7f5859cd/28620c95-f0d0-410f-9ffd-1d6b7f5859cd' },
+    { id: 'S3·W10', sev: 'XL', desc: 'U-turn missed, 2+merging lane; missing rail — previously present <span class="crit-inline">⚠</span> · <span class="event-tag">Regression?</span>', loc: 'Oakmead median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d7e4772b-a551-4be7-af72-7fe440041386/d7e4772b-a551-4be7-af72-7fe440041386' },
+    { id: 'S3·W11', sev: 'S', desc: 'U-turn good, 3+bike lane', loc: 'Bowers & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/81d8c02b-c2ff-4e92-ba4f-e4fa997ea6a8/81d8c02b-c2ff-4e92-ba4f-e4fa997ea6a8' },
+    { id: 'S3·W12', sev: 'M', desc: 'U-turn good, 3+bike lane; slight wobble at end', loc: 'Bowers & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5013b5ae-4e70-47b2-bbfa-f00231b75978/5013b5ae-4e70-47b2-bbfa-f00231b75978' },
+    { id: 'S3·W13', sev: 'XL', desc: 'U-turn missed, 3+bike lane; road graph not properly formed at higher approach speed <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/14f4e1d1-ba61-4304-9a20-b31ff1d27b71/14f4e1d1-ba61-4304-9a20-b31ff1d27b71' },
+    { id: 'S3·W14', sev: 'S', desc: 'U-turn good, 2+merging lane; unprotected — yielded ★', loc: 'Oakmead median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ab145e4a-1805-4efd-8325-921c6b55f7d4/ab145e4a-1805-4efd-8325-921c6b55f7d4' },
+    { id: 'S3·W15', sev: 'S', desc: 'U-turn good, 3+bike lane', loc: 'Bowers & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/877f878e-950e-4704-a90c-230fbbfdaa05/877f878e-950e-4704-a90c-230fbbfdaa05' },
+    { id: 'S3·W16', sev: 'XL', desc: 'U-turn missed, 3+bike lane; road graph issue + noodle flicker <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/5a038811-1433-4ce7-b1b4-300a28298651/5a038811-1433-4ce7-b1b4-300a28298651' },
+    { id: 'S3·W17', sev: 'M', desc: 'U-turn good, 3-lane; fishhook and wobble at end', loc: 'Central & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/66fc7847-3340-4302-8828-769f13a2cd35/66fc7847-3340-4302-8828-769f13a2cd35' },
+    { id: 'S3·W18', sev: 'XL', desc: 'U-turn missed, 2+bike lane; possibly infeasible <span class="crit-inline">⚠</span>', loc: 'Jay & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/e3c15f4d-f85c-4fd7-9921-39adbced7d70/e3c15f4d-f85c-4fd7-9921-39adbced7d70' },
+    { id: 'S3·W19', sev: 'XL', desc: 'U-turn missed, 2+bike lane; possibly infeasible <span class="crit-inline">⚠</span>', loc: 'Scott & Olcott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/dcc78d03-9b57-4b10-9866-436a3481cb9b/dcc78d03-9b57-4b10-9866-436a3481cb9b' },
+    { id: 'S3·W20', sev: 'S', desc: 'U-turn good, 4-lane; slight correction at end · <span class="event-tag">HD</span>', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/df706efc-2c5c-41bd-8028-bf4ed658ddd0/df706efc-2c5c-41bd-8028-bf4ed658ddd0' },
+    { id: 'S3·W21', sev: 'S', desc: 'U-turn good, 4-lane; fishhook at end', loc: 'San Tomas & Monroe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/177b2262-d515-4297-ba31-0aaef91a7818/177b2262-d515-4297-ba31-0aaef91a7818' },
+    { id: 'S3·W22', sev: 'S', desc: 'U-turn good, 4-lane; slight fishhook correction · <span class="event-tag">HD</span>', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/291d8410-6cec-4f39-abaa-2b87a345be05/291d8410-6cec-4f39-abaa-2b87a345be05' },
+  ],
+},
+
+// ============ 5/27 ============
+{
+  label: '5/27',
+  title: 'U-Turn Stress Test — SC Routes',
+  subtitle: 'Understeer dominant · 2-lane 0% pass · same build as 5/26',
+  build: '45649850.2',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45649850&vid=2',
+  model: 'sft-5386',
+  tester: 'A',
+  vehicle: '174-323',
+  session: '37e10337',
+  sessionUrl: 'https://maglev.nvda.ai/av/drivescrubber/drives/673911',
+  route: 'SC · San Tomas / El Camino / Saratoga / Winchester / Stevens Creek',
+  barPct: 78,
+  barLabel: '78% pass',
+  verdictCards: [
+    { kind: 'success', icon: '✅', title: 'Strong 3+4 Lane Performance', body: '90% pass rate on 3+4 lane combined (18/20). 4-lane San Tomas corridor was perfect at 100% (8/8). 3-lane including asymmetric and bike lane configs passed at 83% (10/12). Understeer into outer lane was the most common M-level issue but consistently self-corrected.' },
+    { kind: 'warning', icon: '⚠️', title: '2-Lane Continues to Struggle', body: '0% pass rate on 2-lane + bike lane (0/3). A5: noodle flickered into U-turn then aborted (Monroe). A18: missed Saratoga unprotected. A19: missed Pruneridge & Saratoga (asymmetric). All expected pattern.' },
+    { kind: 'note', icon: '📋', title: 'Understeer Dominant Issue', body: '10 M-rated events — majority due to understeer into outer lane (3rd or 4th) with no contenders present. Fishhook corrections noted on multiple turns. Planner not choosing U-turn (A17, A21) at unprotected Stevens Creek locations.' },
+  ],
+  tallies: { xl: 5, l: 1, m: 10, s: 7, xlDesc: '2-lane missed · 3-lane missed · noodle abort · planner skip', lDesc: 'fishhook + tap-to-go', mDesc: 'understeer outer lane · fishhook · wobble · ghost brake', sDesc: 'clean turn · good asymmetric' },
+  pass: [
+    { label: 'U-Turn Pass Rate', value: '78%', rate: 78 },
+    { label: '3+4 Lane', value: '90%', rate: 90 },
+    { label: '4-Lane', value: '100%', rate: 100 },
+    { label: '2-Lane + Bike', value: '0%', rate: 0 },
+  ],
+  config: [
+    { config: '4-Lane', rate: 100, count: '8/8', notes: 'A9 L (fishhook + tap-to-go); all others S or M — understeer into 4th lane common but no contenders' },
+    { config: '3-Lane (incl. +bike)', rate: 83, count: '10/12', notes: 'A17 XL (Stevens Creek, planner skip); A21 XL (planner not choosing U-turn); A26 S excellent asymmetric' },
+    { config: '3+4 Lane Combined', rate: 90, count: '18/20', notes: 'R18 scope' },
+    { config: 'Asymmetric Intersection', rate: 80, count: '4/5', notes: 'A15, A16, A20 M passed; A26 S excellent; A19 XL missed (Pruneridge & Saratoga 2-lane)' },
+    { config: '2-Lane + Bike', rate: 0, count: '0/3', notes: 'A5 XL Monroe (noodle abort); A18 XL Saratoga unprotected; A19 XL Pruneridge & Saratoga — consistent with prior builds' },
+  ],
+  trends: [
+    { sev: 'XL', label: '2-lane + bike missed (all 3 attempts)', count: 3 },
+    { sev: 'XL', label: 'Planner not choosing U-turn (Stevens Creek)', count: 2 },
+    { sev: 'M', label: 'Understeer into outer lane (3rd or 4th)', count: 7 },
+    { sev: 'M', label: 'Fishhook / wobble at end of turn', count: 3 },
+    { sev: 'L', label: 'Fishhook + tap-to-go (Cabrillo 4-lane)', count: 1 },
+  ],
+  locations: [
+    { label: 'Stevens Creek (unprotected, no median)', detail: 'XL ×2 (A17, A21)' },
+    { label: 'San Tomas & Monroe (2-lane)', detail: 'XL ×1 (A5 noodle abort)' },
+    { label: 'Pruneridge & Saratoga (2+bike, asym)', detail: 'XL ×1 (A19)' },
+    { label: 'San Tomas & Forbes (3-lane, asym)', detail: 'M ×3 (A13, A15, A16, A20)' },
+    { label: 'San Tomas 4-lane corridor', detail: 'S/M ×8 — all completed' },
+    { label: 'Saratoga & San Tomas (3-lane asym)', detail: 'S ★ (A26 excellent)' },
+  ],
+  callouts: [
+    { kind: 'crit', text: '⚠️ A17 + A21: Planner not selecting U-turn at unprotected Stevens Creek 3-lane locations — two separate misses. No median present. May be feasibility filter or planner rail selection issue.' },
+    { text: '★ A26: Excellent asymmetric U-turn at Saratoga & San Tomas — ego entered 2nd lane cleanly. Best asymmetric result this session.' },
+    { text: 'ℹ️ Understeer into outer lane is pervasive but benign — no contenders present in any M-rated understeer event. Consistent across 4-lane and 3-lane. Tap-to-go at TL on A9 and A11 (A11 excluded — accidental CPTO).' },
+  ],
+  events: [
+    { id: 'A1', sev: 'S', desc: 'U-turn good, 4+bike lane; slight fishhook, understeer into 4th lane', loc: 'El Camino Real & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/6be78ac5-6b91-4a23-bd2d-9bc31cee3618/6be78ac5-6b91-4a23-bd2d-9bc31cee3618' },
+    { id: 'A2', sev: 'M', desc: 'U-turn good, 4-lane; slight wobble, understeer into middle of 4th lane', loc: 'Scott & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/e2f3e285-95b3-4df5-af44-5f7f9a92def5/e2f3e285-95b3-4df5-af44-5f7f9a92def5' },
+    { id: 'A3', sev: 'M', desc: 'U-turn good, 4-lane; understeer, fishhook, hesitant — contender honking from rear', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/8d0df86d-48a3-4390-ab8d-405f4ad8fadf/8d0df86d-48a3-4390-ab8d-405f4ad8fadf' },
+    { id: 'A4', sev: 'S', desc: 'U-turn good, 4-lane small median; wide into 4th lane, no contenders', loc: 'Scott & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/57a0521d-a6be-4f62-9474-2620c8889e44/57a0521d-a6be-4f62-9474-2620c8889e44' },
+    { id: 'A5', sev: 'XL', desc: 'U-turn missed, 2-lane; noodle flickered into U-turn then aborted <span class="crit-inline">⚠</span>', loc: 'Monroe 2-lane', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ffc46c05-9abd-4167-b861-0c9151aa44c7/ffc46c05-9abd-4167-b861-0c9151aa44c7' },
+    { id: 'A6', sev: 'S', desc: 'Skip — no U-turn signage but roadmap DDB shows lanes available — map data inconsistency', loc: 'San Tomas & Monroe', url: 'https://maglev.nvda.ai/av/drivescrubber/events/70174ce8-321a-4ec4-b680-64cfb1d016f2/70174ce8-321a-4ec4-b680-64cfb1d016f2' },
+    { id: 'A7', sev: 'M', desc: 'U-turn good, 4-lane normal median; understeer and jerk at end', loc: 'Walsh & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/4d9993d3-6d96-4dc0-a9fe-92c50d5cafce/4d9993d3-6d96-4dc0-a9fe-92c50d5cafce' },
+    { id: 'A8', sev: 'S', desc: 'U-turn good, 4-lane small median; good start, let off steering halfway — entered 4th lane', loc: 'El Camino Real & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/76a9329c-520e-4d63-86d5-8404a4a2de46/76a9329c-520e-4d63-86d5-8404a4a2de46' },
+    { id: 'A9', sev: 'L', desc: 'U-turn good, 4-lane large median; fishhook at end, tap-to-go required', loc: 'Cabrillo & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/0ea370eb-d9d7-4a79-a6fd-57dfa88861a5/0ea370eb-d9d7-4a79-a6fd-57dfa88861a5' },
+    { id: 'A10', sev: 'S', desc: 'U-turn good, 4-lane small median; understeer into 4th lane slightly, no contenders', loc: 'El Camino & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/47d95bcd-412d-4e7e-b4c7-4fddb89854fb/47d95bcd-412d-4e7e-b4c7-4fddb89854fb' },
+    { id: 'A11', sev: 'S', desc: 'Skip — tap-to-go; accidental driver CPTO — disregard', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/773fc593-2852-4a5d-b164-b4d5fa8a4d5e/773fc593-2852-4a5d-b164-b4d5fa8a4d5e' },
+    { id: 'A12', sev: 'S', desc: 'U-turn good, 3-lane small median; entered 3rd lane, touched right side line', loc: 'Pruneridge & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a5d4603e-a2a2-4d0d-9a1f-c38f0f899947/a5d4603e-a2a2-4d0d-9a1f-c38f0f899947' },
+    { id: 'A13', sev: 'M', desc: 'U-turn good, 3-lane large median; understeer into 3rd lane', loc: 'Forbes & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/ea222dce-18e5-472e-92fb-a8aae1da79e6/ea222dce-18e5-472e-92fb-a8aae1da79e6' },
+    { id: 'A14', sev: 'S', desc: 'U-turn good, 3-lane medium median; touched 3rd lane line slightly', loc: 'Pruneridge & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f7e1c5f8-651c-4cd1-bce3-3305fd5e4dd5/f7e1c5f8-651c-4cd1-bce3-3305fd5e4dd5' },
+    { id: 'A15', sev: 'M', desc: 'U-turn good, 3-lane medium median; ghost brake, hesitant · <span class="event-tag">Asymmetric</span>', loc: 'Forbes & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f8ba1715-d261-4484-b83c-c62b94bc58e8/f8ba1715-d261-4484-b83c-c62b94bc58e8' },
+    { id: 'A16', sev: 'M', desc: 'U-turn good, 3-lane medium median; understeer halfway into 3rd lane · <span class="event-tag">Asymmetric</span>', loc: 'Forbes & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/0f1ff7e6-fe43-4201-ad29-1912df919d7e/0f1ff7e6-fe43-4201-ad29-1912df919d7e' },
+    { id: 'A17', sev: 'XL', desc: 'U-turn missed, 3-lane no median; planner not choosing U-turn — unprotected <span class="crit-inline">⚠</span>', loc: 'San Tomas & Stevens Creek', url: 'https://maglev.nvda.ai/av/drivescrubber/events/e561b43a-77c7-49a9-9803-df94a3cee179/e561b43a-77c7-49a9-9803-df94a3cee179' },
+    { id: 'A18', sev: 'XL', desc: 'U-turn missed, 2+bike lane; unprotected <span class="crit-inline">⚠</span>', loc: 'Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/6998977f-714f-454d-af6b-bd64d273effc/6998977f-714f-454d-af6b-bd64d273effc' },
+    { id: 'A19', sev: 'XL', desc: 'U-turn missed, 2+bike lane <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Pruneridge & Saratoga', url: 'https://maglev.nvda.ai/av/drivescrubber/events/421a7a78-f042-47ec-acc5-09c705e3212e/421a7a78-f042-47ec-acc5-09c705e3212e' },
+    { id: 'A20', sev: 'M', desc: 'U-turn good, 3-lane large median; understeer into 3rd lane — plenty of room · <span class="event-tag">Asymmetric</span>', loc: 'Forbes & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2261208e-ed57-42f3-89b0-adaf15730873/2261208e-ed57-42f3-89b0-adaf15730873' },
+    { id: 'A21', sev: 'XL', desc: 'U-turn missed, 3-lane no median; planner not choosing U-turn <span class="crit-inline">⚠</span>', loc: 'Stevens Creek', url: 'https://maglev.nvda.ai/av/drivescrubber/events/0e8403ae-a19a-4820-96af-3496083b5f84/0e8403ae-a19a-4820-96af-3496083b5f84' },
+    { id: 'A22', sev: 'S', desc: 'Skip — good 6-lane unprotected LT, not a U-turn', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2286c072-97d2-4d2a-80de-5ae44ebfb1f3/2286c072-97d2-4d2a-80de-5ae44ebfb1f3' },
+    { id: 'A23', sev: 'M', desc: 'U-turn good, 3+bike lane small median; understeer into bike lane (no contenders)', loc: 'Dorcic St & Winchester', url: 'https://maglev.nvda.ai/av/drivescrubber/events/691055e6-a131-44e2-b14f-33dc4da351d8/691055e6-a131-44e2-b14f-33dc4da351d8' },
+    { id: 'A24', sev: 'M', desc: 'U-turn good, 3+bike lane medium median; smooth but mostly in 3rd lane, self-corrected to 2nd', loc: 'Santana Row & Stevens Creek', url: 'https://maglev.nvda.ai/av/drivescrubber/events/dd1f502e-f4bc-4be1-9cca-9a71522a5a9d/dd1f502e-f4bc-4be1-9cca-9a71522a5a9d' },
+    { id: 'A25', sev: 'M', desc: 'U-turn good, 3+bike lane small median; fishhook and hesitation after completing turn', loc: 'Winchester', url: 'https://maglev.nvda.ai/av/drivescrubber/events/f7578365-2b64-43c6-998b-8224c7e9d0d5/f7578365-2b64-43c6-998b-8224c7e9d0d5' },
+    { id: 'A26', sev: 'S', desc: 'U-turn good, 3-lane large median; slight asymmetric — excellent, cleanly into 2nd lane ★ · <span class="event-tag">Asymmetric</span>', loc: 'Saratoga & San Tomas', url: 'https://maglev.nvda.ai/av/drivescrubber/events/008e7231-6f7f-4dca-9224-a3637f4a7b32/008e7231-6f7f-4dca-9224-a3637f4a7b32' },
+  ],
+},
+
+// ============ 6/10 PM IFORV (culmination) ============
+{
+  label: '6/10 PM',
+  iforv: true,
+  title: 'IFORV Validation — SC Route 0 L2PP',
+  subtitle: '★ Sprint culmination · 95% pass rate · sft-5748 · Best session yet',
+  build: '45915737.1',
+  buildUrl: 'http://testbot.nvidia.com/testbot/view/content/change/changeDetail.jsf?gcid=45915737&vid=1',
+  model: 'sft-5748',
+  tester: 'W',
+  vehicle: '174-393',
+  session: '126c51f9',
+  sessionUrl: 'https://maglev.nvda.ai/av/drivescrubber/drives/687456',
+  route: 'SC · San Tomas / Bowers / Saratoga / Oakmead',
+  barPct: 95,
+  barLabel: '95% pass ★',
+  verdictCards: [
+    { kind: 'success', icon: '✅', title: 'Best Session Yet — 95% Overall', body: '95% U-turn pass rate (19/20) with 4-lane at 100% (9/9) and 3-lane at 91% (10/11). Understeer and minor wobble present throughout but all self-corrected. Channelized and unprotected turns completed cleanly. sft-5748 shows strong trajectory quality improvement.' },
+    { kind: 'warning', icon: '⚠️', title: 'Bowers & Central Asymmetric Persists', body: 'W21 XL: noodle flicker/jump at Bowers & Central asymmetric — same recurring failure location across multiple builds. W24 L: completed with wobble but missing node/lane graph. Road graph issue at this intersection remains unresolved (awaiting AVCF-8615).' },
+    { kind: 'note', icon: '📋', title: 'Non-U-Turn Quality Issues', body: '7 non-U-turn events logged: W6 L (large drift near roundabout), W22 L (jerky RT), W25 L (hesitant RoR — classical), W11 L (SILC/BBL behind parked vehicle), W19 L (ghost brake DRT), W23 L (missing lane/node), W26 M (slow PLT). Jerkiness pattern extends beyond U-turns.' },
+  ],
+  tallies: { xl: 1, l: 1, m: 7, s: 11, xlDesc: 'asymmetric noodle flicker', lDesc: 'asymmetric wobble + missing node', mDesc: 'understeer · wobble · fishhook · jerky', sDesc: 'clean turn · channelized · unprotected yield' },
+  pass: [
+    { label: 'U-Turn Pass Rate', value: '95%', rate: 95 },
+    { label: '3+4 Lane', value: '95%', rate: 95 },
+    { label: '4-Lane', value: '100%', rate: 100 },
+    { label: '3-Lane', value: '91%', rate: 91 },
+  ],
+  config: [
+    { config: '4-Lane', rate: 100, count: '9/9', notes: 'W1–W10 (excl. W6); all completed — understeer into adj lane and fishhook present but all S or M' },
+    { config: '3-Lane (incl. +bike, channelized)', rate: 91, count: '10/11', notes: 'W21 XL Bowers & Central (asymmetric, noodle flicker); W24 L same location (missing node); W18 S channelized Stevens Creek' },
+    { config: '3+4 Lane Combined', rate: 95, count: '19/20', notes: 'R18 scope' },
+    { config: 'Asymmetric Intersection', rate: 67, count: '2/3', notes: 'W17 S (Saratoga & Stevens Creek — good); W21 XL + W24 L (Bowers & Central — recurring road graph issue)' },
+  ],
+  trends: [
+    { sev: 'XL', label: 'Asymmetric missed — noodle flicker/jump (Bowers & Central)', count: 1 },
+    { sev: 'L', label: 'Asymmetric completed with wobble — missing node/lane graph', count: 1 },
+    { sev: 'M', label: 'Understeer into adjacent lane (no contenders)', count: 5 },
+    { sev: 'M', label: 'Wobble / fishhook / jerky at end', count: 2 },
+  ],
+  locations: [
+    { label: 'Bowers & Central (asymmetric)', detail: 'XL + L (W21, W24)' },
+    { label: 'San Tomas & Scott (4-lane)', detail: 'M + S ×3 (W2, W3, W5)' },
+    { label: 'San Tomas & Walsh (4-lane)', detail: 'M + S ×2 (W1, W4)' },
+    { label: 'San Tomas & Forbes (3-lane)', detail: 'S + M ×2 (W13, W15)' },
+    { label: 'Stevens Creek channelized', detail: 'S (W18 — good)' },
+    { label: 'Oakmead median (unprotected)', detail: 'S (W27 — classical, good)' },
+    { label: 'Saratoga & Stevens Creek (asym)', detail: 'S (W17 — good)' },
+  ],
+  callouts: [
+    { kind: 'crit', text: '⚠️ W21 + W24: Bowers & Central asymmetric intersection has been a recurring failure across multiple builds and sessions. Missing node/lane graph appears to be a persistent road graph issue at this location. Requires road graph investigation. Awaiting AVCF-8615 asymmetric RL gen (ETA 6/23).' },
+    { text: 'ℹ️ W17 S (Saratoga & Stevens Creek asymmetric) and W18 S (channelized Stevens Creek median) are both notable clean completions — locations that have caused failures in prior builds. W27 S (Oakmead unprotected, classical mode) also completed cleanly.' },
+    { text: '📌 The jerkiness pattern observed in U-turns (W1, W8, W15) also appears in regular turns — W22 (jerky RT) and W25 (hesitant RoR). Suggests a broader trajectory smoothness issue in sft-5748 beyond U-turn maneuvers. W23 (missing lane/node) may be related to the same road graph issues seen at Bowers & Central.' },
+  ],
+  events: [
+    { id: 'W1', sev: 'M', desc: 'U-turn good, 4-lane; slightly jerky · <span class="event-tag">HD</span>', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a3365b92-81f4-4a7c-b569-59d3557ac9dc/a3365b92-81f4-4a7c-b569-59d3557ac9dc' },
+    { id: 'W2', sev: 'S', desc: 'U-turn good, 4-lane; slight fishhook at start', loc: 'San Tomas & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/c2e87d15-5c14-4447-abf7-77a1f1800db6/c2e87d15-5c14-4447-abf7-77a1f1800db6' },
+    { id: 'W3', sev: 'M', desc: 'U-turn good, 4-lane; slight wobble at end', loc: 'San Tomas & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/363e8e74-bc1a-45d2-8829-0229e10a8892/363e8e74-bc1a-45d2-8829-0229e10a8892' },
+    { id: 'W4', sev: 'S', desc: 'U-turn good, 4-lane; tap-to-go, jerky at end · <span class="event-tag">HD</span>', loc: 'San Tomas & Walsh', url: 'https://maglev.nvda.ai/av/drivescrubber/events/79505cb1-bcf8-48d7-a982-8b34cfd8b7ff/79505cb1-bcf8-48d7-a982-8b34cfd8b7ff' },
+    { id: 'W5', sev: 'M', desc: 'U-turn good, 4-lane; understeer, slight wobble during correction', loc: 'San Tomas & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2e8bf684-1410-488e-8059-479c131c541b/2e8bf684-1410-488e-8059-479c131c541b' },
+    { id: 'W6', sev: 'L', desc: '⬚ Non-U-turn: Large drift during split near roundabout', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/113fabce-08dc-4225-a1fa-dba2455fa39f/113fabce-08dc-4225-a1fa-dba2455fa39f' },
+    { id: 'W7', sev: 'M', desc: 'U-turn good, 4-lane; understeer, corrected into adj lane left', loc: 'San Tomas & El Camino Real', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d540c86f-22ad-406e-a98c-50589158f726/d540c86f-22ad-406e-a98c-50589158f726' },
+    { id: 'W8', sev: 'M', desc: 'U-turn good, 4-lane; slightly jerky at end', loc: 'San Tomas & Cabrillo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/3f8fd190-3219-41b2-b849-f7b9dd8cbda2/3f8fd190-3219-41b2-b849-f7b9dd8cbda2' },
+    { id: 'W9', sev: 'S', desc: 'U-turn good, 4-lane; slight fishhook at end', loc: 'San Tomas & El Camino Real', url: 'https://maglev.nvda.ai/av/drivescrubber/events/48caa18f-23e8-462c-8b6d-a2f6fb971590/48caa18f-23e8-462c-8b6d-a2f6fb971590' },
+    { id: 'W10', sev: 'S', desc: 'U-turn good, 4-lane', loc: 'San Tomas & Cabrillo', url: 'https://maglev.nvda.ai/av/drivescrubber/events/e46f3f0d-630e-431e-bbde-211323d128c2/e46f3f0d-630e-431e-bbde-211323d128c2' },
+    { id: 'W11', sev: 'L', desc: '⬚ Non-U-turn: SILC or BBL behind parked vehicle — behavior unclear', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2f7be3e0-1bf7-4630-9d09-435ca40e407f/2f7be3e0-1bf7-4630-9d09-435ca40e407f' },
+    { id: 'W12', sev: 'M', desc: 'U-turn good, 3-lane; slight wobble', loc: 'San Tomas & Pruneridge', url: 'https://maglev.nvda.ai/av/drivescrubber/events/95e2a561-07ab-4bb6-9b80-ef6a0fdb33bf/95e2a561-07ab-4bb6-9b80-ef6a0fdb33bf' },
+    { id: 'W13', sev: 'S', desc: 'U-turn good, 3-lane', loc: 'San Tomas & Forbes', url: 'https://maglev.nvda.ai/av/drivescrubber/events/43250f60-320e-46f3-94b3-ce64eeff77c5/43250f60-320e-46f3-94b3-ce64eeff77c5' },
+    { id: 'W14', sev: 'S', desc: 'U-turn good, 3-lane', loc: 'San Tomas & Pruneridge', url: 'https://maglev.nvda.ai/av/drivescrubber/events/a5ed9937-1eaa-46ae-a53e-d075267099ad/a5ed9937-1eaa-46ae-a53e-d075267099ad' },
+    { id: 'W15', sev: 'M', desc: 'U-turn good, 3-lane; slight jerk at end', loc: 'San Tomas & Forbes', url: 'https://maglev.nvda.ai/av/drivescrubber/events/6c4f8559-89f2-4f1f-bbd8-ec7add130b27/6c4f8559-89f2-4f1f-bbd8-ec7add130b27' },
+    { id: 'W16', sev: 'S', desc: 'U-turn good, 3-lane', loc: 'Winchester & Dorich', url: 'https://maglev.nvda.ai/av/drivescrubber/events/7451bf95-56b5-4acb-a87b-261655d41d8b/7451bf95-56b5-4acb-a87b-261655d41d8b' },
+    { id: 'W17', sev: 'S', desc: 'U-turn good, 3-lane ★ · <span class="event-tag">Asymmetric</span>', loc: 'Saratoga & Stevens Creek', url: 'https://maglev.nvda.ai/av/drivescrubber/events/b1b48195-e9c2-4cc9-a685-5a53111aaf11/b1b48195-e9c2-4cc9-a685-5a53111aaf11' },
+    { id: 'W18', sev: 'S', desc: 'U-turn good, 3-lane channelized median ★', loc: 'Stevens Creek median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/9c817ea9-be65-4f5a-addd-defd75900343/9c817ea9-be65-4f5a-addd-defd75900343' },
+    { id: 'W19', sev: 'L', desc: '⬚ Non-U-turn: Ghost brake during DRT', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/badc0c49-4141-4d47-b6cd-8e179eea026d/badc0c49-4141-4d47-b6cd-8e179eea026d' },
+    { id: 'W20', sev: 'S', desc: 'U-turn good, 3+bike lane', loc: 'Bowers & Scott', url: 'https://maglev.nvda.ai/av/drivescrubber/events/2b5cd863-5806-4fcd-a0d1-c08c890962af/2b5cd863-5806-4fcd-a0d1-c08c890962af' },
+    { id: 'W21', sev: 'XL', desc: 'U-turn bad, 3-lane; noodle flicker/jump — asymmetric <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d4231446-3f57-4e4d-8a3d-8b6fa0240ef9/d4231446-3f57-4e4d-8a3d-8b6fa0240ef9' },
+    { id: 'W22', sev: 'L', desc: '⬚ Non-U-turn: Jerky RT', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/78cb98de-87ea-4673-8dc5-c5bba03cc7e7/78cb98de-87ea-4673-8dc5-c5bba03cc7e7' },
+    { id: 'W23', sev: 'L', desc: '⬚ Non-U-turn: Missing lane/node', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/c28d1096-36de-4400-9e97-d9c8ca3de70e/c28d1096-36de-4400-9e97-d9c8ca3de70e' },
+    { id: 'W24', sev: 'L', desc: 'U-turn bad, 3-lane; wobble at end, missing node/lane graph <span class="crit-inline">⚠</span> · <span class="event-tag">Asymmetric</span>', loc: 'Bowers & Central', url: 'https://maglev.nvda.ai/av/drivescrubber/events/0d503d50-a361-4f17-a566-848126b5e489/0d503d50-a361-4f17-a566-848126b5e489' },
+    { id: 'W25', sev: 'L', desc: '⬚ Non-U-turn: Hesitant RoR · <span class="event-tag">Classical</span>', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/81d50e07-52a3-45de-ae41-f1ce4d149b9b/81d50e07-52a3-45de-ae41-f1ce4d149b9b' },
+    { id: 'W26', sev: 'M', desc: '⬚ Non-U-turn: Slow PLT', loc: '—', url: 'https://maglev.nvda.ai/av/drivescrubber/events/3f655c91-3b64-4929-9bff-5a37aa4db3a5/3f655c91-3b64-4929-9bff-5a37aa4db3a5' },
+    { id: 'W27', sev: 'S', desc: 'U-turn good, 3-lane channelized Oakmead median; unprotected ★ · <span class="event-tag">Classical</span>', loc: 'Oakmead median', url: 'https://maglev.nvda.ai/av/drivescrubber/events/d3915cf7-ebe3-414c-89d3-fcf81a0e1633/d3915cf7-ebe3-414c-89d3-fcf81a0e1633' },
+  ],
+},
+  ];
+
+  // ---- Utility renderers ----
+  const rateClass = (rate) => {
+    if (rate >= 80) return 'pass';
+    if (rate >= 60) return 'mid';
+    return 'fail';
+  };
+  const sevLower = (s) => s.toLowerCase();
+  const chip = (sev) => `<span class="chip ${sevLower(sev)}">${sev}</span>`;
+
+  function eventLink(ev) {
+    if (!ev.url) return ev.id ? `<span style="color:var(--text-faint)">${ev.id}</span>` : '—';
+    return `<a href="${ev.url}" target="_blank" rel="noopener">${ev.id}</a>`;
+  }
+
+  function renderVerdictCards(cards) {
+    if (!cards || !cards.length) return '';
+    return `<div class="cards">${cards.map(c => `
+      <div class="card ${c.kind}">
+        <span class="card-icon">${c.icon || ''}</span>
+        <div class="card-title">${c.title}</div>
+        <div class="card-body">${c.body}</div>
+      </div>`).join('')}</div>`;
+  }
+
+  function renderSevStrip(t) {
+    const cells = [];
+    if (t.xxl !== undefined) cells.push({key:'xxl', label:'XXL', val:t.xxl, desc:t.xxlDesc || ''});
+    cells.push({key:'xl', label:'XL', val:t.xl, desc:t.xlDesc || ''});
+    cells.push({key:'l', label:'L', val:t.l, desc:t.lDesc || ''});
+    cells.push({key:'m', label:'M', val:t.m, desc:t.mDesc || ''});
+    cells.push({key:'s', label:'S', val:t.s, desc:t.sDesc || ''});
+    return `<div class="sev-strip">${cells.map(c => `
+      <div class="sev-cell ${c.key}">
+        <div class="sev-label">${c.label}</div>
+        <div class="sev-value">${c.val}</div>
+        ${c.desc ? `<div class="sev-desc">${c.desc}</div>` : ''}
+      </div>`).join('')}</div>`;
+  }
+
+  function renderMeta(s) {
+    const parts = [];
+    if (s.build) {
+      const buildText = s.buildUrl ? `<a href="${s.buildUrl}" target="_blank">${s.build}</a>` : s.build;
+      parts.push(`<span class="meta-item">Build<strong>${buildText}</strong></span>`);
+    }
+    if (s.model)    parts.push(`<span class="meta-item">Model<strong>${s.model}</strong></span>`);
+    if (s.tester)   parts.push(`<span class="meta-item">Tester<strong>${s.tester}</strong></span>`);
+    if (s.vehicle)  parts.push(`<span class="meta-item">Vehicle<strong>${s.vehicle}</strong></span>`);
+    if (s.session) {
+      const sessText = s.sessionUrl ? `<a href="${s.sessionUrl}" target="_blank">${s.session}</a>` : s.session;
+      parts.push(`<span class="meta-item">Session<strong>${sessText}</strong></span>`);
+    }
+    if (s.route)    parts.push(`<span class="meta-item">Route<strong>${s.route}</strong></span>`);
+    return `<div class="meta-row">${parts.join('')}</div>`;
+  }
+
+  function renderPassBlock(s) {
+    if (!s.pass) return '';
+    return `<div class="sect">
+      <h3 class="sect-h">Pass Rate</h3>
+      <div class="hero-stats" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+        ${s.pass.map(p => `
+          <div class="hero-stat">
+            <div class="hero-stat-value" style="color: var(--${p.rate >= 80 ? 's' : p.rate >= 60 ? 'l' : 'xl'})">${p.value}</div>
+            <div class="hero-stat-label">${p.label}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  function renderConfig(cfg) {
+    if (!cfg || !cfg.length) return '';
+    return `<div class="sect">
+      <h3 class="sect-h">Lane Configuration Pass Rate</h3>
+      <table class="cfg-table">
+        <thead><tr><th>Config</th><th>Rate</th><th>Count</th><th>Notes</th></tr></thead>
+        <tbody>${cfg.map(c => `
+          <tr>
+            <td>${c.config}</td>
+            <td><span class="cfg-rate ${rateClass(c.rate)}">${c.rate}%</span></td>
+            <td class="mono" style="color:var(--text-dim)">${c.count}</td>
+            <td style="color:var(--text-dim); font-size:12px">${c.notes || ''}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  }
+
+  function renderTrends(trends) {
+    if (!trends || !trends.length) return '';
+    return `<div>
+      <h3 class="sect-h">Failure Trends</h3>
+      <div class="list">${trends.map(t => `
+        <div class="list-row">
+          <div class="list-row-label">${t.sev ? chip(t.sev)+' ' : ''}${t.label}</div>
+          <div class="list-row-count">${t.count}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  function renderLocations(locs) {
+    if (!locs || !locs.length) return '';
+    return `<div>
+      <h3 class="sect-h">Recurring Locations</h3>
+      <div class="list">${locs.map(l => `
+        <div class="list-row">
+          <div class="list-row-label">${l.label}</div>
+          <div class="list-row-count">${l.detail}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  function renderCallouts(cos) {
+    if (!cos || !cos.length) return '';
+    return cos.map(c => `<div class="callout ${c.kind || ''}">${c.text}</div>`).join('');
+  }
+
+  function renderEvents(events) {
+    if (!events || !events.length) return '';
+    return `<div class="sect">
+      <h3 class="sect-h">Detailed Event Log · ${events.length} events</h3>
+      <div class="events-wrap">
+        <table class="events">
+          <thead><tr><th>#</th><th>Sev</th><th>Description</th><th class="col-loc">Location</th></tr></thead>
+          <tbody>${events.map(ev => `
+            <tr>
+              <td class="col-w">${eventLink(ev)}</td>
+              <td class="col-sev">${chip(ev.sev)}</td>
+              <td class="event-desc">${ev.desc || ''}${ev.tags ? ev.tags.map(t => `<span class="event-tag">${t}</span>`).join('') : ''}</td>
+              <td class="col-loc">${ev.loc || '—'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  }
+
+  function renderOverview(s) {
+    // Special renderer for the sprint-overview session (first tab)
+    return `
+      <div class="session-header">
+        <h2 class="session-title">${s.title}</h2>
+        <div class="session-subtitle">${s.subtitle}</div>
+      </div>
+      ${renderVerdictCards(s.verdictCards)}
+      ${s.arcs ? `<div class="arc">
+        <div class="arc-h">Sprint Arc — Software Stack Story</div>
+        ${s.arcs.map(a => `<div class="arc-week">
+          <div class="arc-week-label">${a.week}</div>
+          <div>
+            <h3>${a.title}</h3>
+            <p>${a.body}</p>
+          </div>
+        </div>`).join('')}
+      </div>` : ''}
+      ${s.pareto ? `<div class="sect">
+        <h3 class="sect-h">Aggregate Issues by Solution Provider</h3>
+        <table class="cfg-table">
+          <thead><tr><th>Owner</th><th>Cluster</th><th>Sprint fix in-flight</th></tr></thead>
+          <tbody>${s.pareto.map(p => `
+            <tr>
+              <td class="mono" style="color:var(--accent);font-weight:600">${p.owner}</td>
+              <td style="color:var(--text-dim);font-size:12px">${p.cluster}</td>
+              <td style="color:var(--text-dim);font-size:12px">${p.fix}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>` : ''}
+      ${s.buildTable ? `<div class="sect">
+        <h3 class="sect-h">Builds Tested</h3>
+        <table class="cfg-table">
+          <thead><tr><th>Build</th><th>Model</th><th>Dates</th><th>Verdict</th><th>Notes</th></tr></thead>
+          <tbody>${s.buildTable.map(b => `
+            <tr>
+              <td class="mono">${b.buildUrl ? `<a href="${b.buildUrl}" target="_blank">${b.build}</a>` : b.build}</td>
+              <td style="color:var(--text-dim)">${b.model || '—'}</td>
+              <td class="mono" style="color:var(--text-dim); font-size:12px">${b.dates}</td>
+              <td>${b.verdict === 'PASS' ? '<span class="chip s">PASS</span>' : b.verdict === 'FAIL' ? '<span class="chip xl">FAIL</span>' : '<span class="chip l">MIXED</span>'}</td>
+              <td style="color:var(--text-dim); font-size:12px">${b.notes || ''}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>` : ''}
+    `;
+  }
+
+  function renderSession(s) {
+    if (s.type === 'overview') return renderOverview(s);
+    return `
+      <div class="session-header">
+        <h2 class="session-title">${s.title}</h2>
+        <div class="session-subtitle">${s.subtitle || ''}</div>
+        ${renderMeta(s)}
+      </div>
+      ${renderVerdictCards(s.verdictCards)}
+      ${renderSevStrip(s.tallies)}
+      ${renderPassBlock(s)}
+      ${renderConfig(s.config)}
+      <div class="two-col">
+        ${renderTrends(s.trends)}
+        ${renderLocations(s.locations)}
+      </div>
+      ${renderCallouts(s.callouts)}
+      ${renderEvents(s.events)}
+    `;
+  }
+
+  // ---- Boot ----
+  function boot() {
+    const tabbar = document.getElementById('tabbar');
+    const panels = document.getElementById('panels');
+
+    sessions.forEach((s, i) => {
+      const tab = document.createElement('button');
+      tab.className = 'tab' + (s.iforv ? ' iforv' : '') + (i === 0 ? ' active' : '');
+      tab.setAttribute('role', 'tab');
+      tab.setAttribute('data-idx', i);
+      const bar = s.barPct ?? 0;
+      const barColor = bar >= 80 ? 'var(--s)' : bar >= 60 ? 'var(--l)' : 'var(--xl)';
+      tab.innerHTML = `
+        <span class="tab-date">${s.label}${s.tester && s.tester !== 'W' && s.type !== 'overview' ? `<span class="tab-tester">${s.tester}</span>` : ''}</span>
+        ${s.type === 'overview' ? '<span class="tab-rate">Sprint arc</span>' : `<span class="tab-rate">${s.barLabel || ''}</span>
+        <div class="tab-bar"><div class="tab-bar-fill" style="width:${bar}%; background:${barColor}"></div></div>`}
+      `;
+      tab.addEventListener('click', () => activate(i));
+      tabbar.appendChild(tab);
+
+      const panel = document.createElement('section');
+      panel.className = 'session' + (i === 0 ? ' active' : '');
+      panel.setAttribute('data-idx', i);
+      panel.innerHTML = renderSession(s);
+      panels.appendChild(panel);
+    });
+
+    function activate(idx) {
+      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+      document.querySelectorAll('.session').forEach((p, i) => p.classList.toggle('active', i === idx));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
