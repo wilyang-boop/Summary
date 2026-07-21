@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PMB HR Drive — 07/21/26 — SF Sunset</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-2: #1e222b;
+    --border: #2a2f3a;
+    --text: #e6e8ee;
+    --muted: #8a92a3;
+    --accent: #6ea8ff;
+    --accent-dim: #3a5c92;
+    --good: #4ade80;
+    --warn: #fbbf24;
+    --bad: #f87171;
+    --red: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; font-size: 14px; line-height: 1.55; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  /* Header */
+  .hdr { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 24px; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  h1 { font-size: 28px; margin: 6px 0 10px; font-weight: 700; letter-spacing: -0.01em; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 20px; color: var(--muted); font-size: 13px; }
+  .meta b { color: var(--text); font-weight: 600; }
+  .meta code { background: var(--panel); padding: 2px 6px; border-radius: 4px; font-size: 12px; color: var(--text); }
+
+  /* Rating cards */
+  .ratings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0 28px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; }
+  .card .label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .card .score { font-size: 32px; font-weight: 700; margin: 4px 0 6px; letter-spacing: -0.01em; }
+  .card .score span { font-size: 15px; font-weight: 500; color: var(--muted); }
+  .card .note { font-size: 12.5px; color: var(--muted); }
+  .card.good .score { color: var(--good); }
+  .card.warn .score { color: var(--warn); }
+  .card.na .score { color: var(--muted); font-size: 22px; margin-top: 8px; }
+
+  /* Tabs */
+  .tabs { display: flex; flex-wrap: wrap; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 22px; }
+  .tab { background: transparent; border: none; color: var(--muted); padding: 10px 16px; font-size: 13px; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: inherit; transition: color 0.15s, border-color 0.15s; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .tab .count { font-size: 11px; color: var(--muted); margin-left: 6px; background: var(--panel-2); padding: 1px 6px; border-radius: 10px; }
+  .tab.active .count { background: var(--accent-dim); color: var(--text); }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  h2 { font-size: 18px; margin: 4px 0 14px; font-weight: 600; }
+  h3 { font-size: 14px; margin: 22px 0 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  h3:first-child { margin-top: 4px; }
+
+  /* Summary prose */
+  .summary { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 22px; margin-bottom: 24px; }
+  .summary p { margin: 0 0 10px; }
+  .summary p:last-child { margin-bottom: 0; }
+
+  /* Event lists */
+  ul.events { list-style: none; padding: 0; margin: 0; }
+  ul.events li { padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 6px; background: var(--panel); font-size: 13px; display: flex; align-items: flex-start; gap: 10px; }
+  ul.events li:hover { background: var(--panel-2); }
+  .sev { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px; letter-spacing: 0.04em; flex-shrink: 0; margin-top: 1px; min-width: 26px; text-align: center; }
+  .sev.XL { background: rgba(248,113,113,0.15); color: var(--bad); }
+  .sev.L  { background: rgba(251,191,36,0.15); color: var(--warn); }
+  .sev.M  { background: rgba(110,168,255,0.15); color: var(--accent); }
+  .sev.S  { background: rgba(74,222,128,0.15); color: var(--good); }
+  .id { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; flex-shrink: 0; min-width: 38px; }
+  .desc { flex: 1; }
+  .ticket { color: var(--accent); text-decoration: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; margin-left: 6px; }
+  .tag { display: inline-block; font-size: 10px; padding: 1px 5px; border-radius: 3px; background: var(--panel-2); color: var(--muted); margin-left: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .tag.red { background: rgba(239,68,68,0.15); color: var(--red); }
+
+  /* Trending groups */
+  .group { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; margin-bottom: 12px; }
+  .group-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .group-title { font-size: 14px; font-weight: 600; }
+  .group-count { font-size: 11px; padding: 3px 8px; background: var(--panel-2); border-radius: 12px; color: var(--muted); font-weight: 600; }
+  .group-count.hot { background: rgba(248,113,113,0.15); color: var(--bad); }
+
+  /* Positives */
+  .positive li { border-left: 3px solid var(--good); }
+  .check { color: var(--good); flex-shrink: 0; }
+
+  /* Set badges */
+  .set { font-size: 10px; padding: 1px 6px; border-radius: 3px; background: var(--panel-2); color: var(--muted); margin-left: 6px; letter-spacing: 0.04em; }
+
+  /* Pie chart */
+  .chart-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 22px; margin-bottom: 22px; display: flex; align-items: center; gap: 32px; flex-wrap: wrap; }
+  .donut { position: relative; width: 180px; height: 180px; flex-shrink: 0; border-radius: 50%; background: conic-gradient(var(--bad) 0 22.7%, var(--warn) 22.7% 61.3%, var(--accent) 61.3% 68.1%, var(--good) 68.1% 100%); }
+  .donut::after { content: ""; position: absolute; inset: 32px; background: var(--panel); border-radius: 50%; }
+  .donut .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; }
+  .donut .center b { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .donut .center span { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .legend { flex: 1; min-width: 220px; }
+  .legend-title { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 12px; }
+  .legend-item { display: flex; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .legend-item:last-child { border-bottom: none; }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; margin-right: 10px; flex-shrink: 0; }
+  .swatch.xl { background: var(--bad); }
+  .swatch.l  { background: var(--warn); }
+  .swatch.m  { background: var(--accent); }
+  .swatch.s  { background: var(--good); }
+  .legend-item .name { flex: 1; font-weight: 500; }
+  .legend-item .val { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--muted); }
+  .legend-item .pct { font-weight: 600; margin-left: 12px; min-width: 44px; text-align: right; }
+
+  /* Bullet summary */
+  ul.bullets { list-style: none; padding: 0; margin: 0; }
+  ul.bullets li { position: relative; padding: 6px 0 6px 22px; font-size: 13.5px; }
+  ul.bullets li::before { content: ""; position: absolute; left: 6px; top: 14px; width: 5px; height: 5px; border-radius: 50%; background: var(--muted); }
+  ul.bullets li.hot::before { background: var(--bad); }
+  ul.bullets li.warn::before { background: var(--warn); }
+  ul.bullets li.good::before { background: var(--good); }
+  ul.bullets li b { color: var(--text); }
+  .sub-list { margin: 4px 0 0; padding-left: 6px; }
+  .sub-list li { padding: 3px 0 3px 22px; color: var(--muted); font-size: 12.5px; }
+  .sub-list li::before { width: 4px; height: 4px; background: var(--border); top: 12px; }
+
+  /* KV table */
+  .kv { display: grid; grid-template-columns: 180px 1fr; gap: 4px 16px; font-size: 13px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+
+  @media (max-width: 720px) {
+    .ratings { grid-template-columns: 1fr; }
+    .kv { grid-template-columns: 1fr; gap: 2px; }
+    .kv dd { margin-bottom: 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <header class="hdr">
+    <div class="eyebrow">PMB HR Drive Summary</div>
+    <h1>Main HR — SF Sunset — 07/21/26</h1>
+    <div class="meta">
+      <span><b>Build:</b> <code>46470229.1</code></span>
+      <span><b>Test ID:</b> 174-745</span>
+      <span><b>Sets:</b> 2</span>
+    </div>
+    <dl class="kv" style="margin-top: 14px;">
+      <dt>Set 1 (ds-1)</dt><dd>3c937dbc-745f-4090-b4bf-bb2579283508</dd>
+      <dt>Set 2 (ds-2)</dt><dd>9d5f3cf7-64be-4331-9e01-9cc32ca592c7</dd>
+    </dl>
+  </header>
+
+  <!-- Rating cards -->
+  <div class="ratings">
+    <div class="card good">
+      <div class="label">Comfort</div>
+      <div class="score">4<span>/5</span></div>
+      <div class="note">Minor pulse brakes and slightly jerky turns — acceptable overall.</div>
+    </div>
+    <div class="card warn">
+      <div class="label">Safety</div>
+      <div class="score">3<span>/5</span></div>
+      <div class="note">One aggressive RoR with cross traffic moving; one RoR without full stop; CVC-violating understeer into middle lane.</div>
+    </div>
+    <div class="card good">
+      <div class="label">Positive Scenarios</div>
+      <div class="score">15<span> events</span></div>
+      <div class="note">Good yield/RoR (7) · nudge & obstacle (5) · sharp turn / special maneuver (3).</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-panel="overview">Overview</button>
+    <button class="tab" data-panel="top">Top Issues <span class="count">8</span></button>
+    <button class="tab" data-panel="other">Secondary Issues <span class="count">4</span></button>
+    <button class="tab" data-panel="trending">Trending <span class="count">24</span></button>
+    <button class="tab" data-panel="positives">Positive Scenarios <span class="count">15</span></button>
+  </nav>
+
+  <!-- Overview -->
+  <section class="panel active" id="overview">
+    <h3>Event severity distribution</h3>
+    <div class="chart-wrap">
+      <div class="donut" role="img" aria-label="Pie chart: XL 10, L 17, M 3, S 14">
+        <div class="center"><b>44</b><span>events</span></div>
+      </div>
+      <div class="legend">
+        <div class="legend-title">Severity breakdown</div>
+        <div class="legend-item"><span class="swatch xl"></span><span class="name">XL</span><span class="val">10 events</span><span class="pct">22.7%</span></div>
+        <div class="legend-item"><span class="swatch l"></span><span class="name">L</span><span class="val">17 events</span><span class="pct">38.6%</span></div>
+        <div class="legend-item"><span class="swatch m"></span><span class="name">M</span><span class="val">3 events</span><span class="pct">6.8%</span></div>
+        <div class="legend-item"><span class="swatch s"></span><span class="name">S (positive)</span><span class="val">14 events</span><span class="pct">31.8%</span></div>
+      </div>
+    </div>
+
+    <h3>Summary</h3>
+    <ul class="bullets">
+      <li>Overall control was comfortable with minor issues (small pulse brakes, fish hook turns, slightly jerky turns) — <b>acceptable level</b>.</li>
+      <li class="hot"><b>Biggest problem:</b> getting stuck with parallel and perpendicularly parked vehicles on multiple occasions.</li>
+      <li class="warn">Multiple understeer / wobbly RT landings in wrong lanes.</li>
+      <li class="warn">One aggressive RoR where cross traffic began moving — would have been nice to wait but not too bad; <b>no intervention needed</b>.</li>
+      <li>One instance of under-speed on residential road segment.</li>
+      <li class="hot">One bad ghost brake during RT with contender close behind entering Golden Gate Park.</li>
+      <li class="good"><b>Improvements observed</b> in areas where we had issues before:
+        <ul class="sub-list">
+          <li>Going into GGP from Lincoln Ave and out to Lincoln Ave</li>
+          <li>No routing issues in Forest Hill despite odd road geometry</li>
+          <li>Good yield to oncoming vehicles at narrow corridor</li>
+        </ul>
+      </li>
+      <li class="warn">Still have a <b>false-positive stop sign</b> at GGP where ego stops inside junction.</li>
+      <li><b>Minor:</b> slight fish hook turns — observed since last week.</li>
+    </ul>
+  </section>
+
+  <!-- Top Issues -->
+  <section class="panel" id="top">
+    <h3>Set 1 <span class="set">ds-1</span></h3>
+    <ul class="events">
+      <li><span class="sev XL">XL</span><span class="id">B3</span><span class="desc">RoR into middle lane with traffic approaching but slowly <a class="ticket" href="#">AVDRIS-708555</a></span></li>
+      <li><span class="sev XL">XL</span><span class="id">B12</span><span class="desc">Stuck behind parked car right during RT <span class="tag">APTO</span><span class="tag">narrow road</span> <a class="ticket" href="#">AVDRIS-708552</a></span></li>
+      <li><span class="sev XL">XL</span><span class="id">B14</span><span class="desc">Stopped behind parked car right then proceeded <a class="ticket" href="#">AVDRIS-708556</a></span></li>
+      <li><span class="sev XL">XL</span><span class="id">B20</span><span class="desc">Ping pong before RT — no full stop at red light <span class="tag">map</span><span class="tag">LIT</span> <a class="ticket" href="#">AVDRIS-708561</a></span></li>
+      <li><span class="sev XL">XL</span><span class="id">B25</span><span class="desc">Stuck behind parked car on right with enough clearance to proceed <span class="tag">APTO</span></span></li>
+      <li><span class="sev XL">XL</span><span class="id">B30</span><span class="desc">Stuck behind angled parked vehicle on right <span class="tag">APTO</span><span class="tag red">TOP</span> <a class="ticket" href="#">AVDRIS-708525</a></span></li>
+      <li><span class="sev XL">XL</span><span class="id">B35</span><span class="desc">Stuck behind perpendicular parked car <span class="tag red">TOP</span> <a class="ticket" href="#">AVDRIS-708518</a></span></li>
+    </ul>
+
+    <h3>Set 2 <span class="set">ds-2</span></h3>
+    <ul class="events">
+      <li><span class="sev XL">XL</span><span class="id">W3</span><span class="desc">Ghost brake during RT with contender behind <a class="ticket" href="#">AVDRIS-708553</a></span></li>
+    </ul>
+  </section>
+
+  <!-- Secondary Issues -->
+  <section class="panel" id="other">
+    <h3>Secondary issues</h3>
+    <ul class="events">
+      <li><span class="sev XL">XL</span><span class="id">B37</span><span class="desc">Ghost brake to stop with VRU cyclist behind — route ended? <span class="set">Set 1</span></span></li>
+      <li><span class="sev L">L</span><span class="id">W17</span><span class="desc">Underspeed in residential roads <span class="set">Set 2</span></span></li>
+      <li><span class="sev L">L</span><span class="id">B40</span><span class="desc">Heavy oversteer into oncoming lane <span class="tag">map</span><span class="set">Set 1</span></span></li>
+      <li><span class="sev XL">XL</span><span class="id">W7</span><span class="desc">FN speed bump <span class="set">Set 2</span> <a class="ticket" href="#">AVDRIS-708482</a></span></li>
+    </ul>
+  </section>
+
+  <!-- Trending -->
+  <section class="panel" id="trending">
+    <div class="group">
+      <div class="group-head">
+        <span class="group-title">Stuck behind parked / perpendicular vehicles</span>
+        <span class="group-count hot">6 instances</span>
+      </div>
+      <ul class="events">
+        <li><span class="sev XL">XL</span><span class="id">B12</span><span class="desc">Stuck behind parked car right during RT <span class="tag">APTO</span><span class="tag">narrow</span><span class="set">Set 1</span> <a class="ticket" href="#">AVDRIS-708552</a></span></li>
+        <li><span class="sev XL">XL</span><span class="id">B14</span><span class="desc">Stopped behind parked car right then proceeded <span class="set">Set 1</span> <a class="ticket" href="#">AVDRIS-708556</a></span></li>
+        <li><span class="sev XL">XL</span><span class="id">B25</span><span class="desc">Stuck behind parked car right — enough clearance <span class="tag">APTO</span><span class="set">Set 1</span></span></li>
+        <li><span class="sev XL">XL</span><span class="id">B30</span><span class="desc">Stuck behind angled parked vehicle <span class="tag">APTO</span><span class="tag red">TOP</span><span class="set">Set 1</span> <a class="ticket" href="#">AVDRIS-708525</a></span></li>
+        <li><span class="sev XL">XL</span><span class="id">B35</span><span class="desc">Stuck behind perpendicular parked car <span class="tag red">TOP</span><span class="set">Set 1</span> <a class="ticket" href="#">AVDRIS-708518</a></span></li>
+        <li><span class="sev L">L</span><span class="id">B36</span><span class="desc">Very hesitant to proceed past perpendicularly parked car <span class="tag">LIT</span><span class="set">Set 1</span></span></li>
+      </ul>
+    </div>
+
+    <div class="group">
+      <div class="group-head">
+        <span class="group-title">Understeer / oversteer on turns</span>
+        <span class="group-count hot">7 instances</span>
+      </div>
+      <ul class="events">
+        <li><span class="sev L">L</span><span class="id">B6</span><span class="desc">Understeer LT landing at odd angle before consecutive LT <span class="set">Set 1</span></span></li>
+        <li><span class="sev L">L</span><span class="id">B7</span><span class="desc">Wobbly understeer RT <span class="set">Set 1</span></span></li>
+        <li><span class="sev L">L</span><span class="id">B18</span><span class="desc">Understeer invading bike lane with VRU on scooter <span class="set">Set 1</span></span></li>
+        <li><span class="sev M">M</span><span class="id">B27</span><span class="desc">Understeer LT <span class="set">Set 1</span></span></li>
+        <li><span class="sev L">L</span><span class="id">B31</span><span class="desc">Understeer RT enters middle lane <span class="tag red">CVC violation</span><span class="set">Set 1</span></span></li>
+        <li><span class="sev L">L</span><span class="id">W11</span><span class="desc">Understeer right on red <span class="set">Set 2</span></span></li>
+        <li><span class="sev L">L</span><span class="id">W18</span><span class="desc">Understeer <span class="set">Set 2</span> <a class="ticket" href="#">AVDRIS-708524</a></span></li>
+      </ul>
+    </div>
+
+    <div class="group">
+      <div class="group-head">
+        <span class="group-title">Ghost braking</span>
+        <span class="group-count">4 instances</span>
+      </div>
+      <ul class="events">
+        <li><span class="sev XL">XL</span><span class="id">B37</span><span class="desc">Ghost brake to stop with VRU cyclist behind — route ended? <span class="set">Set 1</span></span></li>
+        <li><span class="sev XL">XL</span><span class="id">W3</span><span class="desc">Ghost brake during RT with contender behind <span class="set">Set 2</span> <a class="ticket" href="#">AVDRIS-708553</a></span></li>
+        <li><span class="sev L">L</span><span class="id">W15</span><span class="desc">Ghost brake during DRT <span class="set">Set 2</span></span></li>
+        <li><span class="sev L">L</span><span class="id">W24</span><span class="desc">Ghost brake and jerk left passing perpendicular parked car <span class="set">Set 2</span></span></li>
+      </ul>
+    </div>
+
+    <div class="group">
+      <div class="group-head">
+        <span class="group-title">Fishhook / jerky turns</span>
+        <span class="group-count">4 instances</span>
+      </div>
+      <ul class="events">
+        <li><span class="sev M">M</span><span class="id">B5</span><span class="desc">Jerky during S-turn <span class="set">Set 1</span></span></li>
+        <li><span class="sev L">L</span><span class="id">B19</span><span class="desc">Fishhook RoR with pulse braking <span class="tag">LIT</span><span class="set">Set 1</span></span></li>
+        <li><span class="sev L">L</span><span class="id">W12</span><span class="desc">Jerky turn aborts — last second rerouting <span class="set">Set 2</span></span></li>
+        <li><span class="sev L">L</span><span class="id">W13</span><span class="desc">Slight fishhook before right turn <span class="set">Set 2</span></span></li>
+      </ul>
+    </div>
+
+    <div class="group">
+      <div class="group-head">
+        <span class="group-title">Hesitation at intersections / AWS</span>
+        <span class="group-count">3 instances</span>
+      </div>
+      <ul class="events">
+        <li><span class="sev M">M</span><span class="id">B2</span><span class="desc">Hesitant at AWS <span class="set">Set 1</span></span></li>
+        <li><span class="sev L">L</span><span class="id">B29</span><span class="desc">Hesitant at AWS <span class="tag">LIT</span><span class="set">Set 1</span></span></li>
+        <li><span class="sev L">L</span><span class="id">W26</span><span class="desc">Stuck at stop sign with ped too close stationary <span class="tag">APTO</span><span class="set">Set 2</span></span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Positives -->
+  <section class="panel" id="positives">
+    <h3>Maneuver types executed well</h3>
+    <ul class="bullets">
+      <li class="good"><b>Yield / RoR / proceed</b> (7) — AWS with creeping oncoming, narrow-corridor yielding, yield to oncoming cyclist, yield during RT on downhill, proceed with Waymo reversing, cross-traffic cut-in, FN pedestrian yield.</li>
+      <li class="good"><b>Nudge & obstacle handling</b> (5) — natural slowdown for perpendicular car clearing, residential curvature at Forest Hill, nudge for reverse-parking vehicle, nudge for cones, turn abort in heavy traffic.</li>
+      <li class="good"><b>Sharp turn / special maneuver</b> (3) — sharp left at previously problematic location, pullout in L2PP with recovery, DILC.</li>
+    </ul>
+
+    <div class="group">
+      <div class="group-head">
+        <span class="group-title">Good yield / RoR / proceed</span>
+        <span class="group-count">7 instances</span>
+      </div>
+      <ul class="events positive">
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">B8</span><span class="desc">Good proceed at AWS with oncoming creeping but stopped contender <span class="set">Set 1</span></span></li>
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">B15</span><span class="desc">Good yield to oncoming in narrow corridor <span class="set">Set 1</span></span></li>
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">B21</span><span class="desc">Good yield to oncoming cyclist <span class="set">Set 1</span></span></li>
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">B23</span><span class="desc">Good yield during RT with oncoming downhill <span class="set">Set 1</span></span></li>
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">B24</span><span class="desc">Good proceed with Waymo reversing to yield — interesting case <span class="set">Set 1</span></span></li>
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">W14</span><span class="desc">Good handling of cross-traffic cut-in <span class="set">Set 2</span></span></li>
+        <li><span class="check">✓</span><span class="sev L">L</span><span class="id">W22</span><span class="desc">FN yield to ped entering CW — enough time to make it through but better to yield <span class="set">Set 2</span></span></li>
+      </ul>
+    </div>
+
+    <div class="group">
+      <div class="group-head">
+        <span class="group-title">Good nudge / obstacle handling</span>
+        <span class="group-count">5 instances</span>
+      </div>
+      <ul class="events positive">
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">B13</span><span class="desc">Good natural slowdown for perpendicular car clearing out of path <span class="set">Set 1</span></span></li>
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">B16</span><span class="desc">Good proceed on residential — curvature and narrow corridor at Forest Hill <span class="set">Set 1</span></span></li>
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">W1</span><span class="desc">Good nudge for reverse parking vehicle <span class="set">Set 2</span></span></li>
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">W25</span><span class="desc">Good nudge for cones <span class="set">Set 2</span></span></li>
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">B32</span><span class="desc">Good turn abort since a lot of traffic in right lane <span class="set">Set 1</span></span></li>
+      </ul>
+    </div>
+
+    <div class="group">
+      <div class="group-head">
+        <span class="group-title">Good sharp turn / special maneuver</span>
+        <span class="group-count">3 instances</span>
+      </div>
+      <ul class="events positive">
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">W5</span><span class="desc">Good sharp left — previously a problem here <span class="set">Set 2</span></span></li>
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">W27</span><span class="desc">Good pullout in L2PP — strange recovery afterward (oversteer then correction) <span class="set">Set 2</span></span></li>
+        <li><span class="check">✓</span><span class="sev S">S</span><span class="id">W29</span><span class="desc">Good DILC <span class="set">Set 2</span></span></li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  tabs.forEach(t => {
+    t.addEventListener('click', () => {
+      const target = t.dataset.panel;
+      tabs.forEach(x => x.classList.toggle('active', x === t));
+      panels.forEach(p => p.classList.toggle('active', p.id === target));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
